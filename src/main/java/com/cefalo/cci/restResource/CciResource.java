@@ -1,6 +1,6 @@
 package com.cefalo.cci.restResource;
 
-import com.cefalo.cci.utility.Utils;
+import com.cefalo.cci.utils.Utils;
 import com.sun.jersey.api.view.Viewable;
 
 import javax.ws.rs.GET;
