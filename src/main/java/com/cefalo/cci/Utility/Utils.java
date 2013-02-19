@@ -1,4 +1,4 @@
-package com.cefalo.cci.Utility;
+package com.cefalo.cci.utility;
 
 import java.util.Arrays;
 import java.util.HashMap;
