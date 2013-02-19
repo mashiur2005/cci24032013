@@ -26,7 +26,17 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("/");
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
         String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
-        System.out.println("testing..........." + responseString);
+        System.out.println("testing Organization List..........." + responseString);
+        assertEquals(200, clientResponse.getStatus());
+        assertNotNull(responseString);
+    }
+
+    @Test
+    public void getOrganizationTest() {
+        ws = resource().path(BASE_URL).path("/Polaris");
+        ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
+        System.out.println("testing Organization..........." + responseString);
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
     }

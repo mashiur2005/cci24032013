@@ -10,7 +10,7 @@
 <body>
 <ul class="organizations">
     <c:forEach items="${it.organizations}" var="organization">
-        <li><a href="${fn:toLowerCase(organization)}">${organization}</a></li>
+        <li><a href="${organization}">${organization}</a></li>
     </c:forEach>
 </ul>
 </body>
