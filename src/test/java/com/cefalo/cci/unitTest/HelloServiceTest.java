@@ -1,5 +1,6 @@
-package com.cefalo.cci.service;
+package com.cefalo.cci.unitTest;
 
+import com.cefalo.cci.service.HelloService;
 import com.google.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;

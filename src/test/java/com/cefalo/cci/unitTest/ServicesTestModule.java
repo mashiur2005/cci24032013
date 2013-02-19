@@ -1,5 +1,7 @@
-package com.cefalo.cci.service;
+package com.cefalo.cci.unitTest;
 
+import com.cefalo.cci.service.HelloService;
+import com.cefalo.cci.service.HelloServiceImpl;
 import com.google.inject.AbstractModule;
 
 public class ServicesTestModule extends AbstractModule {

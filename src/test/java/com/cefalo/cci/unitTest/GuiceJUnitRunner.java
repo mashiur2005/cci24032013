@@ -1,4 +1,4 @@
-package com.cefalo.cci.service;// GuiceJunitRunner.java, created by Fabio Strozzi on Mar 27, 2011
+package com.cefalo.cci.unitTest;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

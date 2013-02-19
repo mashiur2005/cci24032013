@@ -1,12 +1,14 @@
 package com.cefalo.cci.restResource;
 
+import com.cefalo.cci.testUtils.TestHelper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import org.junit.Test;
-
+import org.w3c.dom.NodeList;
 import javax.ws.rs.core.MediaType;
+import javax.xml.xpath.XPathExpressionException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -36,8 +38,10 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("/Polaris");
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
         String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
-        System.out.println("testing Organization..........." + responseString);
+        NodeList nodeList = (NodeList) TestHelper.getNodeList("//li", responseString);
+
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
+        assertEquals(2, nodeList.getLength());
     }
 }
