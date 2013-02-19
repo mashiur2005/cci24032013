@@ -5,6 +5,7 @@ import com.sun.jersey.api.view.Viewable;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,4 +23,15 @@ public class CciResource {
         model.put("organizations", organizations);
         return Response.ok(new Viewable("/organizationList", model)).build();
     }
+
+    @GET
+    @Path("/{organization}")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getOrganization(@PathParam("organization") String organization) {
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("organization", organization);
+        model.put("publications", Utils.ORGANIZATION_DETAILS.get(organization));
+        return Response.ok(new Viewable("/organization", model)).build();
+    }
+
 }
