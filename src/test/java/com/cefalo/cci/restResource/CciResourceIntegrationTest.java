@@ -7,8 +7,8 @@ import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import org.junit.Test;
 import org.w3c.dom.NodeList;
+
 import javax.ws.rs.core.MediaType;
-import javax.xml.xpath.XPathExpressionException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -27,10 +27,12 @@ public class CciResourceIntegrationTest extends JerseyTest{
     public void getOrganizationListTest() {
         ws = resource().path(BASE_URL).path("/");
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
-        System.out.println("testing Organization List..........." + responseString);
+        String responseHtml = ws.accept(MediaType.TEXT_HTML).get(String.class);
+        NodeList nodeList = (NodeList) TestHelper.getNodeList("//li", responseHtml);
+
         assertEquals(200, clientResponse.getStatus());
-        assertNotNull(responseString);
+        assertNotNull(responseHtml);
+        assertEquals(3, nodeList.getLength());
     }
 
     @Test
