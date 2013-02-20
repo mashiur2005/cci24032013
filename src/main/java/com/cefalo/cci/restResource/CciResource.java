@@ -2,6 +2,8 @@ package com.cefalo.cci.restResource;
 
 import com.cefalo.cci.utils.Utils;
 import com.sun.jersey.api.view.Viewable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,6 +17,8 @@ import java.util.Set;
 
 @Path("/")
 public class CciResource {
+    private static final Logger log = LoggerFactory.getLogger(CciResource.class);
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response getOrganizationList() {
@@ -28,6 +32,7 @@ public class CciResource {
     @Path("/{organization}")
     @Produces(MediaType.TEXT_HTML)
     public Response getOrganization(@PathParam("organization") String organization) {
+        log.info("Log Working.................");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("organization", organization);
         model.put("publications", Utils.ORGANIZATION_DETAILS.get(organization));
