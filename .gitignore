@@ -9,3 +9,8 @@ target
 *.iml
 *.ipr
 *.iws
+
+# Eclipse IDE specific files #
+.settings
+.classpath
+.project
