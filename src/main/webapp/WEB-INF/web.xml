@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="WebApp_ID" version="2.5">
 
-    <display-name>CciDistributionService</display-name>
+    <display-name>CCI Distribution Service</display-name>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
@@ -19,23 +19,5 @@
     <listener>
         <listener-class>com.cefalo.cci.listener.ServletContextListener</listener-class>
     </listener>
-
-    <!-- ===================================================================== -->
-    <!--   TAG Library Definitions                                             -->
-    <!-- ===================================================================== -->
-
-    <jsp-config>
-        <taglib>
-            <taglib-uri>/c.tld</taglib-uri>
-            <taglib-location>/WEB-INF/tld/c.tld</taglib-location>
-        </taglib>
-
-        <taglib>
-            <taglib-uri>/fmt.tld</taglib-uri>
-            <taglib-location>/WEB-INF/tld/fmt.tld</taglib-location>
-        </taglib>
-    </jsp-config>
-
-
-
+    
 </web-app>
