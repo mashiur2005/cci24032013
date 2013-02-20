@@ -4,9 +4,9 @@
     <groupId>com.cefalo</groupId>
     <artifactId>ccidist</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <name>CCI Distribution Service</name>
-    <url>http://maven.apache.org</url>
+    <url>http://www.cefalo.no/</url>
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -112,7 +112,6 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>DistributionService</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -128,6 +127,8 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>8.1.9.v20130131</version>
                 <configuration>
+                	<stopPort>9000</stopPort>
+              		<stopKey>stopJetty</stopKey>
                     <webApp>
                         <contextPath>/cciService</contextPath>
                     </webApp>
@@ -171,6 +172,7 @@
             <!--maven jetty integration test plugin start-->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.10</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*IntegrationTest*.java</exclude>
