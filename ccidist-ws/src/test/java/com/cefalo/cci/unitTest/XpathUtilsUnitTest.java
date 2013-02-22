@@ -20,20 +20,20 @@ public class XpathUtilsUnitTest {
     public void getNodeListFromHtmlTest() {
         String fileStr = readFileAsString("/test.html");
 
-        String expression = "html/body/table[@id='table']/tr[@id='tr1']/ul[@class='organizations']/li";
+        String expression = "html/body/table[@id='table']/tr[@id='tr1']/td/ul[@class='organizations']/li";
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml(expression, fileStr);
         assertEquals(3, nodeList.getLength());
 
-        String linkExpression = "html/body/table[@id='table']/tr[@id='tr2']/ul[@class='organizations']/li";
+        String linkExpression = "html/body/table[@id='table']/tr[@id='tr2']/td/ul[@class='organizations']/li";
         NodeList linkNodeList = (NodeList) xpathUtils.getNodeListFromHtml(linkExpression, fileStr);
         assertEquals(4, linkNodeList.getLength());
 
-        String emptyCheck = "html/body/table[@id='table']/tr[@id='tr3']/ul[@class='organizations']/li";
+        String emptyCheck = "html/body/table[@id='table']/tr[@id='tr3']/td/ul[@class='organizations']/li";
         NodeList emptyList = (NodeList) xpathUtils.getNodeListFromHtml(emptyCheck, fileStr);
         assertEquals(0, emptyList.getLength());
 
         String exceptNameSpcStr = readFileAsString("/testWithoutNameSpaceTest.html");
-        String exceptNameSpcExp = "html/body/table[@id='table']/tr[@id='tr1']/ul[@class='organizations']/li";
+        String exceptNameSpcExp = "html/body/table[@id='table']/tr[@id='tr1']/td/ul[@class='organizations']/li";
         NodeList exceptNameSpcNodeList = (NodeList) xpathUtils.getNodeListFromHtml(exceptNameSpcExp, exceptNameSpcStr);
         assertEquals(3, exceptNameSpcNodeList.getLength());
 
