@@ -7,6 +7,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head><title>Organization</title></head>
 <body>
+<h1>Organization</h1>
+<h3>${it.organization}</h3>
 <ul class="organization">
     <c:forEach items="${it.publications}" var="publication">
         <li><a href="${it.organization}/${publication}">${publication}</a></li>

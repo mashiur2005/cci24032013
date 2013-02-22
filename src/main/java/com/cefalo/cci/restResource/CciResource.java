@@ -31,7 +31,7 @@ public class CciResource {
     @GET
     @Path("/{organization}")
     @Produces(MediaType.TEXT_HTML)
-    public Response getOrganization(@PathParam("organization") String organization) {
+    public Response getOrganizationDetail(@PathParam("organization") String organization) {
         log.info("Log Working.................");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("organization", organization);
@@ -39,4 +39,13 @@ public class CciResource {
         return Response.ok(new Viewable("/organization", model)).build();
     }
 
+    @GET
+    @Path("/{organization}/{publication}")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getPublicationDetail(@PathParam("organization") String organization, @PathParam("publication") String publication) {
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("organization", organization);
+        model.put("publication", publication);
+        return Response.ok(new Viewable("/publication", model)).build();
+    }
 }

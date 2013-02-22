@@ -9,6 +9,7 @@
     <title>Organization List</title>
 </head>
 <body>
+<h1>Organization List</h1>
 <ul class="organizations">
     <c:forEach items="${it.organizations}" var="organization">
         <li><a href="${organization}">${organization}</a></li>

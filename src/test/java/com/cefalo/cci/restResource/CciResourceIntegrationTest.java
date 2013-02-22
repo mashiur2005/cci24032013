@@ -51,10 +51,13 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
     @Test
     public void getOrganizationTest() {
-        ws = resource().path(BASE_URL).path("/Polaris/$#@");
+
+/*
+        ws = resource().path(BASE_URL).path("/Polaris$#@");
         ClientResponse notFoundClientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
 
         assertEquals(404, notFoundClientResponse.getStatus());
+*/
 
         ws = resource().path(BASE_URL).path("/Polaris");
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
@@ -74,4 +77,17 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
         assertEquals(actualList, expectedList);
     }
+
+    @Test
+    public void getPublicationTest() {
+        ws = resource().path(BASE_URL).path("/Polaris/Addressa");
+        ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
+
+        assertEquals(200, clientResponse.getStatus());
+        assertNotNull(responseString);
+        assertEquals(1, nodeList.getLength());
+    }
+
 }
