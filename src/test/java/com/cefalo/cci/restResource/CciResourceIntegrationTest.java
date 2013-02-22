@@ -10,12 +10,11 @@ import org.junit.Test;
 import org.w3c.dom.NodeList;
 
 import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 
 public class CciResourceIntegrationTest extends JerseyTest{
     private static final String BASE_URL = "/cciService";
@@ -40,14 +39,14 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertNotNull(responseHtml);
         assertEquals(3, nodeList.getLength());
 
-        boolean contains = true;
+        List<String> actualList= new ArrayList<String>(Utils.ORGANIZATION_DETAILS.keySet());
+        List<String> expectedList = new ArrayList<String>();
+
         for (int i = 0; i < nodeList.getLength(); i++) {
-            if (!Utils.ORGANIZATION_DETAILS.containsKey(nodeList.item(i).getTextContent())) {
-                contains = false;
-            }
+            expectedList.add(nodeList.item(i).getTextContent());
         }
 
-        assertTrue(contains);
+        assertEquals(actualList, expectedList);
     }
 
     @Test
@@ -65,5 +64,14 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
         assertEquals(2, nodeList.getLength());
+
+        List<String> actualList= new ArrayList<String>(Utils.ORGANIZATION_DETAILS.get("Polaris"));
+        List<String> expectedList = new ArrayList<String>();
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            expectedList.add(nodeList.item(i).getTextContent());
+        }
+
+        assertEquals(actualList, expectedList);
     }
 }
