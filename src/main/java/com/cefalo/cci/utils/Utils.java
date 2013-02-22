@@ -8,6 +8,7 @@ import java.util.Map;
 public class Utils {
 
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
+    public static String HOME_DIR = System.getProperty("user.home");
 
     static {
          ORGANIZATION_DETAILS.put("Polaris", Arrays.asList("Addressa", "Harstadtidende"));
