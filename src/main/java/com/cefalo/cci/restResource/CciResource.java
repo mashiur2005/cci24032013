@@ -5,7 +5,9 @@ import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.utils.Utils;
 import com.google.inject.Inject;
 import com.sun.jersey.api.view.Viewable;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Util;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,9 @@ public class CciResource {
     @Path("/{organization}")
     @Produces(MediaType.TEXT_HTML)
     public Response getOrganizationDetail(@PathParam("organization") String organization) {
+        if (!Utils.ORGANIZATION_DETAILS.containsKey(organization)) {
+            return Response.status(404).build();
+        }
         log.info("Log Working.................");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("organization", organization);
@@ -73,4 +78,29 @@ public class CciResource {
         model.put("issue", issue);
         return Response.ok(new Viewable("/issueDetail", model)).build();
     }
+
+    @GET
+    @Path("/{organization}/{publication}/issues")
+    @Produces(MediaType.APPLICATION_ATOM_XML)
+    public Response getIssueList(@PathParam("organization") String organizationName, @PathParam("publication") String publicationName) {
+        if (!Utils.ORGANIZATION_DETAILS.containsKey(organizationName) || !Utils.ORGANIZATION_DETAILS.get(organizationName).contains(publicationName)) {
+            return Response.status(404).build();
+        }
+
+        String feedType = "atom_0.3";
+        String fileDir = Utils.FILE_BASE_PATH + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName;
+
+        SyndFeed feed = cciService.getIssueAsAtomFeed(feedType, organizationName, publicationName, fileDir);
+
+        SyndFeedOutput output = new SyndFeedOutput();
+        String responseString = null;
+        try {
+            responseString = output.outputString(feed);
+        } catch (FeedException e) {
+            e.printStackTrace();
+        }
+
+        return Response.ok(responseString).build();
+    }
+
 }

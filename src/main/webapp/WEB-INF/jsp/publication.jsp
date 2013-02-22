@@ -8,7 +8,6 @@
 <h1>Publication</h1>
 
 <h3>${it.publication}</h3>
-
 <div>
     <span>Issue Search:</span>
 

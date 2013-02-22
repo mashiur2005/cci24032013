@@ -1,5 +1,7 @@
 package com.cefalo.cci.restResource;
 
+import com.cefalo.cci.service.CciService;
+import com.cefalo.cci.service.CciServiceImpl;
 import com.cefalo.cci.utils.Utils;
 import com.cefalo.cci.utils.XpathUtils;
 import com.sun.jersey.api.client.ClientResponse;
@@ -22,10 +24,12 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
     private WebResource ws;
     private XpathUtils xpathUtils;
+    private CciService cciService;
 
     public CciResourceIntegrationTest() {
         super(new WebAppDescriptor.Builder(PACKAGE_NAME).build());
         xpathUtils = new XpathUtils();
+        cciService = new CciServiceImpl();
     }
 
     @Test
@@ -47,17 +51,19 @@ public class CciResourceIntegrationTest extends JerseyTest{
         }
 
         assertEquals(actualList, expectedList);
+
+        ws = resource().path(BASE_URL).path("@#&*/");
+        clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+
+        assertEquals(404, clientResponse.getStatus());
     }
 
     @Test
     public void getOrganizationTest() {
-
-/*
         ws = resource().path(BASE_URL).path("/Polaris$#@");
         ClientResponse notFoundClientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
 
         assertEquals(404, notFoundClientResponse.getStatus());
-*/
 
         ws = resource().path(BASE_URL).path("/Polaris");
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
@@ -88,9 +94,6 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
 
-        ws = resource().path(BASE_URL).path("/Polaris/Addressa/issueList");
-        ClientResponse notFoundResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        assertEquals(404, notFoundResponse.getStatus());
     }
 
     @Test
@@ -117,6 +120,25 @@ public class CciResourceIntegrationTest extends JerseyTest{
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
         assertEquals("accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
         assertEquals("accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
+    }
+
+    @Test
+    public void getIssueList() {
+        String organizationName = "Polaris";
+        String publicationName = "Addressa";
+        ws = resource().path(BASE_URL).path(organizationName).path(publicationName).path("/issues");
+        ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        assertEquals(200, clientResponse.getStatus());
+
+        String responseString = ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
+        assertNotNull(responseString);
+
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        assertEquals(cciService.getAllFileNamesInDirectory(Utils.FILE_BASE_PATH + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName).size(), nodeList.getLength());
+
+        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("/issues");
+        clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        assertEquals(404, clientResponse.getStatus());
     }
 
 }
