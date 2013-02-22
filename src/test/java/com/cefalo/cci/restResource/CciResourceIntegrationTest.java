@@ -90,4 +90,24 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(1, nodeList.getLength());
     }
 
+    @Test
+    public void getIssueTest() {
+        ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024/#@$");
+        ClientResponse notFoundResponse1 = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        assertEquals(404, notFoundResponse1.getStatus());
+
+        ws = resource().path(BASE_URL).path("/Polaris/Alex/accessible_epub_3-20121024/#@$");
+        ClientResponse notFoundResponse2 = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        assertEquals(404, notFoundResponse2.getStatus());
+
+        ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024");
+        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
+        ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
+
+        assertEquals(200, clientResponse.getStatus());
+        assertNotNull(responseString);
+        assertEquals(2, nodeList.getLength());
+    }
+
 }
