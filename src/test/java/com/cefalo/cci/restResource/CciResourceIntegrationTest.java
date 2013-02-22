@@ -81,33 +81,42 @@ public class CciResourceIntegrationTest extends JerseyTest{
     @Test
     public void getPublicationTest() {
         ws = resource().path(BASE_URL).path("/Polaris/Addressa");
-        ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
+        ClientResponse clientResponse;
 
+        clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
-        assertEquals(1, nodeList.getLength());
+
+        ws = resource().path(BASE_URL).path("/Polaris/Addressa/issueList");
+        ClientResponse notFoundResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        assertEquals(404, notFoundResponse.getStatus());
     }
 
     @Test
     public void getIssueTest() {
         ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024/#@$");
-        ClientResponse notFoundResponse1 = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        assertEquals(404, notFoundResponse1.getStatus());
+        ClientResponse notFoundResponse;
+        notFoundResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        assertEquals(404, notFoundResponse.getStatus());
 
         ws = resource().path(BASE_URL).path("/Polaris/Alex/accessible_epub_3-20121024/#@$");
-        ClientResponse notFoundResponse2 = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        assertEquals(404, notFoundResponse2.getStatus());
+        notFoundResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        assertEquals(404, notFoundResponse.getStatus());
 
         ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024");
         String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
+        NodeList nodeList;
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
 
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
         assertEquals(2, nodeList.getLength());
+
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
+        assertEquals("accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
+        assertEquals("accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
     }
 
 }
