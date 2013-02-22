@@ -7,8 +7,6 @@ import org.junit.runner.RunWith;
 import org.w3c.dom.NodeList;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,31 +18,57 @@ public class XpathUtilsUnitTest {
 
     @Test
     public void getNodeListFromHtmlTest() {
-        String testHtml = fileRead("/test.html");
-        Map<String, String> nameSpaceMap = new HashMap<String, String>();
-        nameSpaceMap.put("h", "http://www.w3.org/1999/xhtml");
+        String fileStr = readFileAsString("/test.html");
 
-        String expression = "h:html/h:body/h:table[@id='table']/h:tr[@id='tr1']/h:ul[@class='organizations']/h:li";
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml(expression, testHtml, nameSpaceMap);
+        String expression = "html/body/table[@id='table']/tr[@id='tr1']/ul[@class='organizations']/li";
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml(expression, fileStr);
         assertEquals(3, nodeList.getLength());
 
-        String linkExpression = "h:html/h:body/h:table[@id='table']/h:tr[@id='tr2']/h:ul[@class='organizations']/h:li";
-        NodeList linkNodeList = (NodeList) xpathUtils.getNodeListFromHtml(linkExpression, testHtml, nameSpaceMap);
+        String linkExpression = "html/body/table[@id='table']/tr[@id='tr2']/ul[@class='organizations']/li";
+        NodeList linkNodeList = (NodeList) xpathUtils.getNodeListFromHtml(linkExpression, fileStr);
         assertEquals(4, linkNodeList.getLength());
 
-        String emptyCheck = "h:html/h:body/h:table[@id='table1']/h:tr[@id='tr2']/h:ul[@class='organizations']/h:li";
-        NodeList emptyList = (NodeList) xpathUtils.getNodeListFromHtml(emptyCheck, testHtml, nameSpaceMap);
+        String emptyCheck = "html/body/table[@id='table']/tr[@id='tr3']/ul[@class='organizations']/li";
+        NodeList emptyList = (NodeList) xpathUtils.getNodeListFromHtml(emptyCheck, fileStr);
         assertEquals(0, emptyList.getLength());
 
-        String withoutNameSpaceHtml = fileRead("/testWithoutNameSpaceTest.html");
+        String exceptNameSpcStr = readFileAsString("/testWithoutNameSpaceTest.html");
+        String exceptNameSpcExp = "html/body/table[@id='table']/tr[@id='tr1']/ul[@class='organizations']/li";
+        NodeList exceptNameSpcNodeList = (NodeList) xpathUtils.getNodeListFromHtml(exceptNameSpcExp, exceptNameSpcStr);
+        assertEquals(3, exceptNameSpcNodeList.getLength());
 
-        String exp = "html/h:body/h:table[@id='table']/h:tr[@id='tr1']/h:ul[@class='organizations']/h:li";
-        NodeList nList = (NodeList) xpathUtils.getNodeListFromHtml(exp, withoutNameSpaceHtml, nameSpaceMap);
-        assertEquals(3, nList.getLength());
+        String atomFileStr = readFileAsString("/atom.xml");
+        String atomFileLinkExp = "feed/link";
+        NodeList atomLinkNodeList = (NodeList) xpathUtils.getNodeListFromHtml(atomFileLinkExp, atomFileStr);
+        assertEquals(4, atomLinkNodeList.getLength());
 
+        atomFileLinkExp = "feed/link/@rel";
+        atomLinkNodeList = (NodeList) xpathUtils.getNodeListFromHtml(atomFileLinkExp, atomFileStr);
+        assertEquals(4, atomLinkNodeList.getLength());
+
+        String atomFileEntryExp = "feed/entry";
+        NodeList atomEntryNodeList = (NodeList) xpathUtils.getNodeListFromHtml(atomFileEntryExp, atomFileStr);
+        assertEquals(3, atomEntryNodeList.getLength());
+
+        String publicationXhtml = readFileAsString("/publication.xhtml");
+        String deviceTypeExp = "html/body/dl/dd/ul/li";
+        NodeList deviceNodeList= (NodeList) xpathUtils.getNodeListFromHtml(deviceTypeExp, publicationXhtml);
+        assertEquals(3, deviceNodeList.getLength());
+        String linkTemplateExp = "html/body/dl/dd/link-template";
+        NodeList linkTemplateNodeList= (NodeList) xpathUtils.getNodeListFromHtml(linkTemplateExp, publicationXhtml);
+        assertEquals(1, linkTemplateNodeList.getLength());
+
+        String packageXhtml = readFileAsString("/package.xhtml");
+        String itemXpathExp = "package/manifest/item";
+        NodeList itemNodeList = (NodeList) xpathUtils.getNodeListFromHtml(itemXpathExp, packageXhtml);
+        assertEquals(9, itemNodeList.getLength());
+
+        itemXpathExp = "package/spine[@toc='ncx']/itemref/@idref";
+        itemNodeList = (NodeList) xpathUtils.getNodeListFromHtml(itemXpathExp, packageXhtml);
+        assertEquals(4, itemNodeList.getLength());
     }
 
-    public String fileRead(String fileName) {
+    public String readFileAsString(String fileName) {
         int ch;
         StringBuffer strContent = new StringBuffer("");
         try {

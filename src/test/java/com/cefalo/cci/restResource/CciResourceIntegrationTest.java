@@ -1,5 +1,6 @@
 package com.cefalo.cci.restResource;
 
+import com.cefalo.cci.utils.Utils;
 import com.cefalo.cci.utils.XpathUtils;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 public class CciResourceIntegrationTest extends JerseyTest{
     private static final String BASE_URL = "/cciService";
@@ -29,24 +31,27 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
     @Test
     public void getOrganizationListTest() {
-        Map<String, String> nameSpaceMap = new HashMap<String, String>();
-        nameSpaceMap.put("h", "http://www.w3.org/1999/xhtml");
-
         ws = resource().path(BASE_URL).path("/");
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
         String responseHtml = ws.accept(MediaType.TEXT_HTML).get(String.class);
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("h:html/h:body/h:ul/h:li", responseHtml, nameSpaceMap);
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseHtml);
 
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseHtml);
         assertEquals(3, nodeList.getLength());
+
+        boolean contains = true;
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            if (!Utils.ORGANIZATION_DETAILS.containsKey(nodeList.item(i).getTextContent())) {
+                contains = false;
+            }
+        }
+
+        assertTrue(contains);
     }
 
     @Test
     public void getOrganizationTest() {
-        Map<String, String> nameSpaceMap = new HashMap<String, String>();
-        nameSpaceMap.put("h", "http://www.w3.org/1999/xhtml");
-
         ws = resource().path(BASE_URL).path("/Polaris/$#@");
         ClientResponse notFoundClientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
 
@@ -55,7 +60,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("/Polaris");
         ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
         String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("h:html/h:body/h:ul/h:li", responseString, nameSpaceMap);
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
 
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
