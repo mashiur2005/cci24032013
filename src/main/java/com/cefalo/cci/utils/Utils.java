@@ -9,6 +9,7 @@ public class Utils {
 
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
     public static String HOME_DIR = System.getProperty("user.home");
+    public static String FILE_SEPERATOR = System.getProperty("file.separator");
 
     static {
          ORGANIZATION_DETAILS.put("Polaris", Arrays.asList("Addressa", "Harstadtidende"));

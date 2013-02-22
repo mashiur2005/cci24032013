@@ -1,6 +1,8 @@
 package com.cefalo.cci.restResource;
 
+import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.utils.Utils;
+import com.google.inject.Inject;
 import com.sun.jersey.api.view.Viewable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,9 @@ import java.util.*;
 @Path("/")
 public class CciResource {
     private static final Logger log = LoggerFactory.getLogger(CciResource.class);
+
+    @Inject
+    private CciService cciService;
 
     @GET
     @Produces(MediaType.TEXT_HTML)

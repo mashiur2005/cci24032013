@@ -2,6 +2,8 @@ package com.cefalo.cci.mapping;
 
 import com.cefalo.cci.dao.ResourceDao;
 import com.cefalo.cci.dao.ResourceDaoImpl;
+import com.cefalo.cci.service.CciService;
+import com.cefalo.cci.service.CciServiceImpl;
 import com.cefalo.cci.service.HelloService;
 import com.cefalo.cci.service.HelloServiceImpl;
 import com.google.inject.persist.PersistFilter;
@@ -20,6 +22,7 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
 
         bind(HelloService.class).to(HelloServiceImpl.class);
         bind(ResourceDao.class).to(ResourceDaoImpl.class);
+        bind(CciService.class).to(CciServiceImpl.class);
 
         Map<String, String> params = new HashMap<String, String>();
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.cefalo.cci.restResource");
