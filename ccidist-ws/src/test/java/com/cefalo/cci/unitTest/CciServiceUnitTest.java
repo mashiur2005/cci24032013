@@ -2,6 +2,7 @@ package com.cefalo.cci.unitTest;
 
 import com.cefalo.cci.service.CciService;
 import com.google.inject.Inject;
+import com.sun.syndication.feed.synd.SyndLink;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,5 +34,26 @@ public class CciServiceUnitTest {
         listFileNames = cciService.getAllFileNamesInDirectory(null);
         assertEquals(0, listFileNames.size());
         assertTrue(listFileNames.isEmpty());
+    }
+
+    @Test
+    public void getLinksUnitTest() {
+        List<SyndLink> syndLinkList = cciService.getLinks(1, 5, "Polaris", "Addressa", 12);
+        assertEquals(2, syndLinkList.size());
+
+        syndLinkList = cciService.getLinks(2, 5, "Polaris", "Addressa", 12);
+        assertEquals(3, syndLinkList.size());
+
+        syndLinkList = cciService.getLinks(7, 5, "Polaris", "Addressa", 12);
+        assertEquals(3, syndLinkList.size());
+
+        syndLinkList = cciService.getLinks(-1, 5, "Polaris", "Addressa", 12);
+        assertEquals(0, syndLinkList.size());
+
+        syndLinkList = cciService.getLinks(1, -5, "Polaris", "Addressa", 12);
+        assertEquals(0, syndLinkList.size());
+
+        syndLinkList = cciService.getLinks(7, 6, "Polaris", "Addressa", 12);
+        assertEquals(2, syndLinkList.size());
     }
 }
