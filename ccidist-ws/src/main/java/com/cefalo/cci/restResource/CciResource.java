@@ -28,7 +28,7 @@ public class CciResource {
     private String epubFileDirPath;
 
     @GET
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getOrganizationList() {
         Map<String, Object> model = new HashMap<String, Object>();
         Set<String> organizations = Utils.ORGANIZATION_DETAILS.keySet();
@@ -38,7 +38,7 @@ public class CciResource {
 
     @GET
     @Path("/{organization}")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getOrganizationDetail(@PathParam("organization") String organization) {
         if (!Utils.ORGANIZATION_DETAILS.containsKey(organization)) {
             return Response.status(404).build();
@@ -52,7 +52,7 @@ public class CciResource {
 
     @GET
     @Path("/{organization}/{publication}")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getPublicationDetail(@PathParam("organization") String organization, @PathParam("publication") String publication) {
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("organization", organization);
@@ -62,7 +62,7 @@ public class CciResource {
 
     @GET
     @Path("/{organization}/{publication}/{issue}")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getIssueDetail(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                    @PathParam("issue") String issue) {
 

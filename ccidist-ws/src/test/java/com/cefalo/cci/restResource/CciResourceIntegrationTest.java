@@ -31,8 +31,8 @@ public class CciResourceIntegrationTest extends JerseyTest{
     @Test
     public void getOrganizationListTest() {
         ws = resource().path(BASE_URL).path("/");
-        ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        String responseHtml = ws.accept(MediaType.TEXT_HTML).get(String.class);
+        ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
+        String responseHtml = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseHtml);
 
         assertEquals(200, clientResponse.getStatus());
@@ -49,21 +49,25 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(actualList, expectedList);
 
         ws = resource().path(BASE_URL).path("@#&*/");
-        clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
 
         assertEquals(404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/");
+        clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        assertEquals(406, clientResponse.getStatus());
     }
 
     @Test
-    public void getOrganizationTest() {
+    public void getOrganizationDetailTest() {
         ws = resource().path(BASE_URL).path("/Polaris$#@");
-        ClientResponse notFoundClientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        ClientResponse notFoundClientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
 
         assertEquals(404, notFoundClientResponse.getStatus());
 
         ws = resource().path(BASE_URL).path("/Polaris");
-        ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
+        ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
+        String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
 
         assertEquals(200, clientResponse.getStatus());
@@ -78,34 +82,43 @@ public class CciResourceIntegrationTest extends JerseyTest{
         }
 
         assertEquals(actualList, expectedList);
+
+        ws = resource().path(BASE_URL).path("/Polaris");
+        clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+
+        assertEquals(406, clientResponse.getStatus());
     }
 
     @Test
-    public void getPublicationTest() {
+    public void getPublicationDetailTest() {
         ws = resource().path(BASE_URL).path("/Polaris/Addressa");
         ClientResponse clientResponse;
 
-        clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
-        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
+        clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
+        String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
+
+        ws = resource().path(BASE_URL).path("Polaris").path("Addressa");
+        clientResponse = ws.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertEquals(406, clientResponse.getStatus());
 
     }
 
     @Test
-    public void getIssueTest() {
+    public void getIssueDetailTest() {
         ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024/#@$");
         ClientResponse notFoundResponse;
-        notFoundResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        notFoundResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         assertEquals(404, notFoundResponse.getStatus());
 
         ws = resource().path(BASE_URL).path("/Polaris/Alex/accessible_epub_3-20121024/#@$");
-        notFoundResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        notFoundResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         assertEquals(404, notFoundResponse.getStatus());
 
         ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024");
-        String responseString = ws.accept(MediaType.TEXT_HTML).get(String.class);
-        ClientResponse clientResponse = ws.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
+        ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         NodeList nodeList;
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
 
@@ -116,10 +129,14 @@ public class CciResourceIntegrationTest extends JerseyTest{
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
         assertEquals("accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
         assertEquals("accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
+
+        ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024");
+        clientResponse = ws.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertEquals(406, clientResponse.getStatus());
     }
 
     @Test
-    public void getIssueList() {
+    public void getIssueListTest() {
         String organizationName = "Polaris";
         String publicationName = "Addressa";
         ws = resource().path(BASE_URL).path(organizationName).path(publicationName).path("/issues");
