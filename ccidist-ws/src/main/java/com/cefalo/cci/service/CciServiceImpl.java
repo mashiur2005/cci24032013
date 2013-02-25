@@ -168,4 +168,12 @@ public class CciServiceImpl implements CciService {
         }
         return feed;
     }
+
+    public String getMediaType(String epubFileLoc, String contentLocInEpub) {
+        try {
+            return Files.probeContentType(Paths.get(contentLocInEpub));
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }

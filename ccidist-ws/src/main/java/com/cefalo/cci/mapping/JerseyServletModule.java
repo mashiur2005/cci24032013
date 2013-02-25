@@ -6,6 +6,8 @@ import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.service.CciServiceImpl;
 import com.cefalo.cci.service.HelloService;
 import com.cefalo.cci.service.HelloServiceImpl;
+import com.cefalo.cci.storage.FileSystemStorage;
+import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
 import com.google.inject.name.Names;
 import com.google.inject.persist.PersistFilter;
@@ -25,6 +27,7 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         bind(HelloService.class).to(HelloServiceImpl.class);
         bind(ResourceDao.class).to(ResourceDaoImpl.class);
         bind(CciService.class).to(CciServiceImpl.class);
+        bind(Storage.class).to(FileSystemStorage.class);
 
         bindConstant().annotatedWith(Names.named("epubFileDirPath")).to(Utils.FILE_BASE_PATH);
 

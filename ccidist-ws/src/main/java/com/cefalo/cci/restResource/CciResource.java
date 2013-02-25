@@ -1,5 +1,9 @@
 package com.cefalo.cci.restResource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,12 +16,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cefalo.cci.service.CciService;
+import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
+import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.jersey.api.NotFoundException;
@@ -33,6 +40,9 @@ public class CciResource {
 
     @Inject @Named("epubFileDirPath")
     private String epubFileDirPath;
+
+    @Inject
+    private Storage storage;
 
     @GET
     @Produces(MediaType.APPLICATION_XHTML_XML)
@@ -107,4 +117,32 @@ public class CciResource {
         return Response.ok(feed).build();
     }
 
+    @GET
+    @Path("/{organization}/{publication}/{issue}/{contentLocInEpub: .+}")
+    public Response getEpubContent(@PathParam("organization") String organization, @PathParam("publication") String publication,
+                                   @PathParam("issue") String issue, @PathParam("contentLocInEpub") final String contentLocInEpub) throws IOException {
+
+        String issueLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication;
+        String epubFileLoc = issueLocation + Utils.FILE_SEPARATOR + issue + ".epub";
+        log.info("Epub File Loc... " + epubFileLoc);
+
+        epubFileLoc = epubFileLoc.replace("\\", "/");
+        URI uri = URI.create("jar:file:/" + epubFileLoc);
+        URI fragmentPath = URI.create("/" + contentLocInEpub);
+        final InputStream in = storage.getFragment(uri, fragmentPath);
+
+        if (in == null) {
+            throw new NotFoundException("Resource is not found");
+        }
+        StreamingOutput sout = new StreamingOutput() {
+            public void write(OutputStream outputStream) throws IOException {
+                ByteStreams.copy(in, outputStream);
+            }
+        };
+        String mediaType = cciService.getMediaType(epubFileLoc, contentLocInEpub);
+        if (mediaType == null) {
+              mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        }
+        return Response.ok(sout, mediaType).build();
+    }
 }
