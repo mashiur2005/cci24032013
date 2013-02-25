@@ -1,5 +1,7 @@
 package com.cefalo.cci.service;
 
+import static com.google.common.io.Files.getNameWithoutExtension;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -147,25 +149,28 @@ public class CciServiceImpl implements CciService {
 
         List<String> fileNameList = getAllFileNamesInDirectory(fileDir);
 
-        List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
+        if (!fileNameList.isEmpty()) {
+            List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
 
-        if (!links.isEmpty()) {
-            List<SyndEntry> entries = new ArrayList<SyndEntry>();
-            SyndEntry syndEntry;
+            if (!links.isEmpty()) {
+                List<SyndEntry> entries = new ArrayList<SyndEntry>();
+                SyndEntry syndEntry;
 
-			for (String fileName : fileNameList.subList(start - 1, start + limit - 1)) {
-                syndEntry = new SyndEntryImpl();
-                syndEntry.setUri("entry Id test");
-                syndEntry.setUpdatedDate(new Date());
-                syndEntry.setTitle(fileName);
-                syndEntry.setAuthor(publicationName);
-                syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + com.google.common.io.Files.getNameWithoutExtension(fileName));
-                entries.add(syndEntry);
+                for (String fileName : fileNameList.subList(start - 1, start + limit - 1)) {
+                    syndEntry = new SyndEntryImpl();
+                    syndEntry.setUri("entry Id test");
+                    syndEntry.setUpdatedDate(new Date());
+                    syndEntry.setTitle(fileName);
+                    syndEntry.setAuthor(publicationName);
+                    syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + getNameWithoutExtension(fileName));
+                    entries.add(syndEntry);
+                }
+
+                feed.setLinks(links);
+                feed.setEntries(entries);
             }
-
-            feed.setLinks(links);
-            feed.setEntries(entries);
         }
+
         return feed;
     }
 
