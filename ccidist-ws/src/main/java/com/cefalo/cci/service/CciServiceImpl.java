@@ -117,25 +117,28 @@ public class CciServiceImpl implements CciService {
 
         List<String> fileNameList = getAllFileNamesInDirectory(fileDir);
 
-        List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
+        if (!fileNameList.isEmpty()) {
+            List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
 
-        if (!links.isEmpty()) {
-            List<SyndEntry> entries = new ArrayList<SyndEntry>();
-            SyndEntry syndEntry;
+            if (!links.isEmpty()) {
+                List<SyndEntry> entries = new ArrayList<SyndEntry>();
+                SyndEntry syndEntry;
 
-            for (String aFileNameList : fileNameList.subList(start - 1, start + limit - 1)) {
-                syndEntry = new SyndEntryImpl();
-                syndEntry.setUri("entry Id test");
-                syndEntry.setUpdatedDate(new Date());
-                syndEntry.setTitle(aFileNameList);
-                syndEntry.setAuthor(publicationName);
-                syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + StringUtils.remove(aFileNameList, ".epub"));
-                entries.add(syndEntry);
+                for (String aFileNameList : fileNameList.subList(start - 1, start + limit - 1)) {
+                    syndEntry = new SyndEntryImpl();
+                    syndEntry.setUri("entry Id test");
+                    syndEntry.setUpdatedDate(new Date());
+                    syndEntry.setTitle(aFileNameList);
+                    syndEntry.setAuthor(publicationName);
+                    syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + StringUtils.remove(aFileNameList, ".epub"));
+                    entries.add(syndEntry);
+                }
+
+                feed.setLinks(links);
+                feed.setEntries(entries);
             }
-
-            feed.setLinks(links);
-            feed.setEntries(entries);
         }
+
         return feed;
     }
 
