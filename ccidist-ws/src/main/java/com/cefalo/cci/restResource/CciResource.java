@@ -4,14 +4,16 @@ import com.cefalo.cci.exception.NotFoundException;
 import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.utils.Utils;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -24,6 +26,9 @@ public class CciResource {
 
     @Inject
     private CciService cciService;
+
+    @Inject @Named("epubFileDirPath")
+    private String epubFileDirPath;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -64,7 +69,7 @@ public class CciResource {
     public Response getIssueDetail(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                    @PathParam("issue") String issue) {
 
-        String issueLocation = Utils.FILE_BASE_PATH + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication;
+        String issueLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication;
         log.info("issue location is " + issueLocation);
 
         //TODO: Checking database for issue and this method is used to read file from directory as temporary basis
@@ -88,19 +93,11 @@ public class CciResource {
         }
 
         String feedType = "atom_0.3";
-        String fileDir = Utils.FILE_BASE_PATH + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName;
+        String fileDir = epubFileDirPath + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName;
 
         SyndFeed feed = cciService.getIssueAsAtomFeed(feedType, organizationName, publicationName, fileDir);
 
-        SyndFeedOutput output = new SyndFeedOutput();
-        String responseString = null;
-        try {
-            responseString = output.outputString(feed);
-        } catch (FeedException e) {
-            e.printStackTrace();
-        }
-
-        return Response.ok(responseString).build();
+        return Response.ok(feed).build();
     }
 
 }

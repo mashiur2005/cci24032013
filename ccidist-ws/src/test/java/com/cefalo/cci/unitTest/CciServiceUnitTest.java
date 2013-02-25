@@ -25,5 +25,13 @@ public class CciServiceUnitTest {
         List<String> listFileNames = cciService.getAllFileNamesInDirectory(fileDir);
         assertEquals(2, listFileNames.size());
         assertTrue(listFileNames.contains("widget-quiz-20121022.epub"));
+
+        listFileNames = cciService.getAllFileNamesInDirectory("");
+        assertEquals(0, listFileNames.size());
+        assertTrue(listFileNames.isEmpty());
+
+        listFileNames = cciService.getAllFileNamesInDirectory(null);
+        assertEquals(0, listFileNames.size());
+        assertTrue(listFileNames.isEmpty());
     }
 }
