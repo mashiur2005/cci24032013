@@ -23,6 +23,7 @@
     
     <modules>
       <module>ccidist-ws</module>
+      <module>ccidist-storage</module>
     </modules>
     
     <dependencyManagement>
