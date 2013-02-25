@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CciServiceImpl implements CciService {
@@ -28,46 +29,100 @@ public class CciServiceImpl implements CciService {
         return epubFileNames;
     }
 
-    @Override
-    public SyndFeed getIssueAsAtomFeed(String feedType, String organizationName, String publicationName, String fileDir) {
-        List<SyndLink> links = new ArrayList<SyndLink>();
+    public List<SyndLink> getLinks(int start, int limit, String organizationName, String publicationName, int totalFile) {
+        if (start < 0 || limit < 0 || start > totalFile || limit > totalFile || (start > 0 && limit > 0 && start + limit > totalFile)) {
+            return new ArrayList<SyndLink>();
+        }
 
-        SyndLink prev = new SyndLinkImpl();
-        prev.setRel("prev");
-        prev.setHref("/" + organizationName + "/" + publicationName + "/issueList" + "?limit=4&amp;start=1");
+        List<SyndLink> links = new ArrayList<SyndLink>();
+        int prevStart = 0;
+        int prevLimit = 0;
+        int selfStart = 0;
+        int selfLimit = 0;
+        int nextStart = 0;
+        int nextLimit = 0;
+        boolean addPrev = true;
+
+        if (start > limit) {
+            prevStart = start - limit;
+            selfStart = start;
+            nextStart = start + limit;
+
+            prevLimit = limit;
+            selfLimit = limit;
+            nextLimit = limit;
+        } else if (start < limit && start > 1) {
+            prevStart = 1;
+            selfStart = start;
+            nextStart = start + limit;
+
+            prevLimit = start - prevStart;
+            selfLimit = limit;
+            nextLimit = limit;
+        } else if (start == 1) {
+            addPrev = false;
+            selfStart = start;
+            nextStart = start + limit;
+
+            selfLimit = limit;
+            nextLimit = limit;
+        }
+
+        if (addPrev) {
+            SyndLink prev = new SyndLinkImpl();
+            prev.setRel("prev");
+            prev.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + prevLimit + "&start=" + prevStart);
+            links.add(prev);
+        }
 
         SyndLink self = new SyndLinkImpl();
         self.setRel("self");
-        self.setHref("/" + organizationName + "/" + publicationName + "/issueList" + "?limit=4&amp;start=5");
+        self.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + selfLimit + "&start=" + selfStart);
         SyndLink next = new SyndLinkImpl();
         next.setRel("next");
-        next.setHref("/" + organizationName + "/" + publicationName + "/issueList" + "?limit=4&amp;start=9");
+        next.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + nextLimit + "&start=" + nextStart);
 
         links.add(self);
-        links.add(prev);
         links.add(next);
 
+        return links;
+    }
+
+    @Override
+    public SyndFeed getIssueAsAtomFeed(String organizationName, String publicationName, String fileDir, int start, int limit) {
+        String feedType = "atom_1.0";
         SyndFeed feed = new SyndFeedImpl();
         feed.setFeedType(feedType);
-
         feed.setTitle(publicationName + " Issues");
-        feed.setLinks(links);
-        feed.setAuthor(publicationName);
+        feed.setUri("feed Id test");
+        feed.setPublishedDate(new Date());
+
+        SyndPerson syndPerson = new SyndPersonImpl();
+        syndPerson.setName(publicationName);
+
+        feed.getAuthors().add(syndPerson);
 
         List<String> fileNameList = getAllFileNamesInDirectory(fileDir);
 
-        List<SyndEntry> entries = new ArrayList<SyndEntry>();
-        SyndEntry syndEntry;
+        List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
 
-        for (String aFileNameList : fileNameList) {
-            syndEntry = new SyndEntryImpl();
-            syndEntry.setTitle(aFileNameList);
-            syndEntry.setAuthor(publicationName);
-            syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + StringUtils.remove(aFileNameList, ".epub"));
-            entries.add(syndEntry);
+        if (!links.isEmpty()) {
+            List<SyndEntry> entries = new ArrayList<SyndEntry>();
+            SyndEntry syndEntry;
+
+            for (String aFileNameList : fileNameList.subList(start, start + limit)) {
+                syndEntry = new SyndEntryImpl();
+                syndEntry.setUri("entry Id test");
+                syndEntry.setUpdatedDate(new Date());
+                syndEntry.setTitle(aFileNameList);
+                syndEntry.setAuthor(publicationName);
+                syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + StringUtils.remove(aFileNameList, ".epub"));
+                entries.add(syndEntry);
+            }
+
+            feed.setLinks(links);
+            feed.setEntries(entries);
         }
-
-        feed.setEntries(entries);
         return feed;
     }
 }

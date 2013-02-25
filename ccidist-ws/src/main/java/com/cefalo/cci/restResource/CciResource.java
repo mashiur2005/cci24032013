@@ -10,10 +10,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -87,15 +84,18 @@ public class CciResource {
     @GET
     @Path("/{organization}/{publication}/issues")
     @Produces(MediaType.APPLICATION_ATOM_XML)
-    public Response getIssueList(@PathParam("organization") String organizationName, @PathParam("publication") String publicationName) {
+    public Response getIssueList(@PathParam("organization") String organizationName, @PathParam("publication") String publicationName,
+                                 @QueryParam("start") @DefaultValue("1") String start, @QueryParam("limit") @DefaultValue("4") String limit) {
         if (!Utils.ORGANIZATION_DETAILS.containsKey(organizationName) || !Utils.ORGANIZATION_DETAILS.get(organizationName).contains(publicationName)) {
             return Response.status(404).build();
         }
 
-        String feedType = "atom_0.3";
+        int startAsInt = Integer.valueOf(start);
+        int limitAsInt = Integer.valueOf(limit);
+
         String fileDir = epubFileDirPath + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName;
 
-        SyndFeed feed = cciService.getIssueAsAtomFeed(feedType, organizationName, publicationName, fileDir);
+        SyndFeed feed = cciService.getIssueAsAtomFeed(organizationName, publicationName, fileDir, startAsInt, limitAsInt);
 
         return Response.ok(feed).build();
     }

@@ -126,15 +126,50 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals(200, clientResponse.getStatus());
 
+        clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        assertEquals(406, clientResponse.getStatus());
+
         String responseString = ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals(12, nodeList.getLength());
+        assertEquals(4, nodeList.getLength());
 
         ws = resource().path(BASE_URL).path("polaris").path("addressa").path("/issues");
         clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals(404, clientResponse.getStatus());
+
+        ws = resource().queryParam("start", "2").queryParam("limit", "8").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
+        assertNotNull(responseString);
+
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        assertEquals(8, nodeList.getLength());
+
+        ws = resource().queryParam("start", "2").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
+        assertNotNull(responseString);
+
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        assertEquals(4, nodeList.getLength());
+
+        ws = resource().queryParam("start", "2").queryParam("limit", "-8").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
+        assertNotNull(responseString);
+
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        assertEquals(0, nodeList.getLength());
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
+        assertEquals(0, nodeList.getLength());
+
+        ws = resource().queryParam("start", "40").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
+        assertNotNull(responseString);
+
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        assertEquals(0, nodeList.getLength());
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
+        assertEquals(0, nodeList.getLength());
     }
 
 }
