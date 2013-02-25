@@ -6,6 +6,8 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -98,6 +100,7 @@ public class CciServiceImpl implements CciService {
         return links;
     }
 
+
     @Override
     public SyndFeed getIssueAsAtomFeed(String organizationName, String publicationName, String fileDir, int start, int limit) {
         String feedType = "atom_1.0";
@@ -134,5 +137,13 @@ public class CciServiceImpl implements CciService {
             feed.setEntries(entries);
         }
         return feed;
+    }
+
+    public String getMediaType(String epubFileLoc, String contentLocInEpub) {
+        try {
+            return Files.probeContentType(Paths.get(contentLocInEpub));
+        } catch (IOException e) {
+            return null;
+        }
     }
 }
