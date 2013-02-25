@@ -29,8 +29,9 @@ public class CciServiceImpl implements CciService {
         return epubFileNames;
     }
 
+    @Override
     public List<SyndLink> getLinks(int start, int limit, String organizationName, String publicationName, int totalFile) {
-        if (start < 0 || limit < 0 || start > totalFile || limit > totalFile || (start > 0 && limit > 0 && start + limit > totalFile)) {
+        if (start <= 0 || limit <= 0 || start > totalFile || limit > totalFile || (start > 0 && limit > 0 && start + limit - 1 > totalFile)) {
             return new ArrayList<SyndLink>();
         }
 
@@ -42,6 +43,11 @@ public class CciServiceImpl implements CciService {
         int nextStart = 0;
         int nextLimit = 0;
         boolean addPrev = true;
+        boolean addNext = true;
+
+        if (start + limit - 1 == totalFile) {
+            addNext = false;
+        }
 
         if (start > limit) {
             prevStart = start - limit;
@@ -50,7 +56,8 @@ public class CciServiceImpl implements CciService {
 
             prevLimit = limit;
             selfLimit = limit;
-            nextLimit = limit;
+            int left = totalFile - (start + limit) + 1;
+            nextLimit = limit < left ? limit : left;
         } else if (start < limit && start > 1) {
             prevStart = 1;
             selfStart = start;
@@ -58,14 +65,16 @@ public class CciServiceImpl implements CciService {
 
             prevLimit = start - prevStart;
             selfLimit = limit;
-            nextLimit = limit;
+            int left = totalFile - (start + limit) + 1;
+            nextLimit = limit < left ? limit : left;
         } else if (start == 1) {
             addPrev = false;
             selfStart = start;
             nextStart = start + limit;
 
             selfLimit = limit;
-            nextLimit = limit;
+            int left = totalFile - (start + limit) + 1;
+            nextLimit = limit < left ? limit : left;
         }
 
         if (addPrev) {
@@ -78,12 +87,13 @@ public class CciServiceImpl implements CciService {
         SyndLink self = new SyndLinkImpl();
         self.setRel("self");
         self.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + selfLimit + "&start=" + selfStart);
-        SyndLink next = new SyndLinkImpl();
-        next.setRel("next");
-        next.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + nextLimit + "&start=" + nextStart);
-
         links.add(self);
-        links.add(next);
+        if (addNext) {
+            SyndLink next = new SyndLinkImpl();
+            next.setRel("next");
+            next.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + nextLimit + "&start=" + nextStart);
+            links.add(next);
+        }
 
         return links;
     }
@@ -110,7 +120,7 @@ public class CciServiceImpl implements CciService {
             List<SyndEntry> entries = new ArrayList<SyndEntry>();
             SyndEntry syndEntry;
 
-            for (String aFileNameList : fileNameList.subList(start, start + limit)) {
+            for (String aFileNameList : fileNameList.subList(start - 1, start + limit - 1)) {
                 syndEntry = new SyndEntryImpl();
                 syndEntry.setUri("entry Id test");
                 syndEntry.setUpdatedDate(new Date());
