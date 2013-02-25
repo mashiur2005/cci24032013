@@ -1,17 +1,19 @@
 package com.cefalo.cci.unitTest;
 
-import com.cefalo.cci.service.CciService;
-import com.google.inject.Inject;
-import com.sun.syndication.feed.synd.SyndLink;
-import org.apache.commons.io.FileUtils;
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.cefalo.cci.service.CciService;
+import com.google.inject.Inject;
+import com.sun.syndication.feed.synd.SyndLink;
 
 @RunWith(GuiceJUnitRunner.class)
 @GuiceJUnitRunner.GuiceModules({ServicesTestModule.class })
@@ -21,19 +23,24 @@ public class CciServiceUnitTest {
 
     @Test
     public void getAllFileNamesInDirectoryTest() {
-        File file = FileUtils.getFile("src", "test", "resources", "epubs");
-        String fileDir = file.getAbsolutePath();
-        List<String> listFileNames = cciService.getAllFileNamesInDirectory(fileDir);
+    	checkInvalidDirectoryPath(null, "", "   ");
+    	
+        Path directoryPath = Paths.get("src", "test", "resources", "epubs");
+        List<String> listFileNames = cciService.getAllFileNamesInDirectory(directoryPath.toAbsolutePath().toString());
         assertEquals(2, listFileNames.size());
         assertTrue(listFileNames.contains("widget-quiz-20121022.epub"));
-
-        listFileNames = cciService.getAllFileNamesInDirectory("");
-        assertEquals(0, listFileNames.size());
-        assertTrue(listFileNames.isEmpty());
-
-        listFileNames = cciService.getAllFileNamesInDirectory(null);
-        assertEquals(0, listFileNames.size());
-        assertTrue(listFileNames.isEmpty());
+    }
+    
+    private void checkInvalidDirectoryPath(final String... paths) {
+    	for (String path : paths) {
+    		try {
+    			cciService.getAllFileNamesInDirectory(path);
+    			fail("Empty directory should be an invalid parameter");
+    		}
+    		catch (IllegalArgumentException ex) {
+    			// This is expected
+    		}
+		}
     }
 
     @Test

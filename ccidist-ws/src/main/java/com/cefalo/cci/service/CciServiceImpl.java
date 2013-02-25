@@ -1,30 +1,62 @@
 package com.cefalo.cci.service;
 
-import com.sun.syndication.feed.synd.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CciServiceImpl implements CciService {
-    @Override
-    public List<String> getAllFileNamesInDirectory(String dirPath) {
-        if (dirPath == null) {
-            dirPath = "";
-        }
-        File dir = new File(dirPath);
-        List<String> epubFileNames = new ArrayList<String>();
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-        if (dir.isDirectory()) {
-            List<File> files = (List<File>) FileUtils.listFiles(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-            for (File file : files) {
-                epubFileNames.add(file.getName());
-            }
-        }
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndLink;
+import com.sun.syndication.feed.synd.SyndLinkImpl;
+import com.sun.syndication.feed.synd.SyndPerson;
+import com.sun.syndication.feed.synd.SyndPersonImpl;
+
+public class CciServiceImpl implements CciService {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
+    @Override
+    public List<String> getAllFileNamesInDirectory(final String directory) {
+    	String dir = Strings.nullToEmpty(directory);
+    	Preconditions.checkArgument(dir.trim().length() > 0, "Directory path may not be empty or null.");
+    	
+    	final List<String> epubFileNames = new ArrayList<String>();
+    	try {
+			final Path directoryPath = Paths.get(directory);
+			Files.walkFileTree(directoryPath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file,
+						BasicFileAttributes attrs) throws IOException {
+					epubFileNames.add(file.getFileName().toString());
+					return super.visitFile(file, attrs);
+				}
+				
+				@Override
+				public FileVisitResult preVisitDirectory(Path dir,
+						BasicFileAttributes attrs) throws IOException {
+					if (dir.equals(directoryPath)) {
+						return super.preVisitDirectory(dir, attrs);
+					}
+					
+					return FileVisitResult.SKIP_SUBTREE;
+				}
+			});
+		} catch (IOException e) {
+			logger.error("Error while trying to get the list of files.", e);
+		}
 
         return epubFileNames;
     }
@@ -98,7 +130,8 @@ public class CciServiceImpl implements CciService {
         return links;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public SyndFeed getIssueAsAtomFeed(String organizationName, String publicationName, String fileDir, int start, int limit) {
         String feedType = "atom_1.0";
         SyndFeed feed = new SyndFeedImpl();
@@ -120,13 +153,13 @@ public class CciServiceImpl implements CciService {
             List<SyndEntry> entries = new ArrayList<SyndEntry>();
             SyndEntry syndEntry;
 
-            for (String aFileNameList : fileNameList.subList(start - 1, start + limit - 1)) {
+			for (String fileName : fileNameList.subList(start - 1, start + limit - 1)) {
                 syndEntry = new SyndEntryImpl();
                 syndEntry.setUri("entry Id test");
                 syndEntry.setUpdatedDate(new Date());
-                syndEntry.setTitle(aFileNameList);
+                syndEntry.setTitle(fileName);
                 syndEntry.setAuthor(publicationName);
-                syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + StringUtils.remove(aFileNameList, ".epub"));
+                syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + com.google.common.io.Files.getNameWithoutExtension(fileName));
                 entries.add(syndEntry);
             }
 
