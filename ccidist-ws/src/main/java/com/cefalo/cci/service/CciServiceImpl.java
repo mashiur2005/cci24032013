@@ -12,6 +12,9 @@ import java.util.List;
 public class CciServiceImpl implements CciService {
     @Override
     public List<String> getAllFileNamesInDirectory(String dirPath) {
+        if (dirPath == null) {
+            dirPath = "";
+        }
         File dir = new File(dirPath);
         List<String> epubFileNames = new ArrayList<String>();
 
@@ -53,14 +56,14 @@ public class CciServiceImpl implements CciService {
 
         List<String> fileNameList = getAllFileNamesInDirectory(fileDir);
 
-        List entries = new ArrayList();
+        List<SyndEntry> entries = new ArrayList<SyndEntry>();
         SyndEntry syndEntry;
 
-        for (int i = 0; i < fileNameList.size(); i++) {
-            syndEntry = new SyndEntryImpl();;
-            syndEntry.setTitle(fileNameList.get(i));
+        for (String aFileNameList : fileNameList) {
+            syndEntry = new SyndEntryImpl();
+            syndEntry.setTitle(aFileNameList);
             syndEntry.setAuthor(publicationName);
-            syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + StringUtils.remove(fileNameList.get(i), ".epub"));
+            syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + StringUtils.remove(aFileNameList, ".epub"));
             entries.add(syndEntry);
         }
 

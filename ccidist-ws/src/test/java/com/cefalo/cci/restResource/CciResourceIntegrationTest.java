@@ -1,7 +1,5 @@
 package com.cefalo.cci.restResource;
 
-import com.cefalo.cci.service.CciService;
-import com.cefalo.cci.service.CciServiceImpl;
 import com.cefalo.cci.utils.Utils;
 import com.cefalo.cci.utils.XpathUtils;
 import com.sun.jersey.api.client.ClientResponse;
@@ -24,12 +22,10 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
     private WebResource ws;
     private XpathUtils xpathUtils;
-    private CciService cciService;
 
     public CciResourceIntegrationTest() {
         super(new WebAppDescriptor.Builder(PACKAGE_NAME).build());
         xpathUtils = new XpathUtils();
-        cciService = new CciServiceImpl();
     }
 
     @Test
@@ -134,7 +130,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertNotNull(responseString);
 
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals(cciService.getAllFileNamesInDirectory(Utils.FILE_BASE_PATH + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName).size(), nodeList.getLength());
+        assertEquals(12, nodeList.getLength());
 
         ws = resource().path(BASE_URL).path("polaris").path("addressa").path("/issues");
         clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
