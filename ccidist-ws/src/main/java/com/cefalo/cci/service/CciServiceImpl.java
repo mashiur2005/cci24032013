@@ -1,31 +1,19 @@
 package com.cefalo.cci.service;
 
-import static com.google.common.io.Files.getNameWithoutExtension;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.sun.syndication.feed.synd.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndLink;
-import com.sun.syndication.feed.synd.SyndLinkImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
+import static com.google.common.io.Files.getNameWithoutExtension;
 
 public class CciServiceImpl implements CciService {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -149,27 +137,31 @@ public class CciServiceImpl implements CciService {
 
         List<String> fileNameList = getAllFileNamesInDirectory(fileDir);
 
-        if (!fileNameList.isEmpty()) {
-            List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
+        List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
 
-            if (!links.isEmpty()) {
-                List<SyndEntry> entries = new ArrayList<SyndEntry>();
-                SyndEntry syndEntry;
+        List<SyndEntry> entries = new ArrayList<SyndEntry>();
+        if (!links.isEmpty()) {
+            SyndEntry syndEntry;
 
-                for (String fileName : fileNameList.subList(start - 1, start + limit - 1)) {
-                    syndEntry = new SyndEntryImpl();
-                    syndEntry.setUri("entry Id test");
-                    syndEntry.setUpdatedDate(new Date());
-                    syndEntry.setTitle(fileName);
-                    syndEntry.setAuthor(publicationName);
-                    syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + getNameWithoutExtension(fileName));
-                    entries.add(syndEntry);
-                }
-
-                feed.setLinks(links);
-                feed.setEntries(entries);
+            for (String fileName : fileNameList.subList(start - 1, start + limit - 1)) {
+                syndEntry = new SyndEntryImpl();
+                syndEntry.setUri("entry Id test");
+                syndEntry.setUpdatedDate(new Date());
+                syndEntry.setTitle(fileName);
+                syndEntry.setAuthor(publicationName);
+                syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + getNameWithoutExtension(fileName));
+                entries.add(syndEntry);
             }
+
+        } else {
+            SyndLink self = new SyndLinkImpl();
+            self.setRel("self");
+            self.setHref("/" + organizationName + "/" + publicationName + "/issues?start=0&limit=0");
+            links.add(self);
         }
+
+        feed.setLinks(links);
+        feed.setEntries(entries);
 
         return feed;
     }

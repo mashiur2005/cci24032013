@@ -86,7 +86,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("/Polaris");
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
 
-        assertEquals(406, clientResponse.getStatus());
+        assertEquals("Unsupported MediaType error code: ", 406, clientResponse.getStatus());
     }
 
     @Test
@@ -143,34 +143,34 @@ public class CciResourceIntegrationTest extends JerseyTest{
         String publicationName = "Addressa";
         ws = resource().path(BASE_URL).path(organizationName).path(publicationName).path("/issues");
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
-        assertEquals(200, clientResponse.getStatus());
+        assertEquals("content found error code: ", 200, clientResponse.getStatus());
 
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
-        assertEquals(406, clientResponse.getStatus());
+        assertEquals("Unsupported MediaType error code: ", 406, clientResponse.getStatus());
 
         String responseString = ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals(4, nodeList.getLength());
+        assertEquals("number of entry: ", 4, nodeList.getLength());
 
         ws = resource().path(BASE_URL).path("polaris").path("addressa").path("/issues");
         clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
-        assertEquals(404, clientResponse.getStatus());
+        assertEquals("Html code not found: ", 404, clientResponse.getStatus());
 
         ws = resource().queryParam("start", "2").queryParam("limit", "8").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals(8, nodeList.getLength());
+        assertEquals("number of entry: ", 8, nodeList.getLength());
 
         ws = resource().queryParam("start", "2").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals(4, nodeList.getLength());
+        assertEquals("number of entry: ", 4, nodeList.getLength());
 
         ws = resource().queryParam("start", "2").queryParam("limit", "-8").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
@@ -179,16 +179,16 @@ public class CciResourceIntegrationTest extends JerseyTest{
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals(0, nodeList.getLength());
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
-        assertEquals(0, nodeList.getLength());
+        assertEquals("number of links for limit = -8: " ,1, nodeList.getLength());
 
         ws = resource().queryParam("start", "40").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals(0, nodeList.getLength());
+        assertEquals("number of entry for problematic start and limit: ", 0, nodeList.getLength());
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
-        assertEquals(0, nodeList.getLength());
+        assertEquals("number f links for start = 40 exceeding total number of files: ", 1, nodeList.getLength());
     }
 
 }
