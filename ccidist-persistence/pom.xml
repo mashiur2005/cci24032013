@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ccidist-parent</artifactId>
+        <groupId>com.cefalo</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ccidist-persistence</artifactId>
+    <packaging>jar</packaging>
+
+    <name>CCI Distribution Service :: JPA Persistence Layer Module</name>
+    <description>Provides functionality to retrieve data from database</description>
+    <url>http://www.cefalo.no/</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.cefalo</groupId>
+            <artifactId>ccidist-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!--Guice JPA Integration-->
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-persist</artifactId>
+        </dependency>
+
+        <!--mysql driver dependency-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

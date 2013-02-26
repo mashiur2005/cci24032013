@@ -25,6 +25,7 @@
       <module>ccidist-storage</module>
       <module>ccidist-ws</module>
       <module>ccidist-model</module>
+      <module>ccidist-persistence</module>
     </modules>
     
     <!-- Common dependencies. We'll use these dependencies in all modules. -->
