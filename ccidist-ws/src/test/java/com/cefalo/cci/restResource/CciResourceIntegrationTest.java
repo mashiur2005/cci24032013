@@ -39,7 +39,11 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertNotNull(responseHtml);
         assertEquals(3, nodeList.getLength());
 
-        List<String> actualList= new ArrayList<String>(Utils.ORGANIZATION_DETAILS.keySet());
+        List<String> actualList= new ArrayList<String>();
+        actualList.add("Polaris");
+        actualList.add("NHST");
+        actualList.add("AxelSpringer");
+
         List<String> expectedList = new ArrayList<String>();
 
         for (int i = 0; i < nodeList.getLength(); i++) {

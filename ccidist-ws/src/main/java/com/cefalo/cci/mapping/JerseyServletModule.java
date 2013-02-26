@@ -1,5 +1,7 @@
 package com.cefalo.cci.mapping;
 
+import com.cefalo.cci.dao.OrganizationDao;
+import com.cefalo.cci.dao.OrganizationDaoImpl;
 import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.service.CciServiceImpl;
 import com.cefalo.cci.storage.FileSystemStorage;
@@ -22,6 +24,7 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
 
         bind(CciService.class).to(CciServiceImpl.class);
         bind(Storage.class).to(FileSystemStorage.class);
+        bind(OrganizationDao.class).to(OrganizationDaoImpl.class);
 
         bindConstant().annotatedWith(Names.named("epubFileDirPath")).to(Utils.FILE_BASE_PATH);
 
@@ -29,8 +32,7 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.cefalo.cci.restResource");
         params.put(ServletContainer.JSP_TEMPLATES_BASE_PATH, "/WEB-INF/jsp");
 
-        filter("/resource/*").through(GuiceContainer.class, params);
         filter("/*").through(GuiceContainer.class, params);
-        filter("/resource/*").through(PersistFilter.class, params);
+        filter("/*").through(PersistFilter.class, params);
     }
 }
