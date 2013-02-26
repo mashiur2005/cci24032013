@@ -11,7 +11,7 @@ public class Organization  extends Persistent implements Serializable {
     
     private long id;
     private String name;
-    private Set<Publication> publicationSet;
+    private Set<Publication> publications;
 
     @Id
     @GeneratedValue
@@ -33,11 +33,11 @@ public class Organization  extends Persistent implements Serializable {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "organization")
-    public Set<Publication> getPublicationSet() {
-        return publicationSet;
+    public Set<Publication> getPublications() {
+        return publications;
     }
 
-    public void setPublicationSet(Set<Publication> publicationSet) {
-        this.publicationSet = publicationSet;
+    public void setPublications(Set<Publication> publications) {
+        this.publications = publications;
     }
 }

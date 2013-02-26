@@ -18,11 +18,11 @@ import javax.persistence.Table;
 @Table(name = "publication")
 public class Publication extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     private long id;
     private String name;
     private Organization organization;
-    private Set<PublicationPlatform> publicationPlatformSet;
+    private Set<Platform> platforms;
 
     @Id
     @GeneratedValue
@@ -54,12 +54,20 @@ public class Publication extends Persistent implements Serializable {
         this.organization = organization;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    public Set<PublicationPlatform> getPublicationPlatformSet() {
-        return publicationPlatformSet;
+    @OneToMany
+    @JoinTable(name = "publication_platform",
+            joinColumns = {
+                    @JoinColumn(name = "publication_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "platform_id")
+            }
+    )
+    public Set<Platform> getPlatforms() {
+        return platforms;
     }
 
-    public void setPublicationPlatformSet(Set<PublicationPlatform> publicationPlatformSet) {
-        this.publicationPlatformSet = publicationPlatformSet;
+    public void setPlatforms(Set<Platform> platforms) {
+        this.platforms = platforms;
     }
 }

@@ -12,7 +12,6 @@
         <class>com.cefalo.cci.model.Organization</class>
         <class>com.cefalo.cci.model.Publication</class>
         <class>com.cefalo.cci.model.Platform</class>
-        <class>com.cefalo.cci.model.PublicationPlatform</class>
         <class>com.cefalo.cci.model.Issue</class>
 
         <properties>
