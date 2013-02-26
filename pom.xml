@@ -68,6 +68,11 @@
       		<version>${project.version}</version>
       	</dependency>
       	<dependency>
+            <groupId>com.cefalo</groupId>
+            <artifactId>ccidist-persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+      	<dependency>
       		<groupId>com.cefalo</groupId>
       		<artifactId>ccidist-storage</artifactId>
       		<version>${project.version}</version>

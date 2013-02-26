@@ -25,7 +25,6 @@
         <dependency>
             <groupId>com.cefalo</groupId>
             <artifactId>ccidist-persistence</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
