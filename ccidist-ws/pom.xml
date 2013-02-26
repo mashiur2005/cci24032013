@@ -17,12 +17,12 @@
     
     <dependencies>
       <!-- Internal module dependencies -->
-      <dependency>
-	<groupId>com.cefalo</groupId>
-	<artifactId>ccidist-storage</artifactId>
-	<version>${project.version}</version>
-      </dependency>
-      
+        <dependency>
+            <groupId>com.cefalo</groupId>
+            <artifactId>ccidist-storage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
