@@ -12,6 +12,7 @@ public class Utils {
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
     public static String FILE_BASE_DIR= "epubs";
     public static String FILE_BASE_PATH = HOME_DIR + FILE_SEPARATOR + FILE_BASE_DIR;
+    public static String Context_PATH = "/cciService";
 
     static {
          ORGANIZATION_DETAILS.put("Polaris", Arrays.asList("Addressa", "Harstadtidende"));
