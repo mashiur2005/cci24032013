@@ -1,11 +1,14 @@
 package com.cefalo.cci.model;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 
 @MappedSuperclass
 public class Persistent implements Serializable {
-
+    private static final long serialVersionUID = 1L;
+    
     @Version
     long version;
 

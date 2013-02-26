@@ -1,11 +1,18 @@
 package com.cefalo.cci.model;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "platform")
 public class Platform  extends Persistent implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private long id;
     private String name;
 

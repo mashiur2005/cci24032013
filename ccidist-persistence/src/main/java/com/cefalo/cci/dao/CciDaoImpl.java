@@ -11,6 +11,7 @@ public class CciDaoImpl implements CciDao{
     @Inject
     private EntityManager entityManager;
 
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     public List<Organization> getAllOrganization() {
