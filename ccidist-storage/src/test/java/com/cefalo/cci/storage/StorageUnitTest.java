@@ -4,6 +4,7 @@ import com.cefalo.cci.storage.FileSystemStorage;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
@@ -33,6 +34,16 @@ public class StorageUnitTest {
 
             }
         }
+    }
+
+   @Test
+    public void downloadEpubFileTest() {
+       try {
+           InputStream in = fileSystemStorage.get(null);
+           assertNull(in);
+       } catch (NullPointerException | IOException ex) {
+
+       }
     }
 
 }

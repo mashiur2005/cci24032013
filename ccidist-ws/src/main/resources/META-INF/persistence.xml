@@ -10,6 +10,10 @@
 
         <!-- JPA entities must be registered here -->
         <class>com.cefalo.cci.model.Organization</class>
+        <class>com.cefalo.cci.model.Publication</class>
+        <class>com.cefalo.cci.model.Platform</class>
+        <class>com.cefalo.cci.model.PubtPlatform</class>
+        <class>com.cefalo.cci.model.Issue</class>
 
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
@@ -17,7 +21,7 @@
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/cciService"/>
             <property name="hibernate.connection.username" value="root"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
         </properties>
     </persistence-unit>

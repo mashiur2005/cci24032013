@@ -11,7 +11,15 @@ import java.util.Map;
 public class FileSystemStorage implements Storage {
     @Override
     public InputStream get(URI resourceID) throws IOException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        Preconditions.checkNotNull(resourceID, "Resource Id can not be null");
+        File file = new File(resourceID);
+        try {
+            InputStream in = new FileInputStream(file);
+            Preconditions.checkNotNull(in);
+            return  in;
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override

@@ -1,30 +1,43 @@
 package com.cefalo.cci.model;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Table(name = "organization")
-public class Organization {
-    private Integer id;
-    private String organizationName;
+public class Organization  extends Persistent implements Serializable {
+    private long id;
+    private String name;
+    private Set<Publication> publicationSet;
 
     @Id
     @GeneratedValue
     @Column(name = "id")
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    @Column(name = "name")
-    public String getOrganizationName() {
-        return organizationName;
+    public String getName() {
+        return name;
     }
 
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "organization")
+    public Set<Publication> getPublicationSet() {
+        return publicationSet;
+    }
+
+    public void setPublicationSet(Set<Publication> publicationSet) {
+        this.publicationSet = publicationSet;
     }
 }
