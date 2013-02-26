@@ -1,17 +1,5 @@
 package com.cefalo.cci.unitTest;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.service.CciServiceImpl;
 import com.cefalo.cci.utils.XpathUtils;
@@ -19,6 +7,15 @@ import com.google.inject.Inject;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndLink;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import static junit.framework.Assert.*;
 
 @RunWith(GuiceJUnitRunner.class)
 @GuiceJUnitRunner.GuiceModules({ServicesTestModule.class })
@@ -78,7 +75,7 @@ public class CciServiceUnitTest {
     public void getIssueAsAtomFeed() {
         helperIssueAsAtomFeed(5, 5, 10, 3, 5);
         helperIssueAsAtomFeed(12, 4, 15, 2, 4);
-        helperIssueAsAtomFeed(1, 5, 0, 0, 0);
+        helperIssueAsAtomFeed(1, 5, 0, 1, 0);
     }
 
     public void helperIssueAsAtomFeed(int start, int limit, final int numberOfFiles, int expectedLinkCount, int expectedEntryCount) {
@@ -94,8 +91,8 @@ public class CciServiceUnitTest {
         };
         SyndFeed syndFeed = mockCciService.getIssueAsAtomFeed("Polaris", "Addressa", "/home/mashiur/epubs", start, limit);
 
-        assertEquals("number of links", syndFeed.getLinks().size(), expectedLinkCount);
-        assertEquals("number of entry:", syndFeed.getEntries().size(), expectedEntryCount);
+        assertEquals("number of links: ", syndFeed.getLinks().size(), expectedLinkCount);
+        assertEquals("number of entry: ", syndFeed.getEntries().size(), expectedEntryCount);
 
         List<String> actualList = new ArrayList<String>();
         for (int i = 0; i < syndFeed.getEntries().size(); i++) {
@@ -106,6 +103,6 @@ public class CciServiceUnitTest {
         if (mockCciService.getAllFileNamesInDirectory("").size() > 0) {
             expectedList = mockCciService.getAllFileNamesInDirectory("").subList(start -1 , start + limit - 1);
         }
-        assertEquals("element by element check", expectedList, actualList);
+        assertEquals("element by element check: ", expectedList, actualList);
     }
 }
