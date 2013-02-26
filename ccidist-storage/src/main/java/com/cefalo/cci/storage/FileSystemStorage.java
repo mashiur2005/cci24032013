@@ -1,5 +1,7 @@
 package com.cefalo.cci.storage;
 
+import com.google.common.base.Preconditions;
+
 import java.io.*;
 import java.net.URI;
 import java.nio.file.*;
@@ -14,6 +16,9 @@ public class FileSystemStorage implements Storage {
 
     @Override
     public InputStream getFragment(URI resourceID, URI fragmentPath) {
+
+        Preconditions.checkNotNull(resourceID, "Resource Id can not be null");
+        Preconditions.checkNotNull(fragmentPath, "Fragment Path can not be null");
         final Map<String, String> env = new HashMap<String, String>();
         env.put("create", "false");
         try (FileSystem fs = FileSystems.newFileSystem(resourceID, env)) {

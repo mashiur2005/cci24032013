@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,6 +126,9 @@ public class CciResource {
         String issueLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication;
         String epubFileLoc = issueLocation + Utils.FILE_SEPARATOR + issue + ".epub";
         log.info("Epub File Loc... " + epubFileLoc);
+
+        Preconditions.checkNotNull(epubFileLoc, "Epub File location can not be null");
+        Preconditions.checkNotNull(contentLocInEpub, "Content Location of Epub File can not be null");
 
         epubFileLoc = epubFileLoc.replace("\\", "/");
         URI uri = URI.create("jar:file:/" + epubFileLoc);
