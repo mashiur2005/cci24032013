@@ -11,10 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "pubt_platform")
-public class PubtPlatform extends Persistent implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
+@Table(name = "publication_platform")
+public class PublicationPlatform extends Persistent implements Serializable {
     private long id;
     private Publication publication;
     private Platform platform;
@@ -32,16 +30,6 @@ public class PubtPlatform extends Persistent implements Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "publication_id")
-    public Publication getPublication() {
-        return publication;
-    }
-
-    public void setPublication(Publication publication) {
-        this.publication = publication;
-    }
-
-    @ManyToOne
     @JoinColumn(name = "platform_id")
     public Platform getPlatform() {
         return platform;
@@ -49,5 +37,15 @@ public class PubtPlatform extends Persistent implements Serializable {
 
     public void setPlatform(Platform platform) {
         this.platform = platform;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "publication_id")
+    public Publication getPublication() {
+        return publication;
+    }
+
+    public void setPublication(Publication publication) {
+        this.publication = publication;
     }
 }

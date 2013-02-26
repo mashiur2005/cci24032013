@@ -22,7 +22,7 @@ public class Publication extends Persistent implements Serializable {
     private long id;
     private String name;
     private Organization organization;
-    private Set<PubtPlatform> publicationPlatformSet;
+    private Set<PublicationPlatform> publicationPlatformSet;
 
     @Id
     @GeneratedValue
@@ -55,16 +55,11 @@ public class Publication extends Persistent implements Serializable {
     }
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "publication_platform",
-            joinColumns = @JoinColumn(name = "publication_id"),
-            inverseJoinColumns = @JoinColumn(name = "pubt_platform_id")
-    )
-    public Set<PubtPlatform> getPublicationPlatformSet() {
+    public Set<PublicationPlatform> getPublicationPlatformSet() {
         return publicationPlatformSet;
     }
 
-    public void setPublicationPlatformSet(Set<PubtPlatform> publicationPlatformSet) {
+    public void setPublicationPlatformSet(Set<PublicationPlatform> publicationPlatformSet) {
         this.publicationPlatformSet = publicationPlatformSet;
     }
 }
