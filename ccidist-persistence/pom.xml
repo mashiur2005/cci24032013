@@ -28,12 +28,6 @@
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-persist</artifactId>
         </dependency>
-
-        <!--mysql driver dependency-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>

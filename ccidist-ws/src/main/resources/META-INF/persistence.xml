@@ -9,7 +9,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
         <!-- JPA entities must be registered here -->
-        <class>com.cefalo.cci.domain.User</class>
+        <class>com.cefalo.cci.model.Organization</class>
 
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>

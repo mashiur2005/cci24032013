@@ -1,11 +1,7 @@
 package com.cefalo.cci.mapping;
 
-import com.cefalo.cci.dao.ResourceDao;
-import com.cefalo.cci.dao.ResourceDaoImpl;
 import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.service.CciServiceImpl;
-import com.cefalo.cci.service.HelloService;
-import com.cefalo.cci.service.HelloServiceImpl;
 import com.cefalo.cci.storage.FileSystemStorage;
 import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
@@ -24,8 +20,6 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
     protected void configureServlets() {
         install(new JpaPersistModule("cciJpaUnit"));
 
-        bind(HelloService.class).to(HelloServiceImpl.class);
-        bind(ResourceDao.class).to(ResourceDaoImpl.class);
         bind(CciService.class).to(CciServiceImpl.class);
         bind(Storage.class).to(FileSystemStorage.class);
 
