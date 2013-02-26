@@ -129,7 +129,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(2, nodeList.getLength());
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
-        assertEquals("accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
+        assertEquals("/cciService/Polaris/Addressa/accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
         assertEquals("accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
 
         ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024");

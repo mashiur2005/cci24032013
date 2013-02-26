@@ -1,5 +1,6 @@
 package com.cefalo.cci.restResource;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,6 +20,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
+import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +99,37 @@ public class CciResource {
         model.put("organization", organization);
         model.put("publication", publication);
         model.put("issue", issue);
+        model.put("contextPath", Utils.Context_PATH);
         return Response.ok(new Viewable("/issueDetail", model)).build();
+    }
+
+    @GET
+    @Path("/{organization}/{publication}/{file: [^/]+.epub?}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public StreamingOutput downloadEpub(@PathParam("organization") String organization, @PathParam("publication") String publication,
+                                        @PathParam("file") String file) throws IOException {
+        String fileLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication + Utils.FILE_SEPARATOR + file;
+        fileLocation = fileLocation.replace("\\", "/");
+        log.info("File location is " + file);
+        InputStream in = null;
+
+        try {
+            in = storage.get(URI.create("file:/" + fileLocation));
+
+            final InputStream finalIn = in;
+            return new StreamingOutput() {
+                public void write(OutputStream outputStream) throws IOException {
+                    ByteStreams.copy(finalIn, outputStream);
+                    Closeables.close(finalIn, true);
+                }
+            };
+        } catch (NullPointerException e) {
+            throw new NotFoundException("File not found");
+        } catch (IOException e) {
+            Closeables.close(in, true);
+            Throwables.propagateIfPossible(e.getCause(),IOException.class);
+            throw new IllegalStateException(e);
+        }
     }
 
     @GET
