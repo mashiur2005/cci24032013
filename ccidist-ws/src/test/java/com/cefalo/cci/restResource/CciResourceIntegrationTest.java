@@ -28,7 +28,6 @@ public class CciResourceIntegrationTest extends JerseyTest{
         xpathUtils = new XpathUtils();
     }
 
-/*
     @Test
     public void getOrganizationListTest() {
         ws = resource().path(BASE_URL).path("/");
@@ -53,8 +52,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
         assertEquals(actualList, expectedList);
 
-        ws = resource().path(BASE_URL).path("@#&*//*
-");
+        ws = resource().path(BASE_URL).path("@#&*//*");
         clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
 
         assertEquals(404, clientResponse.getStatus());
@@ -63,7 +61,6 @@ public class CciResourceIntegrationTest extends JerseyTest{
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         assertEquals(406, clientResponse.getStatus());
     }
-*/
 
     @Test
     public void getOrganizationDetailTest() {
