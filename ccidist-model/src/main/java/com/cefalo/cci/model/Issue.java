@@ -1,27 +1,22 @@
 package com.cefalo.cci.model;
 
 import java.io.Serializable;
-import java.sql.Blob;
+import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "issue")
 public class Issue extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     private long id;
     private String name;
     private Publication publication;
     private Platform platform;
-    private Blob epubFile;
+    private EpubFile epubFile;
+    private Date created;
+    private Date updated;
 
     @Id
     @GeneratedValue
@@ -40,6 +35,16 @@ public class Issue extends Persistent implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "epub_file_id")
+    public EpubFile getEpubFile() {
+        return epubFile;
+    }
+
+    public void setEpubFile(EpubFile epubFile) {
+        this.epubFile = epubFile;
     }
 
     @ManyToOne
@@ -62,12 +67,32 @@ public class Issue extends Persistent implements Serializable {
         this.platform = platform;
     }
 
-    @Lob
-    public Blob getEpubFile() {
-        return epubFile;
+    @Temporal(value = TemporalType.TIMESTAMP)
+    public Date getCreated() {
+        return created;
     }
 
-    public void setEpubFile(Blob epubFile) {
-        this.epubFile = epubFile;
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    @Temporal(value = TemporalType.TIMESTAMP)
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        setCreated(new Date());
+        setUpdated(new Date());
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        setUpdated(new Date());
     }
 }
