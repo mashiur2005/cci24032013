@@ -21,6 +21,7 @@ import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Publication;
 import com.cefalo.cci.service.PublicationService;
 import com.cefalo.cci.utils.Utils;
+import com.google.common.base.Objects;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.view.Viewable;
@@ -51,7 +52,7 @@ public class PublicationDetailResource {
         Publication publication = publicationService.getPublication(publicationName);
         // We should not allow people to trick us, the requested URI should be accurate.
         // TODO: There is a slight performance hit for this. Caching may solve this.
-        if (publication == null || !publication.getOrganization().getId().equals(organizationName)) {
+        if (publication == null || !Objects.equal(publication.getOrganization().getId(), organizationName)) {
             throw new NotFoundException();
         }
 
