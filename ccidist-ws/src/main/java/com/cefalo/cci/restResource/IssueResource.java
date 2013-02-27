@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +40,12 @@ public class IssueResource {
     private IssueService issueService;
 
     @Inject
-    private Storage storage;
+    @Named("fileSystemStorage")
+    private Storage fileSystemStorage;
+
+    @Inject
+    @Named("databaseStorage")
+    private Storage databaseStorage;
 
     @Context
     private UriInfo uriInfo;
@@ -47,17 +53,19 @@ public class IssueResource {
     @GET
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getIssueList(@PathParam("organization") String organizationName, @PathParam("publication") String publicationName,
-                                 @QueryParam("start") @DefaultValue("1") String start, @QueryParam("limit") @DefaultValue("4") String limit) {
-        if (!Utils.ORGANIZATION_DETAILS.containsKey(organizationName) || !Utils.ORGANIZATION_DETAILS.get(organizationName).contains(publicationName)) {
-            return Response.status(404).build();
+                                 @QueryParam("start") @DefaultValue("1") String start, @QueryParam("limit") @DefaultValue("10") String limit) {
+        //TODO: we have to check 404 error here
+        if (start.isEmpty()) {
+            start = "1";
+        }
+        if (limit.isEmpty()) {
+            limit = "10";
         }
 
         int startAsInt = Integer.valueOf(start);
         int limitAsInt = Integer.valueOf(limit);
 
-        String fileDir = epubFileDirPath + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName;
-
-        SyndFeed feed = cciService.getIssueAsAtomFeed(uriInfo.getBaseUri().getPath(), organizationName, publicationName, fileDir, startAsInt, limitAsInt);
+        SyndFeed feed = issueService.getIssueAsAtomFeed(uriInfo.getBaseUri().getPath(), organizationName, publicationName, startAsInt, limitAsInt);
 
         return Response.ok(feed).build();
     }
@@ -68,11 +76,7 @@ public class IssueResource {
     public Response getIssueDetail(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                    @PathParam("issue") String issue) {
 
-        String issueLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication;
-        log.info("issue location is " + issueLocation);
-
-        //TODO: Checking database for issue and this method is used to read file from directory as temporary basis
-        if (!cciService.getAllFileNamesInDirectory(issueLocation).contains(issue + ".epub")) {
+        if (!issueService.getIssueNameAsList(publication).contains(issue + ".epub")) {
             throw new NotFoundException("Issue " + issue + " is not found");
         }
 
@@ -99,7 +103,7 @@ public class IssueResource {
         epubFileLoc = epubFileLoc.replace("\\", "/");
         URI uri = URI.create("jar:file:/" + epubFileLoc);
         URI fragmentPath = URI.create("/" + contentLocInEpub);
-        final InputStream in = storage.getFragment(uri, fragmentPath);
+        final InputStream in = fileSystemStorage.getFragment(uri, fragmentPath);
 
         if (in == null) {
             throw new NotFoundException("Resource is not found");
@@ -121,13 +125,11 @@ public class IssueResource {
     @Produces(MediaType.TEXT_PLAIN)
     public StreamingOutput downloadEpub(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                         @PathParam("file") String file) throws IOException {
-        String fileLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication + Utils.FILE_SEPARATOR + file;
-        fileLocation = fileLocation.replace("\\", "/");
-        log.info("File location is " + file);
         InputStream in = null;
 
         try {
-            in = storage.get(URI.create("file:/" + fileLocation));
+            String issueId = file.split("[.]")[0];
+            in = databaseStorage.get(URI.create(issueId));
 
             final InputStream finalIn = in;
             return new StreamingOutput() {
@@ -136,7 +138,7 @@ public class IssueResource {
                     Closeables.close(finalIn, true);
                 }
             };
-        } catch (NullPointerException e) {
+        } catch (FileNotFoundException fnfe) {
             throw new NotFoundException("File not found");
         } catch (IOException e) {
             Closeables.close(in, true);

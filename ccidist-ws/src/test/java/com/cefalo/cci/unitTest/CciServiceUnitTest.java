@@ -76,6 +76,8 @@ public class CciServiceUnitTest {
         helperIssueAsAtomFeed(5, 5, 10, 3, 5);
         helperIssueAsAtomFeed(12, 4, 15, 2, 4);
         helperIssueAsAtomFeed(1, 5, 0, 1, 0);
+        helperIssueAsAtomFeed(5, 5, 15, 3, 5);
+        helperIssueAsAtomFeed(15, 15, 30, 3, 15);
     }
 
     public void helperIssueAsAtomFeed(int start, int limit, final int numberOfFiles, int expectedLinkCount, int expectedEntryCount) {
@@ -89,7 +91,7 @@ public class CciServiceUnitTest {
                 return listFileNames;
             }
         };
-        SyndFeed syndFeed = mockCciService.getIssueAsAtomFeed("/cciService/", "Polaris", "Addressa", "/home/mashiur/epubs", start, limit);
+        SyndFeed syndFeed = mockCciService.getIssueAsAtomFeed(mockCciService.getAllFileNamesInDirectory("/using/as/mock/fileLoading"),"/cciService/", "Polaris", "Addressa", start, limit);
 
         assertEquals("number of links: ", syndFeed.getLinks().size(), expectedLinkCount);
         assertEquals("number of entry: ", syndFeed.getEntries().size(), expectedEntryCount);

@@ -97,6 +97,15 @@ public class CciServiceImpl implements CciService {
             selfLimit = limit;
             int left = totalFile - (start + limit) + 1;
             nextLimit = limit < left ? limit : left;
+        } else if (start == limit) {
+            prevStart = start - limit + 1;
+            selfStart = start;
+            nextStart = start + limit;
+
+            selfLimit = limit;
+            prevLimit = start - prevStart;
+            int left = totalFile - (start + limit) + 1;
+            nextLimit = limit < left ? limit : left;
         }
 
         if (addPrev) {
@@ -122,7 +131,7 @@ public class CciServiceImpl implements CciService {
 
     @SuppressWarnings("unchecked")
 	@Override
-    public SyndFeed getIssueAsAtomFeed(String contextPath, String organizationName, String publicationName, String fileDir, int start, int limit) {
+    public SyndFeed getIssueAsAtomFeed(List<String> fileNameList,String contextPath, String organizationName, String publicationName, int start, int limit) {
         String feedType = "atom_1.0";
         SyndFeed feed = new SyndFeedImpl();
         feed.setFeedType(feedType);
@@ -134,8 +143,6 @@ public class CciServiceImpl implements CciService {
         syndPerson.setName(publicationName);
 
         feed.getAuthors().add(syndPerson);
-
-        List<String> fileNameList = getAllFileNamesInDirectory(fileDir);
 
         List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, fileNameList.size());
 

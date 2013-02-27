@@ -41,7 +41,6 @@ public class OrganizationResource {
         Organization org = organizationService.getOrganization(organization.toLowerCase());
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("organization", org);
-       // model.put("publications", Utils.ORGANIZATION_DETAILS.get(organization));
         return Response.ok(new Viewable("/organization", model)).build();
     }
 }
