@@ -47,17 +47,19 @@ public class IssueResource {
     @GET
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getIssueList(@PathParam("organization") String organizationName, @PathParam("publication") String publicationName,
-                                 @QueryParam("start") @DefaultValue("1") String start, @QueryParam("limit") @DefaultValue("4") String limit) {
-        if (!Utils.ORGANIZATION_DETAILS.containsKey(organizationName) || !Utils.ORGANIZATION_DETAILS.get(organizationName).contains(publicationName)) {
-            return Response.status(404).build();
+                                 @QueryParam("start") @DefaultValue("1") String start, @QueryParam("limit") @DefaultValue("10") String limit) {
+        //TODO: we have to check 404 error here
+        if (start.isEmpty()) {
+            start = "1";
+        }
+        if (limit.isEmpty()) {
+            limit = "10";
         }
 
         int startAsInt = Integer.valueOf(start);
         int limitAsInt = Integer.valueOf(limit);
 
-        String fileDir = epubFileDirPath + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName;
-
-        SyndFeed feed = cciService.getIssueAsAtomFeed(uriInfo.getBaseUri().getPath(), organizationName, publicationName, fileDir, startAsInt, limitAsInt);
+        SyndFeed feed = issueService.getIssueAsAtomFeed(uriInfo.getBaseUri().getPath(), organizationName, publicationName, startAsInt, limitAsInt);
 
         return Response.ok(feed).build();
     }

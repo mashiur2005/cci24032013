@@ -19,7 +19,7 @@
         </dl>
         <dl>
             <dt><label for="offset">Offset</label></dt>
-            <dd><input type="text" name="offset" id="offset"/></dd>
+            <dd><input type="text" name="start" id="offset"/></dd>
         </dl>
         <dl>
             <dd><input type="submit" name="submit"/></dd>

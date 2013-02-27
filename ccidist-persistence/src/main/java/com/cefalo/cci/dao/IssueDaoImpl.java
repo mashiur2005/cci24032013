@@ -15,13 +15,13 @@ public class IssueDaoImpl implements IssueDao {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationName(String publicationName) {
-        return (List<Issue>) entityManager.createQuery("from Issue ").getResultList();
+        return (List<Issue>) entityManager.createQuery("select i from Issue i where i.publication.id like :pName").getResultList();
     }
 
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
     public List<String> getIssueNameAsList(String publicationName) {
-        return (List<String>)entityManager.createQuery("select i from Issue i where i.name like :pName").setParameter("pName", publicationName).getResultList();
+        return (List<String>)entityManager.createQuery("select i.name from Issue i where i.publication.id like :pName").setParameter("pName", publicationName).getResultList();
     }
 }
