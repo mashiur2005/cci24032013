@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
@@ -7,11 +8,11 @@
 <body>
 <h1>Publication</h1>
 
-<h3>${it.publication}</h3>
+<h3>${it.publication.name}</h3>
 <div>
     <span>Issue Search:</span>
 
-    <form action="${it.contextPath}${it.organization}/${it.publication}/issue">
+    <form action="${it.contextPath}${it.publication.organization.name}/${it.publication.name}/issue">
         <dl>
             <dt><label for="limit">Limit</label></dt>
             <dd><input type="text" name="limit" id="limit"/></dd>

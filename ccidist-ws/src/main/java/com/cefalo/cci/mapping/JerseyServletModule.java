@@ -26,6 +26,8 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         bind(Storage.class).to(FileSystemStorage.class);
         bind(OrganizationDao.class).to(OrganizationDaoImpl.class);
         bind(OrganizationService.class).to(OrganizationServiceImpl.class);
+        bind(PublicationDao.class).to(PublicationDaoImpl.class);
+        bind(PublicationService.class).to(PublicationServiceImpl.class);
         bind(IssueDao.class).to(IssueDaoImpl.class);
         bind(IssueService.class).to(IssueServiceImpl.class);
 

@@ -8,10 +8,10 @@
 <head><title>Organization</title></head>
 <body>
 <h1>Organization</h1>
-<h3>${it.organization}</h3>
+<h3>${it.organization.name}</h3>
 <ul class="organization">
-    <c:forEach items="${it.publications}" var="publication">
-        <li><a href="${it.organization}/${publication}">${publication}</a></li>
+    <c:forEach items="${it.organization.publications}" var="publication">
+        <li><a href="${it.organization.name}/${publication.name}">${publication.name}</a></li>
     </c:forEach>
 </ul>
 </body>

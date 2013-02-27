@@ -15,4 +15,5 @@ import java.util.List;
 
 public interface OrganizationService {
     List<Organization> getAllOrganizations();
+    Organization getOrganization(String id);
 }
