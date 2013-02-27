@@ -8,7 +8,7 @@
 
 <h3>${it.issue} of '${it.publication}' Publication</h3>
 <ul class="issue">
-    <li><a href="${it.contextPath}${it.organization}/${it.publication}/${it.issue}.epub">Epub</a></li>
+    <li><a href="${it.contextPath}${it.organization}/${it.publication}/issue/${it.issue}.epub">Epub</a></li>
     <li><a href="${it.issue}/META-INF/container.xml">Container</a></li>
 </ul>
 </body>

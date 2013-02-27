@@ -122,7 +122,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(404, notFoundResponse.getStatus());
 */
 
-        ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024");
+        ws = resource().path(BASE_URL).path("/Polaris/Addressa/issue/accessible_epub_3-20121024");
         String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         NodeList nodeList;
@@ -133,10 +133,10 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(2, nodeList.getLength());
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
-        assertEquals("/cciService/Polaris/Addressa/accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
+        assertEquals("/cciService/Polaris/Addressa/issue/accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
         assertEquals("accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
 
-        ws = resource().path(BASE_URL).path("/Polaris/Addressa/accessible_epub_3-20121024");
+        ws = resource().path(BASE_URL).path("/Polaris/Addressa/issue/accessible_epub_3-20121024");
         clientResponse = ws.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(406, clientResponse.getStatus());
     }
@@ -145,7 +145,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
     public void getIssueListTest() {
         String organizationName = "Polaris";
         String publicationName = "Addressa";
-        ws = resource().path(BASE_URL).path(organizationName).path(publicationName).path("/issues");
+        ws = resource().path(BASE_URL).path(organizationName).path(publicationName).path("issue");
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("content found error code: ", 200, clientResponse.getStatus());
 
@@ -158,25 +158,25 @@ public class CciResourceIntegrationTest extends JerseyTest{
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry: ", 4, nodeList.getLength());
 
-        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("/issues");
+        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue");
         clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("Html code not found: ", 404, clientResponse.getStatus());
 
-        ws = resource().queryParam("start", "2").queryParam("limit", "8").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        ws = resource().queryParam("start", "2").queryParam("limit", "8").path(BASE_URL).path("Polaris").path("Addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry: ", 8, nodeList.getLength());
 
-        ws = resource().queryParam("start", "2").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        ws = resource().queryParam("start", "2").path(BASE_URL).path("Polaris").path("Addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry: ", 4, nodeList.getLength());
 
-        ws = resource().queryParam("start", "2").queryParam("limit", "-8").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        ws = resource().queryParam("start", "2").queryParam("limit", "-8").path(BASE_URL).path("Polaris").path("Addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
@@ -185,7 +185,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
         assertEquals("number of links for limit = -8: " ,1, nodeList.getLength());
 
-        ws = resource().queryParam("start", "40").path(BASE_URL).path("Polaris").path("Addressa").path("/issues");
+        ws = resource().queryParam("start", "40").path(BASE_URL).path("Polaris").path("Addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 

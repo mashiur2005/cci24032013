@@ -1,9 +1,9 @@
 package com.cefalo.cci.mapping;
 
-import com.cefalo.cci.dao.OrganizationDao;
-import com.cefalo.cci.dao.OrganizationDaoImpl;
-import com.cefalo.cci.service.CciService;
-import com.cefalo.cci.service.CciServiceImpl;
+import com.cefalo.cci.dao.*;
+import com.cefalo.cci.dao.IssueDao;
+import com.cefalo.cci.dao.IssueDaoImpl;
+import com.cefalo.cci.service.*;
 import com.cefalo.cci.storage.FileSystemStorage;
 import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
@@ -25,6 +25,9 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         bind(CciService.class).to(CciServiceImpl.class);
         bind(Storage.class).to(FileSystemStorage.class);
         bind(OrganizationDao.class).to(OrganizationDaoImpl.class);
+        bind(OrganizationService.class).to(OrganizationServiceImpl.class);
+        bind(IssueDao.class).to(IssueDaoImpl.class);
+        bind(IssueService.class).to(IssueServiceImpl.class);
 
         bindConstant().annotatedWith(Names.named("epubFileDirPath")).to(Utils.FILE_BASE_PATH);
 

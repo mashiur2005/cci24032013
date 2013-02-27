@@ -102,18 +102,18 @@ public class CciServiceImpl implements CciService {
         if (addPrev) {
             SyndLink prev = new SyndLinkImpl();
             prev.setRel("prev");
-            prev.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + prevLimit + "&start=" + prevStart);
+            prev.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + prevLimit + "&start=" + prevStart);
             links.add(prev);
         }
 
         SyndLink self = new SyndLinkImpl();
         self.setRel("self");
-        self.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + selfLimit + "&start=" + selfStart);
+        self.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + selfLimit + "&start=" + selfStart);
         links.add(self);
         if (addNext) {
             SyndLink next = new SyndLinkImpl();
             next.setRel("next");
-            next.setHref("/" + organizationName + "/" + publicationName + "/issues" + "?limit=" + nextLimit + "&start=" + nextStart);
+            next.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + nextLimit + "&start=" + nextStart);
             links.add(next);
         }
 
@@ -149,14 +149,14 @@ public class CciServiceImpl implements CciService {
                 syndEntry.setUpdatedDate(new Date());
                 syndEntry.setTitle(fileName);
                 syndEntry.setAuthor(publicationName);
-                syndEntry.setLink(contextPath + organizationName + "/" + publicationName + "/" + getNameWithoutExtension(fileName));
+                syndEntry.setLink(contextPath + organizationName + "/" + publicationName + "/issue/" + getNameWithoutExtension(fileName));
                 entries.add(syndEntry);
             }
 
         } else {
             SyndLink self = new SyndLinkImpl();
             self.setRel("self");
-            self.setHref(contextPath + organizationName + "/" + publicationName + "/issues?start=0&limit=0");
+            self.setHref(contextPath + organizationName + "/" + publicationName + "/issue?start=0&limit=0");
             links.add(self);
         }
 

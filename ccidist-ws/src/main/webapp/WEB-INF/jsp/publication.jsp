@@ -11,7 +11,7 @@
 <div>
     <span>Issue Search:</span>
 
-    <form action="${it.contextPath}${it.organization}/${it.publication}/issues">
+    <form action="${it.contextPath}${it.organization}/${it.publication}/issue">
         <dl>
             <dt><label for="limit">Limit</label></dt>
             <dd><input type="text" name="limit" id="limit"/></dd>
