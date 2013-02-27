@@ -70,11 +70,7 @@ public class IssueResource {
     public Response getIssueDetail(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                    @PathParam("issue") String issue) {
 
-        String issueLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication;
-        log.info("issue location is " + issueLocation);
-
-        //TODO: Checking database for issue and this method is used to read file from directory as temporary basis
-        if (!cciService.getAllFileNamesInDirectory(issueLocation).contains(issue + ".epub")) {
+        if (!issueService.getIssueNameAsList(publication).contains(issue + ".epub")) {
             throw new NotFoundException("Issue " + issue + " is not found");
         }
 
