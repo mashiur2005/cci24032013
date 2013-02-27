@@ -13,8 +13,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +26,9 @@ public class IssueDetailResource {
 
     @Inject
     private CciService cciService;
+
+    @Context
+    private UriInfo uriInfo;
 
     @Inject @Named("epubFileDirPath")
     private String epubFileDirPath;
@@ -45,7 +50,7 @@ public class IssueDetailResource {
         model.put("organization", organization);
         model.put("publication", publication);
         model.put("issue", issue);
-        model.put("contextPath", Utils.Context_PATH);
+        model.put("contextPath", uriInfo.getBaseUri().getPath());
         return Response.ok(new Viewable("/issueDetail", model)).build();
     }
 }

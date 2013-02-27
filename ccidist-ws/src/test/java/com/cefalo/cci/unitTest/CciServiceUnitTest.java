@@ -89,7 +89,7 @@ public class CciServiceUnitTest {
                 return listFileNames;
             }
         };
-        SyndFeed syndFeed = mockCciService.getIssueAsAtomFeed("Polaris", "Addressa", "/home/mashiur/epubs", start, limit);
+        SyndFeed syndFeed = mockCciService.getIssueAsAtomFeed("/cciService/", "Polaris", "Addressa", "/home/mashiur/epubs", start, limit);
 
         assertEquals("number of links: ", syndFeed.getLinks().size(), expectedLinkCount);
         assertEquals("number of entry: ", syndFeed.getEntries().size(), expectedEntryCount);

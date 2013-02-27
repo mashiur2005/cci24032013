@@ -7,8 +7,10 @@ import com.google.inject.name.Named;
 import com.sun.syndication.feed.synd.SyndFeed;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Path("/{organization}/{publication}/issues")
 public class IssueListResource {
@@ -17,6 +19,9 @@ public class IssueListResource {
 
     @Inject @Named("epubFileDirPath")
     private String epubFileDirPath;
+
+    @Context
+    private UriInfo uriInfo;
 
     @GET
     @Produces(MediaType.APPLICATION_ATOM_XML)
@@ -31,7 +36,7 @@ public class IssueListResource {
 
         String fileDir = epubFileDirPath + Utils.FILE_SEPARATOR + organizationName + Utils.FILE_SEPARATOR + publicationName;
 
-        SyndFeed feed = cciService.getIssueAsAtomFeed(organizationName, publicationName, fileDir, startAsInt, limitAsInt);
+        SyndFeed feed = cciService.getIssueAsAtomFeed(uriInfo.getBaseUri().getPath(), organizationName, publicationName, fileDir, startAsInt, limitAsInt);
 
         return Response.ok(feed).build();
     }

@@ -17,7 +17,7 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 
 public class CciServiceImpl implements CciService {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
+
     @Override
     public List<String> getAllFileNamesInDirectory(final String directory) {
     	String dir = Strings.nullToEmpty(directory);
@@ -122,7 +122,7 @@ public class CciServiceImpl implements CciService {
 
     @SuppressWarnings("unchecked")
 	@Override
-    public SyndFeed getIssueAsAtomFeed(String organizationName, String publicationName, String fileDir, int start, int limit) {
+    public SyndFeed getIssueAsAtomFeed(String contextPath, String organizationName, String publicationName, String fileDir, int start, int limit) {
         String feedType = "atom_1.0";
         SyndFeed feed = new SyndFeedImpl();
         feed.setFeedType(feedType);
@@ -149,14 +149,14 @@ public class CciServiceImpl implements CciService {
                 syndEntry.setUpdatedDate(new Date());
                 syndEntry.setTitle(fileName);
                 syndEntry.setAuthor(publicationName);
-                syndEntry.setLink("/" + organizationName + "/" + publicationName + "/" + getNameWithoutExtension(fileName));
+                syndEntry.setLink(contextPath + organizationName + "/" + publicationName + "/" + getNameWithoutExtension(fileName));
                 entries.add(syndEntry);
             }
 
         } else {
             SyndLink self = new SyndLinkImpl();
             self.setRel("self");
-            self.setHref("/" + organizationName + "/" + publicationName + "/issues?start=0&limit=0");
+            self.setHref(contextPath + organizationName + "/" + publicationName + "/issues?start=0&limit=0");
             links.add(self);
         }
 
