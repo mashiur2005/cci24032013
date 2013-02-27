@@ -4,6 +4,7 @@ import com.cefalo.cci.dao.*;
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.dao.IssueDaoImpl;
 import com.cefalo.cci.service.*;
+import com.cefalo.cci.storage.DatabaseStorage;
 import com.cefalo.cci.storage.FileSystemStorage;
 import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
@@ -23,7 +24,8 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         install(new JpaPersistModule("cciJpaUnit"));
 
         bind(CciService.class).to(CciServiceImpl.class);
-        bind(Storage.class).to(FileSystemStorage.class);
+        bind(Storage.class).annotatedWith(Names.named("databaseStorage")).to(DatabaseStorage.class);
+        bind(Storage.class).annotatedWith(Names.named("fileSystemStorage")).to(FileSystemStorage.class);
         bind(OrganizationDao.class).to(OrganizationDaoImpl.class);
         bind(OrganizationService.class).to(OrganizationServiceImpl.class);
         bind(PublicationDao.class).to(PublicationDaoImpl.class);

@@ -1,5 +1,7 @@
 package com.cefalo.cci.model;
 
+import org.hibernate.annotations.LazyToOne;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -38,6 +40,7 @@ public class Issue extends Persistent implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "epub_file_id")
+    @LazyToOne(org.hibernate.annotations.LazyToOneOption.PROXY)
     public EpubFile getEpubFile() {
         return epubFile;
     }

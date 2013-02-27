@@ -1,5 +1,7 @@
 package com.cefalo.cci.model;
 
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
@@ -32,7 +34,7 @@ public class Organization  extends Persistent implements Serializable {
         this.name = name;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "organization")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "organization", orphanRemoval = true)
     public Set<Publication> getPublications() {
         return publications;
     }

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +40,12 @@ public class IssueResource {
     private IssueService issueService;
 
     @Inject
-    private Storage storage;
+    @Named("fileSystemStorage")
+    private Storage fileSystemStorage;
+
+    @Inject
+    @Named("databaseStorage")
+    private Storage databaseStorage;
 
     @Context
     private UriInfo uriInfo;
@@ -97,7 +103,7 @@ public class IssueResource {
         epubFileLoc = epubFileLoc.replace("\\", "/");
         URI uri = URI.create("jar:file:/" + epubFileLoc);
         URI fragmentPath = URI.create("/" + contentLocInEpub);
-        final InputStream in = storage.getFragment(uri, fragmentPath);
+        final InputStream in = fileSystemStorage.getFragment(uri, fragmentPath);
 
         if (in == null) {
             throw new NotFoundException("Resource is not found");
@@ -119,13 +125,11 @@ public class IssueResource {
     @Produces(MediaType.TEXT_PLAIN)
     public StreamingOutput downloadEpub(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                         @PathParam("file") String file) throws IOException {
-        String fileLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication + Utils.FILE_SEPARATOR + file;
-        fileLocation = fileLocation.replace("\\", "/");
-        log.info("File location is " + file);
         InputStream in = null;
 
         try {
-            in = storage.get(URI.create("file:/" + fileLocation));
+            String issueId = file.split("[.]")[0];
+            in = databaseStorage.get(URI.create(issueId));
 
             final InputStream finalIn = in;
             return new StreamingOutput() {
@@ -134,7 +138,7 @@ public class IssueResource {
                     Closeables.close(finalIn, true);
                 }
             };
-        } catch (NullPointerException e) {
+        } catch (FileNotFoundException fnfe) {
             throw new NotFoundException("File not found");
         } catch (IOException e) {
             Closeables.close(in, true);
