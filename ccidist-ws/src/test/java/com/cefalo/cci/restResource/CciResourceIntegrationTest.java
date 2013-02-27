@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -40,9 +41,9 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(3, nodeList.getLength());
 
         List<String> actualList= new ArrayList<String>();
-        actualList.add("Polaris");
-        actualList.add("NHST");
         actualList.add("AxelSpringer");
+        actualList.add("NHST");
+        actualList.add("Polaris");
 
         List<String> expectedList = new ArrayList<String>();
 
@@ -78,7 +79,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertNotNull(responseString);
         assertEquals(2, nodeList.getLength());
 
-        List<String> actualList= new ArrayList<String>(Utils.ORGANIZATION_DETAILS.get("Polaris"));
+        List<String> actualList= Arrays.asList("Addressa", "Harstadtidende");
         List<String> expectedList = new ArrayList<String>();
 
         for (int i = 0; i < nodeList.getLength(); i++) {

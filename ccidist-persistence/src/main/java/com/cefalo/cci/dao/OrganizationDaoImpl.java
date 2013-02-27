@@ -15,6 +15,13 @@ public class OrganizationDaoImpl implements OrganizationDao {
     @Override
     @Transactional
     public List<Organization> getAllOrganizations() {
-        return (List<Organization>) entityManager.createQuery("from Organization").getResultList();
+        return (List<Organization>) entityManager.createQuery("FROM Organization").getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public Organization getOrganization(String id) {
+        return (Organization) entityManager.find(Organization.class, id);
     }
 }

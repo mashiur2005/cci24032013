@@ -38,9 +38,10 @@ public class OrganizationResource {
         if (!Utils.ORGANIZATION_DETAILS.containsKey(organization)) {
             return Response.status(404).build();
         }
+        Organization org = organizationService.getOrganization(organization.toLowerCase());
         Map<String, Object> model = new HashMap<String, Object>();
-        model.put("organization", organization);
-        model.put("publications", Utils.ORGANIZATION_DETAILS.get(organization));
+        model.put("organization", org);
+       // model.put("publications", Utils.ORGANIZATION_DETAILS.get(organization));
         return Response.ok(new Viewable("/organization", model)).build();
     }
 }

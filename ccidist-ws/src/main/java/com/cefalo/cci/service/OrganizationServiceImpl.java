@@ -14,4 +14,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     public List<Organization> getAllOrganizations() {
         return organizationDao.getAllOrganizations();
     }
+
+    @Override
+    public Organization getOrganization(String id) {
+        return organizationDao.getOrganization(id);
+    }
 }
