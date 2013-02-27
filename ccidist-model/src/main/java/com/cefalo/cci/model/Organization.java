@@ -9,18 +9,18 @@ import java.util.Set;
 public class Organization  extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    private long id;
+    private String id;
     private String name;
     private Set<Publication> publications;
 
+
     @Id
-    @GeneratedValue
     @Column(name = "id")
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

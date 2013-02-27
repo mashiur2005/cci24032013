@@ -13,17 +13,16 @@ import javax.persistence.Table;
 public class Platform  extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    private long id;
+    private String id;
     private String name;
 
     @Id
-    @GeneratedValue
     @Column(name = "id")
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
