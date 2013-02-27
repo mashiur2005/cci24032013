@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Strings;
+
 public class Utils {
 
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
@@ -19,4 +21,17 @@ public class Utils {
          ORGANIZATION_DETAILS.put("AxelSpringer", Arrays.asList("AxelSpringer-SPORTS", "AxelSpringer-ENTERTAINMENT"));
     }
 
+    public static boolean isBlank(final String str) {
+        if (Strings.isNullOrEmpty(str)) {
+            return true;
+        }
+
+        int strLen = str.length();
+        for (int i = 0; i < strLen; i++) {
+            if (Character.isWhitespace(str.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
