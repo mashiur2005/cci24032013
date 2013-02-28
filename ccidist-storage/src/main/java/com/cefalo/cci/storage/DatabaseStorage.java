@@ -28,8 +28,8 @@ public class DatabaseStorage implements Storage {
             logger.info("path...." + resourceID.getPath());
         }
         Issue issue = issueDao.getIssue(resourceID.getPath());
-        if (issue.getEpubFile() == null || issue.getEpubFile().getFile() == null) {
-            throw new FileNotFoundException("No binary file for: ");
+        if (issue == null || issue.getEpubFile() == null || issue.getEpubFile().getFile() == null) {
+            throw new FileNotFoundException(String.format("No binary file for: %s", resourceID));
         }
 
         Blob blob = issue.getEpubFile().getFile();

@@ -23,14 +23,7 @@ public class CacheStorage implements Storage {
     @Override
     public InputStream get(URI resourceID) throws IOException {
         Preconditions.checkNotNull(resourceID, "Resource Id can not be null");
-        File file = new File(resourceID);
-        try {
-            InputStream in = new FileInputStream(file);
-            Preconditions.checkNotNull(in);
-            return  in;
-        } catch (IOException e) {
-            throw new IOException(e);
-        }
+        return databaseStorage.get(resourceID);
     }
 
     @Override
