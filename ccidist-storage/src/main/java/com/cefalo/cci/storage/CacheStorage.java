@@ -1,8 +1,7 @@
 package com.cefalo.cci.storage;
 
-import com.google.common.base.Preconditions;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import java.io.*;
@@ -17,15 +16,15 @@ public class CacheStorage implements Storage {
 
     @Override
     public InputStream get(URI resourceID) throws IOException {
-        Preconditions.checkNotNull(resourceID, "Resource Id can not be null");
+        checkNotNull(resourceID, "Resource Id can not be null");
+
         return databaseStorage.get(resourceID);
     }
 
     @Override
     public InputStream getFragment(URI resourceID, URI fragmentPath) throws IOException {
-
-        Preconditions.checkNotNull(resourceID, "Resource Id can not be null");
-        Preconditions.checkNotNull(fragmentPath, "Fragment Path can not be null");
+        checkNotNull(resourceID, "Resource Id can not be null");
+        checkNotNull(fragmentPath, "Fragment Path can not be null");
 
         String fileName = fragmentPath.getPath();
         InputStream in = databaseStorage.get(resourceID);
