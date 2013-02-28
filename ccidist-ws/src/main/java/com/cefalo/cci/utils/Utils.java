@@ -34,4 +34,8 @@ public class Utils {
         }
         return true;
     }
+
+    public static String createETagHeaderValue(final long value) {
+        return String.format("\"%s\"", value);
+    }
 }

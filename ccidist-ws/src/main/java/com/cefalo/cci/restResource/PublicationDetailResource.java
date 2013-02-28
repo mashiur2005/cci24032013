@@ -6,12 +6,13 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -29,6 +30,9 @@ import com.sun.jersey.api.view.Viewable;
 @Path("/{organization}/{publication}")
 public class PublicationDetailResource {
     @Context
+    private Request request;
+
+    @Context
     private UriInfo uriInfo;
 
     @Inject
@@ -40,9 +44,9 @@ public class PublicationDetailResource {
     // NOTE: If multiple resource methods are used, consider moving the params to member variables.
     @GET
     @Produces(MediaType.APPLICATION_XHTML_XML)
-    public Response getPublicationDetail(@PathParam("organization") @DefaultValue("") final String organizationName,
-            @PathParam("publication") @DefaultValue("") final String publicationName,
-            @HeaderParam("If-None-Match") @DefaultValue("-1") final long ifNoneMatchVersion) {
+    public Response getPublicationDetail(
+            @PathParam("organization") @DefaultValue("") final String organizationName,
+            @PathParam("publication") @DefaultValue("") final String publicationName) {
 
         // Fail fast. No point in proceeding if our arguments are obviously wrong.
         if (Utils.isBlank(publicationName) || Utils.isBlank(organizationName)) {
@@ -57,8 +61,10 @@ public class PublicationDetailResource {
         }
 
         // Support conditional GET requests
-        if (publication.getVersion() == ifNoneMatchVersion) {
-            return Response.notModified().build();
+        ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
+                .createETagHeaderValue(publication.getVersion())));
+        if (unmodifiedResponseBuilder != null) {
+            return unmodifiedResponseBuilder.build();
         }
 
         // FIXME: It would be hard to test this :-(. One option is to create a base class for all resources and return
