@@ -24,7 +24,8 @@ public class IssueDaoImpl implements IssueDao {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId) {
-        return entityManager.createQuery("select i from Issue i where i.publication.id like :pName")
+        return entityManager
+                .createQuery("select i from Issue i where i.publication.id like :pName order by updated desc")
                 .setParameter("pName", publicationId).getResultList();
     }
 
@@ -32,8 +33,10 @@ public class IssueDaoImpl implements IssueDao {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult) {
-        return entityManager.createQuery("select i from Issue i where i.publication.id like :pName")
-                .setParameter("pName", publicationId).setFirstResult((int)start).setMaxResults((int)maxResult).getResultList();
+        return entityManager
+                .createQuery("select i from Issue i where i.publication.id like :pName order by updated  desc")
+                .setParameter("pName", publicationId).setFirstResult((int) start).setMaxResults((int) maxResult)
+                .getResultList();
     }
 
     @Override
