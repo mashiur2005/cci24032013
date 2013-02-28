@@ -1,23 +1,16 @@
 package com.cefalo.cci.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.google.inject.Inject;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndLink;
-import com.sun.syndication.feed.synd.SyndLinkImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
+import com.sun.syndication.feed.synd.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class IssueServiceImpl implements IssueService {
     @Inject
@@ -71,8 +64,15 @@ public class IssueServiceImpl implements IssueService {
         List<SyndEntry> entries = new ArrayList<SyndEntry>();
         if (!links.isEmpty()) {
             SyndEntry syndEntry;
+            int toIndex = 0;
 
-            for (Issue issue : issues) {
+            if (start + limit - 1 > issues.size()) {
+                toIndex = issues.size();
+
+            } else {
+                toIndex = start + limit - 1;
+            }
+            for (Issue issue : issues.subList(start - 1, toIndex)) {
                 syndEntry = new SyndEntryImpl();
                 syndEntry.setUri("entry Id test"); // ??????
                 syndEntry.setUpdatedDate(issue.getUpdated());
