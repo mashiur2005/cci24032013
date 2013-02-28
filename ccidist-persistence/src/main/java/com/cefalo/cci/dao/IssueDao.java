@@ -6,8 +6,7 @@ import com.cefalo.cci.model.Issue;
 import java.util.List;
 
 public interface IssueDao {
-    List<Issue> getIssueListByPublicationName(String publicationName);
-    List<String> getIssueNameAsList(String publicationName);
+    List<Issue> getIssueListByPublicationId(String publicationId);
     EpubFile getEpubFile(long id);
     Issue getIssue(String id);
 }

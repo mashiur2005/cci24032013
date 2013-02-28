@@ -15,23 +15,19 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<Issue> getIssueListByPublicationName(String publicationName) {
-        return (List<Issue>) entityManager.createQuery("select i from Issue i where i.publication.id like :pName").getResultList();
+    public List<Issue> getIssueListByPublicationId(String publicationId) {
+        return entityManager.createQuery("select i from Issue i where i.publication.id like :pName")
+                .setParameter("pName", publicationId).getResultList();
     }
 
     @Override
     @Transactional
-    @SuppressWarnings("unchecked")
-    public List<String> getIssueNameAsList(String publicationName) {
-        return (List<String>)entityManager.createQuery("select i.name from Issue i where i.publication.id like :pName").setParameter("pName", publicationName).getResultList();
-    }
-
-    @Override
     public EpubFile getEpubFile(long id) {
         return entityManager.find(EpubFile.class, id);
     }
 
     @Override
+    @Transactional
     public Issue getIssue(String id) {
         return entityManager.find(Issue.class, id);
     }
