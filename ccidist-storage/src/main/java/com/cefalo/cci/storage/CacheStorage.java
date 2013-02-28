@@ -29,16 +29,22 @@ public class CacheStorage implements Storage {
 
         String fileName = fragmentPath.getPath();
         OutputStream out = null;
+        boolean fileFound = false;
         InputStream in = databaseStorage.get(resourceID);
         ZipInputStream zis = new ZipInputStream(in);
         out = new ByteArrayOutputStream();
         ZipEntry ze;
         while ((ze = zis.getNextEntry()) != null) {
-            if (fileName.contains(ze.getName())) {
+            if (fileName.equals(ze.getName())) {
                 ByteStreams.copy(zis, out);
                 Closeables.close(out, true);
+                fileFound = true;
                 break;
             }
+        }
+
+        if (!fileFound) {
+            throw new FileNotFoundException();
         }
         return new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
     }

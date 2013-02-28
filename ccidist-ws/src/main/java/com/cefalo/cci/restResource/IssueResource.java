@@ -79,7 +79,7 @@ public class IssueResource {
             @PathParam("organization") @DefaultValue("") String organizationName,
             @PathParam("publication") @DefaultValue("") String publicationName,
             @QueryParam("start") @DefaultValue("1") int start,
-            @QueryParam("limit") @DefaultValue("10") int limit) {
+            @QueryParam("limit") @DefaultValue("1") int limit) {
         if (Utils.isBlank(publicationName) || Utils.isBlank(organizationName)) {
             return Responses.clientError().build();
         }
