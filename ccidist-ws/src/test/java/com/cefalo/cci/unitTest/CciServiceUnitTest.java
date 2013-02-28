@@ -78,6 +78,7 @@ public class CciServiceUnitTest {
         helperIssueAsAtomFeed(1, 5, 0, 1, 0);
         helperIssueAsAtomFeed(5, 5, 15, 3, 5);
         helperIssueAsAtomFeed(15, 15, 30, 3, 15);
+        helperIssueAsAtomFeed(1, 12, 4, 1, 4);
     }
 
     public void helperIssueAsAtomFeed(int start, int limit, final int numberOfFiles, int expectedLinkCount, int expectedEntryCount) {
@@ -103,7 +104,13 @@ public class CciServiceUnitTest {
         }
         List<String> expectedList = new ArrayList<String>();
         if (mockCciService.getAllFileNamesInDirectory("").size() > 0) {
-            expectedList = mockCciService.getAllFileNamesInDirectory("").subList(start -1 , start + limit - 1);
+            int toIndex = 0;
+            if (start + limit - 1 > mockCciService.getAllFileNamesInDirectory("").size()) {
+                toIndex = mockCciService.getAllFileNamesInDirectory("").size();
+            } else {
+                toIndex = start + limit - 1;
+            }
+            expectedList = mockCciService.getAllFileNamesInDirectory("").subList(start -1 , toIndex);
         }
         assertEquals("element by element check: ", expectedList, actualList);
     }

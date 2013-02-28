@@ -53,11 +53,20 @@ public class CciServiceImpl implements CciService {
 
     @Override
     public List<SyndLink> getLinks(int start, int limit, String organizationName, String publicationName, int totalFile) {
-        if (start <= 0 || limit <= 0 || start > totalFile || limit > totalFile || (start > 0 && limit > 0 && start + limit - 1 > totalFile)) {
-            return new ArrayList<SyndLink>();
+        List<SyndLink> links = new ArrayList<SyndLink>();
+
+        if (start <= 0 || limit <= 0 || start > totalFile) {
+            return links;
         }
 
-        List<SyndLink> links = new ArrayList<SyndLink>();
+        if (start > 0 && limit > 0 && start + limit - 1 > totalFile) {
+            SyndLink self = new SyndLinkImpl();
+            self.setRel("self");
+            self.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + totalFile + "&start=" + start);
+            links.add(self);
+            return links;
+        }
+
         int prevStart = 0;
         int prevLimit = 0;
         int selfStart = 0;
@@ -149,8 +158,14 @@ public class CciServiceImpl implements CciService {
         List<SyndEntry> entries = new ArrayList<SyndEntry>();
         if (!links.isEmpty()) {
             SyndEntry syndEntry;
+            int toIndex = 0;
+            if (start + limit - 1 > fileNameList.size()) {
+                toIndex = fileNameList.size();
+            } else {
+                toIndex = start + limit - 1;
+            }
 
-            for (String fileName : fileNameList.subList(start - 1, start + limit - 1)) {
+            for (String fileName : fileNameList.subList(start - 1, toIndex)) {
                 syndEntry = new SyndEntryImpl();
                 syndEntry.setUri("entry Id test");
                 syndEntry.setUpdatedDate(new Date());
