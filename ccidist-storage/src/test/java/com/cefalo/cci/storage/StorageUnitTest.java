@@ -1,7 +1,5 @@
 package com.cefalo.cci.storage;
 
-import com.cefalo.cci.storage.FileSystemStorage;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,10 +12,10 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
 
 public class StorageUnitTest {
-    private FileSystemStorage fileSystemStorage;
+    private CacheStorage cacheStorage;
 
     public StorageUnitTest() {
-        fileSystemStorage = new FileSystemStorage();
+        cacheStorage = new CacheStorage();
 
     }
 
@@ -28,9 +26,9 @@ public class StorageUnitTest {
 
         for (int i = 0; i < 3; i++) {
             try {
-                InputStream in = fileSystemStorage.getFragment(URI.create(resourceIds.get(i)), URI.create(fragmentIds.get(i)));
+                InputStream in = cacheStorage.getFragment(URI.create(resourceIds.get(i)), URI.create(fragmentIds.get(i)));
                 assertNull(in);
-            } catch (NullPointerException ex) {
+            } catch (NullPointerException | IOException ex) {
 
             }
         }
@@ -39,7 +37,7 @@ public class StorageUnitTest {
    @Test
     public void downloadEpubFileTest() {
        try {
-           InputStream in = fileSystemStorage.get(null);
+           InputStream in = cacheStorage.get(null);
            assertNull(in);
        } catch (NullPointerException | IOException ex) {
 

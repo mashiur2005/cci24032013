@@ -9,5 +9,5 @@ public interface CciService {
     List<String> getAllFileNamesInDirectory(String dirPath);
     SyndFeed getIssueAsAtomFeed(List<String> fileNameList, String contextPath, String organizationName, String publicationName, int start, int limit);
     List<SyndLink> getLinks(int start, int limit, String organizationName, String publicationName, int totalFile);
-    String getMediaType(String epubFileLoc, String contentLocInEpub);
+    String getMediaType(String contentLocInEpub);
 }

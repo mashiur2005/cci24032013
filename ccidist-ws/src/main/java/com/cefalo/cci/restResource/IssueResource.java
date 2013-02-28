@@ -93,31 +93,34 @@ public class IssueResource {
     public Response getEpubContent(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                    @PathParam("issue") String issue, @PathParam("contentLocInEpub") final String contentLocInEpub) throws IOException {
 
-        String issueLocation = epubFileDirPath + Utils.FILE_SEPARATOR + organization + Utils.FILE_SEPARATOR + publication;
-        String epubFileLoc = issueLocation + Utils.FILE_SEPARATOR + issue + ".epub";
-        log.info("Epub File Loc... " + epubFileLoc);
-
-        Preconditions.checkNotNull(epubFileLoc, "Epub File location can not be null");
         Preconditions.checkNotNull(contentLocInEpub, "Content Location of Epub File can not be null");
 
-        epubFileLoc = epubFileLoc.replace("\\", "/");
-        URI uri = URI.create("jar:file:/" + epubFileLoc);
-        URI fragmentPath = URI.create("/" + contentLocInEpub);
-        final InputStream in = cacheStorage.getFragment(uri, fragmentPath);
+        URI resourceUri = URI.create(issue);
+        URI fragmentPath = URI.create(contentLocInEpub);
 
-        if (in == null) {
-            throw new NotFoundException("Resource is not found");
-        }
-        StreamingOutput sout = new StreamingOutput() {
-            public void write(OutputStream outputStream) throws IOException {
-                ByteStreams.copy(in, outputStream);
+        try {
+            InputStream in = cacheStorage.getFragment(resourceUri, fragmentPath);
+            if (in == null) {
+                throw new NotFoundException("Resource is not found");
             }
-        };
-        String mediaType = cciService.getMediaType(epubFileLoc, contentLocInEpub);
-        if (mediaType == null) {
-            mediaType = MediaType.APPLICATION_OCTET_STREAM;
+
+            final InputStream finalIn = in;
+            StreamingOutput sout = new StreamingOutput() {
+                public void write(OutputStream outputStream) throws IOException {
+                    ByteStreams.copy(finalIn, outputStream);
+                    Closeables.close(finalIn, true);
+                }
+            };
+
+            String mediaType = cciService.getMediaType(contentLocInEpub);
+            if (mediaType == null) {
+                mediaType = MediaType.APPLICATION_OCTET_STREAM;
+            }
+            return Response.ok(sout, mediaType).build();
+        } catch (IOException e) {
+            Throwables.propagateIfPossible(e.getCause(), IOException.class);
+            throw new IllegalStateException(e);
         }
-        return Response.ok(sout, mediaType).build();
     }
 
     @GET

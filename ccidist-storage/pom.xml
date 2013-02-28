@@ -17,6 +17,13 @@
     
     <dependencies>
 
+        <!--Guice JPA Integration-->
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-persist</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>com.cefalo</groupId>
             <artifactId>ccidist-persistence</artifactId>

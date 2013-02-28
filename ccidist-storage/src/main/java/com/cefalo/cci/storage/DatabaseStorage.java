@@ -3,10 +3,10 @@ package com.cefalo.cci.storage;
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.model.Issue;
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

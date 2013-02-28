@@ -1,14 +1,25 @@
 package com.cefalo.cci.storage;
 
 import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URI;
-import java.nio.file.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class CacheStorage implements Storage {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Inject
+    @Named("databaseStorage")
+    Storage databaseStorage;
+
     @Override
     public InputStream get(URI resourceID) throws IOException {
         Preconditions.checkNotNull(resourceID, "Resource Id can not be null");
@@ -23,18 +34,25 @@ public class CacheStorage implements Storage {
     }
 
     @Override
-    public InputStream getFragment(URI resourceID, URI fragmentPath) {
+    public InputStream getFragment(URI resourceID, URI fragmentPath) throws IOException {
 
         Preconditions.checkNotNull(resourceID, "Resource Id can not be null");
         Preconditions.checkNotNull(fragmentPath, "Fragment Path can not be null");
-        final Map<String, String> env = new HashMap<String, String>();
-        env.put("create", "false");
-        try (FileSystem fs = FileSystems.newFileSystem(resourceID, env)) {
-            Path pathInEpubfile = fs.getPath(fragmentPath.getPath());
-            return new ByteArrayInputStream(Files.readAllBytes(pathInEpubfile));
-        } catch (IOException e) {
-            return null;
+
+        String fileName = fragmentPath.getPath();
+        OutputStream out = null;
+        InputStream in = databaseStorage.get(resourceID);
+        ZipInputStream zis = new ZipInputStream(in);
+        out = new ByteArrayOutputStream();
+        ZipEntry ze;
+        while ((ze = zis.getNextEntry()) != null) {
+            if (fileName.contains(ze.getName())) {
+                ByteStreams.copy(zis, out);
+                Closeables.close(out, true);
+                break;
+            }
         }
+        return new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
     }
 
     @Override
