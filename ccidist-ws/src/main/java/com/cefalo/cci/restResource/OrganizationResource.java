@@ -20,6 +20,7 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,16 +35,16 @@ public class OrganizationResource {
     @GET
     @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getOrganizationList() {
-        List<Organization> organizationList = organizationService.getAllOrganizations();
-        if (organizationList.isEmpty()) {
+        List<Organization> organizations = organizationService.getAllOrganizations();
+        if (organizations.isEmpty()) {
             throw new NotFoundException();
         }
 
         ResourceLocator resourceLocator = JerseyResourceLocator.from(uriInfo);
-        Map<String, URI> orgNameUriMap = new HashMap<String, URI>();
+        Map<Organization, URI> orgNameUriMap = new LinkedHashMap<>();
 
-        for (Organization anOrganizationList : organizationList) {
-            orgNameUriMap.put(anOrganizationList.getName(), resourceLocator.getOrganizationURI(anOrganizationList.getId()));
+        for (Organization organization : organizations) {
+            orgNameUriMap.put(organization, resourceLocator.getOrganizationURI(organization.getId()));
         }
 
         Map<String, Object> model = new HashMap<String, Object>();
