@@ -5,7 +5,7 @@ import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.dao.IssueDaoImpl;
 import com.cefalo.cci.service.*;
 import com.cefalo.cci.storage.DatabaseStorage;
-import com.cefalo.cci.storage.FileSystemStorage;
+import com.cefalo.cci.storage.CacheStorage;
 import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
 import com.google.inject.name.Names;
@@ -25,7 +25,7 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
 
         bind(CciService.class).to(CciServiceImpl.class);
         bind(Storage.class).annotatedWith(Names.named("databaseStorage")).to(DatabaseStorage.class);
-        bind(Storage.class).annotatedWith(Names.named("fileSystemStorage")).to(FileSystemStorage.class);
+        bind(Storage.class).annotatedWith(Names.named("cacheStorage")).to(CacheStorage.class);
         bind(OrganizationDao.class).to(OrganizationDaoImpl.class);
         bind(OrganizationService.class).to(OrganizationServiceImpl.class);
         bind(PublicationDao.class).to(PublicationDaoImpl.class);

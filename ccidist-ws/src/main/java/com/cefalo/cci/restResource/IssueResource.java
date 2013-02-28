@@ -40,8 +40,8 @@ public class IssueResource {
     private IssueService issueService;
 
     @Inject
-    @Named("fileSystemStorage")
-    private Storage fileSystemStorage;
+    @Named("cacheStorage")
+    private Storage cacheStorage;
 
     @Inject
     @Named("databaseStorage")
@@ -103,7 +103,7 @@ public class IssueResource {
         epubFileLoc = epubFileLoc.replace("\\", "/");
         URI uri = URI.create("jar:file:/" + epubFileLoc);
         URI fragmentPath = URI.create("/" + contentLocInEpub);
-        final InputStream in = fileSystemStorage.getFragment(uri, fragmentPath);
+        final InputStream in = cacheStorage.getFragment(uri, fragmentPath);
 
         if (in == null) {
             throw new NotFoundException("Resource is not found");
