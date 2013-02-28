@@ -2,7 +2,6 @@ package com.cefalo.cci.restResource;
 
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.service.OrganizationService;
-import com.cefalo.cci.utils.Utils;
 import com.google.inject.Inject;
 import com.sun.jersey.api.view.Viewable;
 
@@ -35,10 +34,10 @@ public class OrganizationResource {
     @Path("/{organization}")
     @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getOrganizationDetail(@PathParam("organization") String organization) {
-        if (!Utils.ORGANIZATION_DETAILS.containsKey(organization)) {
+        Organization org = organizationService.getOrganization(organization.toLowerCase());
+        if (org == null) {
             return Response.status(404).build();
         }
-        Organization org = organizationService.getOrganization(organization.toLowerCase());
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("organization", org);
         return Response.ok(new Viewable("/organization", model)).build();

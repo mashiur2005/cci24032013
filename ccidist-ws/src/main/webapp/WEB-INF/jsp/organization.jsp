@@ -10,7 +10,7 @@
 <h3>${it.organization.name}</h3>
 <ul class="organization">
     <c:forEach items="${it.organization.publications}" var="publication">
-        <li><a href="${it.organization.name}/${publication.name}">${publication.name}</a></li>
+        <li><a href="${it.organization.id}/${publication.id}">${publication.name}</a></li>
     </c:forEach>
 </ul>
 </body>

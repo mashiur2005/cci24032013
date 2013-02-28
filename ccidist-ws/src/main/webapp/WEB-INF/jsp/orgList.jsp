@@ -11,7 +11,7 @@
 <h1>Organization List</h1>
 <ul class="organizations">
     <c:forEach items="${it.organizations}" var="organization">
-        <li><a href="${organization.name}">${organization.name}</a></li>
+        <li><a href="${organization.id}">${organization.name}</a></li>
     </c:forEach>
 </ul>
 </body>
