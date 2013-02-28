@@ -5,17 +5,12 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.net.URI;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class CacheStorage implements Storage {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Inject
     @Named("databaseStorage")
     Storage databaseStorage;
