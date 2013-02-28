@@ -131,22 +131,26 @@ public class IssueResource {
     public Response getEpubContent(@PathParam("organization") String organization, @PathParam("publication") String publication,
                                    @PathParam("issue") String issue, @PathParam("contentLocInEpub") final String contentLocInEpub) throws IOException {
 
-        checkNotNull(contentLocInEpub, "Content Location of Epub File can not be null");
-
-        URI resourceUri = URI.create(issue);
+        if (isBlank(organization) || isBlank(publication) || isBlank(issue) || isBlank(contentLocInEpub)) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        final String issueId = issue;
+        URI resourceUri = URI.create(issueId);
         URI fragmentPath = URI.create(contentLocInEpub);
-
+        boolean exceptionHappened = false;
+        InputStream binaryStream = null;
         try {
-            InputStream in = storage.getFragment(resourceUri, fragmentPath);
-            if (in == null) {
-                throw new NotFoundException("Resource is not found");
-            }
+            binaryStream = storage.getFragment(resourceUri, fragmentPath);
 
-            final InputStream finalIn = in;
+            final InputStream finalVarBinaryStream = binaryStream;
             StreamingOutput sout = new StreamingOutput() {
                 public void write(OutputStream outputStream) throws IOException {
-                    ByteStreams.copy(finalIn, outputStream);
-                    Closeables.close(finalIn, true);
+                    try (InputStream resource = finalVarBinaryStream) {
+                        ByteStreams.copy(resource, outputStream);
+                    } catch (Throwable t) {
+                        log.error(String.format("Error sending EPub file: %s", issueId), t);
+                        throw t;
+                    }
                 }
             };
 
@@ -155,9 +159,17 @@ public class IssueResource {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
             }
             return Response.ok(sout, mediaType).build();
-        } catch (IOException e) {
-            Throwables.propagateIfPossible(e.getCause(), IOException.class);
-            throw new IllegalStateException(e);
+        } catch (FileNotFoundException fnfe) {
+            exceptionHappened = true;
+            throw new NotFoundException();
+        } catch (Throwable t) {
+            exceptionHappened = true;
+            throw t;
+        } finally {
+            if (exceptionHappened) {
+                // We only close when exception happened. Otherwise, the StreamingOutput.write will close it.
+                Closeables.close(binaryStream, exceptionHappened);
+            }
         }
     }
 
