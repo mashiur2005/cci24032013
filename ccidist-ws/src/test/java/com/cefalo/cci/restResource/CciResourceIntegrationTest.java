@@ -51,6 +51,8 @@ public class CciResourceIntegrationTest extends JerseyTest{
             expectedList.add(nodeList.item(i).getTextContent());
         }
 
+        Collections.sort(expectedList);
+
         assertEquals(actualList, expectedList);
 
         ws = resource().path(BASE_URL).path("@#&*//*");

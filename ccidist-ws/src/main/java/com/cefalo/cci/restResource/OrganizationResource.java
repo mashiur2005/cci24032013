@@ -1,17 +1,25 @@
 package com.cefalo.cci.restResource;
 
+import com.cefalo.cci.mapping.JerseyResourceLocator;
+import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Organization;
+import com.cefalo.cci.model.Publication;
 import com.cefalo.cci.service.OrganizationService;
+import com.cefalo.cci.utils.Utils;
 import com.google.inject.Inject;
+import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.view.Viewable;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,26 +28,65 @@ public class OrganizationResource {
     @Inject
     private OrganizationService organizationService;
 
+    @Context
+    private UriInfo uriInfo;
+
     @GET
     @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getOrganizationList() {
-        Map<String, Object> model = new HashMap<String, Object>();
-
         List<Organization> organizationList = organizationService.getAllOrganizations();
-        model.put("organizations", organizationList);
+        if (organizationList == null || organizationList.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        ResourceLocator resourceLocator = JerseyResourceLocator.from(uriInfo);
+        Map<String, URI> orgNameUriMap = new HashMap<String, URI>();
+
+        for (Organization anOrganizationList : organizationList) {
+            orgNameUriMap.put(anOrganizationList.getName(), resourceLocator.getOrganizationURI(anOrganizationList.getId()));
+        }
+
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("orgMap", orgNameUriMap);
+
+        //TODO: we have to add version here
+
         return Response.ok(new Viewable("/orgList", model)).build();
     }
 
     @GET
     @Path("/{organization}")
     @Produces(MediaType.APPLICATION_XHTML_XML)
-    public Response getOrganizationDetail(@PathParam("organization") String organization) {
+    public Response getOrganizationDetail(@PathParam("organization") final String organization, @HeaderParam("If-None-Match") @DefaultValue("-1") final long ifNoneMatchVersion) {
+        if (Utils.isBlank(organization)) {
+            return Responses.clientError().entity("Organization name may not be empty").build();
+        }
         Organization org = organizationService.getOrganization(organization.toLowerCase());
         if (org == null) {
-            return Response.status(404).build();
+            throw  new NotFoundException();
         }
+
+        if (org.getVersion() == ifNoneMatchVersion) {
+            return Response.notModified().build();
+        }
+
+        ResourceLocator resourceLocator = JerseyResourceLocator.from(uriInfo);
+        Map<String, URI> publicationNameUriMap = new HashMap<String, URI>();
+
+        Iterator<Publication> publicationIterator = org.getPublications().iterator();
+
+        while (publicationIterator.hasNext()) {
+            Publication tempPublication = publicationIterator.next();
+            publicationNameUriMap.put(tempPublication.getName(), resourceLocator.getPublicationURI(org.getId(), tempPublication.getId()));
+        }
+
+
         Map<String, Object> model = new HashMap<String, Object>();
-        model.put("organization", org);
-        return Response.ok(new Viewable("/organization", model)).build();
+        model.put("organizationName", org.getName());
+        model.put("publicationMap", publicationNameUriMap);
+
+        ResponseBuilder responseBuilder = Response.ok(new Viewable("/organization", model));
+        responseBuilder = responseBuilder.tag(String.valueOf(org.getVersion()));
+        return responseBuilder.build();
     }
 }

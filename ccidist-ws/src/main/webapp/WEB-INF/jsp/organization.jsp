@@ -7,10 +7,10 @@
 <head><title>Organization</title></head>
 <body>
 <h1>Organization</h1>
-<h3>${it.organization.name}</h3>
+<h3>${it.organizationName}</h3>
 <ul class="organization">
-    <c:forEach items="${it.organization.publications}" var="publication">
-        <li><a href="${it.organization.id}/${publication.id}">${publication.name}</a></li>
+    <c:forEach items="${it.publicationMap}" var="publicationMap">
+        <li><a href="${publicationMap.value}">${publicationMap.key}</a></li>
     </c:forEach>
 </ul>
 </body>
