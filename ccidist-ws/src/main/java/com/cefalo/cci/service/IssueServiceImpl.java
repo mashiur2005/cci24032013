@@ -44,8 +44,9 @@ public class IssueServiceImpl implements IssueService {
             ResourceLocator resourceLocator) {
         checkArgument(start > 0 && limit > 0);
 
+        // Remember that the DB layer expects 0 based indexing while we use 1 based indexing in the resource layer.
         return getIssueAsAtomFeed(
-                issueDao.getIssueListByPublicationId(publication.getId(), start, limit),
+                issueDao.getIssueListByPublicationId(publication.getId(), start - 1, limit),
                 organization,
                 publication,
                 start,
@@ -77,7 +78,7 @@ public class IssueServiceImpl implements IssueService {
         List<SyndEntry> entries = new ArrayList<SyndEntry>();
         for (Issue issue : issues) {
             SyndEntry syndEntry = new SyndEntryImpl();
-            syndEntry.setUri(issue.getId()); // TODO: What is this????????
+            syndEntry.setUri("urn:uuid:".concat(issue.getId()));
             syndEntry.setUpdatedDate(issue.getUpdated());
             syndEntry.setTitle(issue.getName());
             syndEntry.setAuthor(publicationName);

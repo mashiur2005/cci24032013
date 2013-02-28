@@ -25,7 +25,7 @@ public class IssueDaoImpl implements IssueDao {
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId) {
         return entityManager
-                .createQuery("select i from Issue i where i.publication.id like :pName order by updated desc")
+                .createQuery("select i from Issue i where i.publication.id like :pName order by i.updated desc")
                 .setParameter("pName", publicationId).getResultList();
     }
 
@@ -34,12 +34,10 @@ public class IssueDaoImpl implements IssueDao {
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult) {
         return entityManager
-                .createQuery("select i from Issue i where i.publication.id like :pName order by updated  desc")
+                .createQuery("select i from Issue i where i.publication.id like :pName order by i.updated  desc")
                 .setParameter("pName", publicationId).setFirstResult((int) start).setMaxResults((int) maxResult)
                 .getResultList();
-    }
-
-    @Override
+    }    @Override
     @Transactional
     public EpubFile getEpubFile(long id) {
         return entityManager.find(EpubFile.class, id);
