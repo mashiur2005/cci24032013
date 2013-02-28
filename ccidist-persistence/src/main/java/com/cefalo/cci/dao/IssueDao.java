@@ -10,7 +10,7 @@ public interface IssueDao {
 
     List<Issue> getIssueListByPublicationId(String publicationId);
 
-    List<Issue> getIssueListByPublicationId(String publicationId, int start, int maxResult);
+    List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult);
 
     EpubFile getEpubFile(long id);
 

@@ -1,16 +1,25 @@
 package com.cefalo.cci.service;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.google.inject.Inject;
-import com.sun.syndication.feed.synd.*;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndLink;
+import com.sun.syndication.feed.synd.SyndLinkImpl;
+import com.sun.syndication.feed.synd.SyndPerson;
+import com.sun.syndication.feed.synd.SyndPersonImpl;
 
 public class IssueServiceImpl implements IssueService {
     @Inject
@@ -30,22 +39,24 @@ public class IssueServiceImpl implements IssueService {
     public SyndFeed getIssuesAsAtomFeed(
             Organization organization,
             Publication publication,
-            int start,
-            int limit,
+            long start,
+            long limit,
             ResourceLocator resourceLocator) {
+        checkArgument(start > 0 && limit > 0);
 
         return getIssueAsAtomFeed(
-                getIssueListByPublicationId(publication.getId()),
+                issueDao.getIssueListByPublicationId(publication.getId(), start, limit),
                 organization,
                 publication,
                 start,
                 limit,
+                (int)issueDao.getIssueCountByPublicationId(publication.getId()),
                 resourceLocator);
     }
 
     @SuppressWarnings("unchecked")
-    private SyndFeed getIssueAsAtomFeed(List<Issue> issues, Organization organization, Publication publication, int start,
-            int limit, ResourceLocator resourceLocator) {
+    private SyndFeed getIssueAsAtomFeed(List<Issue> issues, Organization organization, Publication publication,
+            long start, long limit, long total, ResourceLocator resourceLocator) {
         String publicationName = publication.getName();
         String organizationName = organization.getName();
 
@@ -59,127 +70,46 @@ public class IssueServiceImpl implements IssueService {
         syndPerson.setName(publicationName);
         feed.getAuthors().add(syndPerson);
 
-        List<SyndLink> links = getLinks(start, limit, organizationName, publicationName, issues.size());
+        List<SyndLink> links = getLinks(start, limit, total,
+                resourceLocator.getIssueListURI(organization.getId(), publication.getId()).toString());
+        feed.setLinks(links);
 
         List<SyndEntry> entries = new ArrayList<SyndEntry>();
-        if (!links.isEmpty()) {
-            SyndEntry syndEntry;
-            int toIndex = 0;
-
-            if (start + limit - 1 > issues.size()) {
-                toIndex = issues.size();
-
-            } else {
-                toIndex = start + limit - 1;
-            }
-            for (Issue issue : issues.subList(start - 1, toIndex)) {
-                syndEntry = new SyndEntryImpl();
-                syndEntry.setUri("entry Id test"); // ??????
-                syndEntry.setUpdatedDate(issue.getUpdated());
-                syndEntry.setTitle(issue.getName());
-                syndEntry.setAuthor(publicationName);
-                syndEntry.setLink(resourceLocator.getIssueURI(organization.getId(), publication.getId(), issue.getId())
-                        .toString());
-                entries.add(syndEntry);
-            }
-
-        } else {
-            SyndLink self = new SyndLinkImpl();
-            self.setRel("self");
-            self.setHref(resourceLocator.getIssueListURI(organization.getId(), publication.getId()).toString()
-                    .concat("?start=0&limit=0"));
-            links.add(self);
+        for (Issue issue : issues) {
+            SyndEntry syndEntry = new SyndEntryImpl();
+            syndEntry.setUri(issue.getId()); // TODO: What is this????????
+            syndEntry.setUpdatedDate(issue.getUpdated());
+            syndEntry.setTitle(issue.getName());
+            syndEntry.setAuthor(publicationName);
+            syndEntry.setLink(resourceLocator.getIssueURI(organization.getId(), publication.getId(), issue.getId())
+                    .toString());
+            entries.add(syndEntry);
         }
-
-        feed.setLinks(links);
         feed.setEntries(entries);
 
         return feed;
     }
 
-    private List<SyndLink> getLinks(int start, int limit, String organizationName, String publicationName, int totalFile) {
+    private List<SyndLink> getLinks(long start, long limit, long total, String issueListUri) {
         List<SyndLink> links = new ArrayList<SyndLink>();
+        links.add(createAtomLink("self", start, limit, issueListUri));
 
-        if (start <= 0 || limit <= 0 || start > totalFile) {
-            return links;
+        if (start > 1) {
+            // There is a prev link
+            links.add(createAtomLink("prev", Math.max(1, start - limit), limit, issueListUri));
         }
-
-        if (start > 0 && limit > 0 && start + limit - 1 > totalFile) {
-            SyndLink self = new SyndLinkImpl();
-            self.setRel("self");
-            self.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + totalFile + "&start=" + start);
-            links.add(self);
-            return links;
-        }
-
-        int prevStart = 0;
-        int prevLimit = 0;
-        int selfStart = 0;
-        int selfLimit = 0;
-        int nextStart = 0;
-        int nextLimit = 0;
-        boolean addPrev = true;
-        boolean addNext = true;
-
-        if (start + limit - 1 == totalFile) {
-            addNext = false;
-        }
-
-        if (start > limit) {
-            prevStart = start - limit;
-            selfStart = start;
-            nextStart = start + limit;
-
-            prevLimit = limit;
-            selfLimit = limit;
-            int left = totalFile - (start + limit) + 1;
-            nextLimit = limit < left ? limit : left;
-        } else if (start < limit && start > 1) {
-            prevStart = 1;
-            selfStart = start;
-            nextStart = start + limit;
-
-            prevLimit = start - prevStart;
-            selfLimit = limit;
-            int left = totalFile - (start + limit) + 1;
-            nextLimit = limit < left ? limit : left;
-        } else if (start == 1) {
-            addPrev = false;
-            selfStart = start;
-            nextStart = start + limit;
-
-            selfLimit = limit;
-            int left = totalFile - (start + limit) + 1;
-            nextLimit = limit < left ? limit : left;
-        } else if (start == limit) {
-            prevStart = start - limit + 1;
-            selfStart = start;
-            nextStart = start + limit;
-
-            selfLimit = limit;
-            prevLimit = start - prevStart;
-            int left = totalFile - (start + limit) + 1;
-            nextLimit = limit < left ? limit : left;
-        }
-
-        if (addPrev) {
-            SyndLink prev = new SyndLinkImpl();
-            prev.setRel("prev");
-            prev.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + prevLimit + "&start=" + prevStart);
-            links.add(prev);
-        }
-
-        SyndLink self = new SyndLinkImpl();
-        self.setRel("self");
-        self.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + selfLimit + "&start=" + selfStart);
-        links.add(self);
-        if (addNext) {
-            SyndLink next = new SyndLinkImpl();
-            next.setRel("next");
-            next.setHref("/" + organizationName + "/" + publicationName + "/issue" + "?limit=" + nextLimit + "&start=" + nextStart);
-            links.add(next);
+        if ((start + limit) < (total + 1)) {
+            // There is a next link
+            links.add(createAtomLink("next", Math.min(start + limit, total), limit, issueListUri));
         }
 
         return links;
+    }
+
+    private SyndLink createAtomLink(String relation, long start, long limit, String baseIssueListUri) {
+        SyndLink self = new SyndLinkImpl();
+        self.setRel(relation);
+        self.setHref(String.format("%s?start=%s&limit=%s", baseIssueListUri, start, limit));
+        return self;
     }
 }

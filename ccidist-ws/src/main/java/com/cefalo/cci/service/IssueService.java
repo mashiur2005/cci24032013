@@ -13,6 +13,6 @@ public interface IssueService {
 
     List<Issue> getIssueListByPublicationId(String publicationId);
 
-    SyndFeed getIssuesAsAtomFeed(Organization organization, Publication publication, int start, int limit,
+    SyndFeed getIssuesAsAtomFeed(Organization organization, Publication publication, long start, long limit,
             ResourceLocator resourceLocator);
 }

@@ -81,7 +81,10 @@ public class IssueResource {
             @QueryParam("start") @DefaultValue("1") int start,
             @QueryParam("limit") @DefaultValue("1") int limit) {
         if (Utils.isBlank(publicationName) || Utils.isBlank(organizationName)) {
-            return Responses.clientError().build();
+            return Responses.clientError().entity("Organization or publication name may not be blank.").build();
+        }
+        if (start <= 0 || limit <= 0) {
+            return Responses.clientError().entity("Start & limit params should have positive non-zero values.").build();
         }
 
         Publication publication = publicationService.getPublication(publicationName);

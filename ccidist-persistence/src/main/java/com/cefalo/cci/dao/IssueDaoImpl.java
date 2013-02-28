@@ -16,7 +16,8 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @Transactional
     public long getIssueCountByPublicationId(String publicationId) {
-        return (Long) entityManager.createQuery("select count(i) from Issue i").getSingleResult();
+        return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName")
+                .setParameter("pName", publicationId).getSingleResult();
     }
 
     @Override
@@ -30,9 +31,9 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<Issue> getIssueListByPublicationId(String publicationId, int start, int maxResult) {
+    public List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult) {
         return entityManager.createQuery("select i from Issue i where i.publication.id like :pName")
-                .setParameter("pName", publicationId).setFirstResult(start).setMaxResults(maxResult).getResultList();
+                .setParameter("pName", publicationId).setFirstResult((int)start).setMaxResults((int)maxResult).getResultList();
     }
 
     @Override
