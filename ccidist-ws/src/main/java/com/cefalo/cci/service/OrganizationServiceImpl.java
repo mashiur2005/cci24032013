@@ -4,6 +4,7 @@ import com.cefalo.cci.dao.OrganizationDao;
 import com.cefalo.cci.model.Organization;
 import com.google.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrganizationServiceImpl implements OrganizationService {
@@ -12,7 +13,11 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<Organization> getAllOrganizations() {
-        return organizationDao.getAllOrganizations();
+        List<Organization> organizationList = organizationDao.getAllOrganizations();
+        if (organizationList == null) {
+            return new ArrayList<>();
+        }
+        return organizationList;
     }
 
     @Override

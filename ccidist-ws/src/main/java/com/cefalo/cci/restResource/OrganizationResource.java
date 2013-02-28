@@ -35,7 +35,7 @@ public class OrganizationResource {
     @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getOrganizationList() {
         List<Organization> organizationList = organizationService.getAllOrganizations();
-        if (organizationList == null || organizationList.isEmpty()) {
+        if (organizationList.isEmpty()) {
             throw new NotFoundException();
         }
 
