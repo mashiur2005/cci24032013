@@ -1,12 +1,13 @@
 package com.cefalo.cci.dao;
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+
 import com.cefalo.cci.model.EpubFile;
 import com.cefalo.cci.model.Issue;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
 
 public class IssueDaoImpl implements IssueDao {
     @Inject
@@ -14,10 +15,24 @@ public class IssueDaoImpl implements IssueDao {
 
     @Override
     @Transactional
+    public long getIssueCountByPublicationId(String publicationId) {
+        return (Long) entityManager.createQuery("select count(i) from Issue i").getSingleResult();
+    }
+
+    @Override
+    @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId) {
         return entityManager.createQuery("select i from Issue i where i.publication.id like :pName")
                 .setParameter("pName", publicationId).getResultList();
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<Issue> getIssueListByPublicationId(String publicationId, int start, int maxResult) {
+        return entityManager.createQuery("select i from Issue i where i.publication.id like :pName")
+                .setParameter("pName", publicationId).setFirstResult(start).setMaxResults(maxResult).getResultList();
     }
 
     @Override
