@@ -1,7 +1,6 @@
 package com.cefalo.cci.restResource;
 
 import static com.cefalo.cci.utils.Utils.isBlank;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,7 +40,6 @@ import com.cefalo.cci.service.IssueService;
 import com.cefalo.cci.service.PublicationService;
 import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
-import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
@@ -76,10 +74,11 @@ public class IssueResource {
     @GET
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getIssueList(
-            @PathParam("organization") @DefaultValue("") String organizationName,
-            @PathParam("publication") @DefaultValue("") String publicationName,
-            @QueryParam("start") @DefaultValue("1") int start,
-            @QueryParam("limit") @DefaultValue("1") int limit) {
+            @PathParam("organization") @DefaultValue("") final String organizationName,
+            @PathParam("publication") @DefaultValue("") final String publicationName,
+            @QueryParam("start") @DefaultValue("1") final int start,
+            @QueryParam("limit") @DefaultValue("1") final int limit) {
+
         if (Utils.isBlank(publicationName) || Utils.isBlank(organizationName)) {
             return Responses.clientError().entity("Organization or publication name may not be blank.").build();
         }
@@ -101,9 +100,10 @@ public class IssueResource {
     @GET
     @Path("/{issue}")
     @Produces(MediaType.APPLICATION_XHTML_XML)
-    public Response getIssueDetail(@PathParam("organization") @DefaultValue("") String organizationId,
-            @PathParam("publication") @DefaultValue("") String publicationId,
-            @PathParam("issue") @DefaultValue("") String issueId) {
+    public Response getIssueDetail(
+            @PathParam("organization") @DefaultValue("") final String organizationId,
+            @PathParam("publication") @DefaultValue("") final String publicationId,
+            @PathParam("issue") @DefaultValue("") final String issueId) {
 
         Issue issue = retrieveIssue(organizationId, publicationId, issueId);
 
@@ -128,15 +128,19 @@ public class IssueResource {
 
     @Path("/{issue}/{contentLocInEpub: .+}")
     @GET
-    public Response getEpubContent(@PathParam("organization") String organization, @PathParam("publication") String publication,
-                                   @PathParam("issue") String issue, @PathParam("contentLocInEpub") final String contentLocInEpub) throws IOException {
+    public Response getEpubContent(@PathParam("organization") @DefaultValue("") final String organizationId,
+            @PathParam("publication") @DefaultValue("") final String publicationId,
+            @PathParam("issue") @DefaultValue("") final String issueId,
+            @PathParam("contentLocInEpub") @DefaultValue("") final String contentLocInEpub) throws IOException {
 
-        if (isBlank(organization) || isBlank(publication) || isBlank(issue) || isBlank(contentLocInEpub)) {
-            throw new WebApplicationException(Status.BAD_REQUEST);
+        Issue issue = retrieveIssue(organizationId, publicationId, issueId);
+        if (isBlank(contentLocInEpub)) {
+            return Responses.clientError().entity("Content location may not be blank.").build();
         }
-        final String issueId = issue;
-        URI resourceUri = URI.create(issueId);
+
+        URI resourceUri = URI.create(issue.getId());
         URI fragmentPath = URI.create(contentLocInEpub);
+
         boolean exceptionHappened = false;
         InputStream binaryStream = null;
         try {
@@ -148,7 +152,7 @@ public class IssueResource {
                     try (InputStream resource = finalVarBinaryStream) {
                         ByteStreams.copy(resource, outputStream);
                     } catch (Throwable t) {
-                        log.error(String.format("Error sending EPub file: %s", issueId), t);
+                        log.error(String.format("Error sending file: %s/%s", issueId, contentLocInEpub), t);
                         throw t;
                     }
                 }
@@ -177,9 +181,9 @@ public class IssueResource {
     @Path("/{file: [^/]+.epub?}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response downloadEpub(
-            @PathParam("organization") @DefaultValue("") String organizationId,
-            @PathParam("publication") @DefaultValue("") String publicationId,
-            @PathParam("file") @DefaultValue("") String binaryFileName) throws IOException {
+            @PathParam("organization") @DefaultValue("") final String organizationId,
+            @PathParam("publication") @DefaultValue("") final String publicationId,
+            @PathParam("file") @DefaultValue("") final String binaryFileName) throws IOException {
 
         final String issueId = Files.getNameWithoutExtension(binaryFileName);
         Issue issue = retrieveIssue(organizationId, publicationId, issueId);
