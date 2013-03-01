@@ -35,18 +35,70 @@ public class IssueServiceImplTest {
 
     @Test
     public void getLinksTest() {
+        List<String> expectedAllRelList = new ArrayList<String>();
+        expectedAllRelList.add("self");
+        expectedAllRelList.add("prev");
+        expectedAllRelList.add("next");
+
+        List<String> selfPrevList = new ArrayList<String>();
+        selfPrevList.add("self");
+        selfPrevList.add("prev");
+
+        List<String> selfNextList = new ArrayList<String>();
+        selfNextList.add("self");
+        selfNextList.add("next");
+
         String issueListUri = "/cciService/polaris/addressa/issue";
         List<SyndLink> syndLinkList = issueServiceImpl.getLinks(1, 5, 12, issueListUri);
         assertEquals(2, syndLinkList.size());
+        assertEquals("self: start=1&limit=5", issueListUri + "?start=1&limit=5", syndLinkList.get(0).getHref());
+        assertEquals("next: start=6&limit=5", issueListUri + "?start=6&limit=5", syndLinkList.get(1).getHref());
+
+        List<String> actualList = new ArrayList<String>();
+        for (SyndLink aSyndLinkList : syndLinkList) {
+            actualList.add(aSyndLinkList.getRel());
+        }
+        assertEquals("relation by relation check: self next", selfNextList, actualList);
 
         syndLinkList = issueServiceImpl.getLinks(2, 5, 12, issueListUri);
         assertEquals(3, syndLinkList.size());
+        assertEquals("self: start=2&limit=5",issueListUri + "?start=2&limit=5", syndLinkList.get(0).getHref());
+        assertEquals("prev: start=1&limit=5", issueListUri + "?start=1&limit=5", syndLinkList.get(1).getHref());
+        assertEquals("next: start=7&limit=5", issueListUri + "?start=7&limit=5", syndLinkList.get(2).getHref());
+
+        actualList = new ArrayList<String>();
+        for (SyndLink aSyndLinkList : syndLinkList) {
+            actualList.add(aSyndLinkList.getRel());
+        }
+
+        assertEquals("relation by relation check: self prev next", expectedAllRelList, actualList);
 
         syndLinkList = issueServiceImpl.getLinks(7, 5, 12, issueListUri);
         assertEquals(3, syndLinkList.size());
+        assertEquals("self: start=7&limit=5",issueListUri + "?start=7&limit=5", syndLinkList.get(0).getHref());
+        assertEquals("prev: start=2&limit=5", issueListUri + "?start=2&limit=5", syndLinkList.get(1).getHref());
+        assertEquals("next: start=12&limit=5", issueListUri + "?start=12&limit=5", syndLinkList.get(2).getHref());
+
+        actualList = new ArrayList<String>();
+
+        for (SyndLink aSyndLinkList : syndLinkList) {
+            actualList.add(aSyndLinkList.getRel());
+        }
+
+        assertEquals("relation by relation check: self prev next", expectedAllRelList, actualList);
 
         syndLinkList = issueServiceImpl.getLinks(7, 6, 12, issueListUri);
         assertEquals(2, syndLinkList.size());
+        assertEquals("self: start=7&limit=6",issueListUri + "?start=7&limit=6", syndLinkList.get(0).getHref());
+        assertEquals("prev: start=1&limit=6", issueListUri + "?start=1&limit=6", syndLinkList.get(1).getHref());
+
+        actualList = new ArrayList<String>();
+
+        for (SyndLink aSyndLinkList : syndLinkList) {
+            actualList.add(aSyndLinkList.getRel());
+        }
+
+        assertEquals("relation by relation check: self prev", selfPrevList, actualList);
     }
 
     @Test
@@ -63,20 +115,20 @@ public class IssueServiceImplTest {
         String organizationId = "polaris";
         String publicationId = "addressa";
 
-        Organization mockOrganization = mock(Organization.class);
-        when(mockOrganization.getId()).thenReturn(organizationId);
-        when(mockOrganization.getName()).thenReturn(organizationId);
+        Organization organization = new Organization();
+        organization.setId(organizationId);
+        organization.setName(organizationId);
 
-        Publication mockPublication = mock(Publication.class);
-        when(mockPublication.getId()).thenReturn(publicationId);
-        when(mockPublication.getName()).thenReturn(publicationId);
+        Publication publication = new Publication();
+        publication.setId(publicationId);
+        publication.setName(publicationId);
 
         List<Issue> dummyIssueList = getDummyList(numberOfIssues);
 
         ResourceLocator mockResourceLocator = mock(ResourceLocator.class);
 
         for (int i = 0; i < numberOfIssues; i++) {
-            when(mockResourceLocator.getIssueURI(mockOrganization.getId(), mockPublication.getId(), dummyIssueList.get(i).getId())).thenReturn(URI.create("/" + organizationId + "/" + publicationId + "/" + dummyIssueList.get(i).getId()));
+            when(mockResourceLocator.getIssueURI(organization.getId(), publication.getId(), dummyIssueList.get(i).getId())).thenReturn(URI.create("/" + organizationId + "/" + publicationId + "/" + dummyIssueList.get(i).getId()));
         }
 
         when(mockResourceLocator.getIssueListURI(organizationId, publicationId)).thenReturn(URI.create("/" + organizationId + "/" + publicationId));
@@ -88,7 +140,7 @@ public class IssueServiceImplTest {
             toIndex = start + limit - 1;
         }
 
-        SyndFeed syndFeed = issueServiceImpl.getIssueAsAtomFeed(dummyIssueList.subList(start - 1, toIndex), mockOrganization, mockPublication, start,limit, numberOfIssues, mockResourceLocator);
+        SyndFeed syndFeed = issueServiceImpl.getIssueAsAtomFeed(dummyIssueList.subList(start - 1, toIndex), organization, publication, start,limit, numberOfIssues, mockResourceLocator);
 
         Assert.assertEquals("number of links: ", syndFeed.getLinks().size(), expectedLinkCount);
         Assert.assertEquals("number of entry: ", syndFeed.getEntries().size(), expectedEntryCount);
