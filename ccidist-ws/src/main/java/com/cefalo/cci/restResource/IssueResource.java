@@ -123,7 +123,7 @@ public class IssueResource {
         model.put("containerUri",
                 locator.getEpubContentURI(organizationId, publicationId, issueId, "META-INF/container.xml"));
 
-        return Response.ok(new Viewable("/issueDetail", model)).build();
+        return Response.ok(new Viewable("/issueDetail", model)).tag(String.valueOf(issue.getVersion())).build();
     }
 
     @Path("/{issue}/{contentLocInEpub: .+}")
