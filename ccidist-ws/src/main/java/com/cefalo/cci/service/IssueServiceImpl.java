@@ -1,25 +1,18 @@
 package com.cefalo.cci.service;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.google.inject.Inject;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndLink;
-import com.sun.syndication.feed.synd.SyndLinkImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
+import com.sun.syndication.feed.synd.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class IssueServiceImpl implements IssueService {
     @Inject
@@ -56,7 +49,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @SuppressWarnings("unchecked")
-    private SyndFeed getIssueAsAtomFeed(List<Issue> issues, Organization organization, Publication publication,
+    SyndFeed getIssueAsAtomFeed(List<Issue> issues, Organization organization, Publication publication,
             long start, long limit, long total, ResourceLocator resourceLocator) {
         String publicationName = publication.getName();
         String organizationName = organization.getName();
@@ -91,7 +84,7 @@ public class IssueServiceImpl implements IssueService {
         return feed;
     }
 
-    private List<SyndLink> getLinks(long start, long limit, long total, String issueListUri) {
+    List<SyndLink> getLinks(long start, long limit, long total, String issueListUri) {
         List<SyndLink> links = new ArrayList<SyndLink>();
         links.add(createAtomLink("self", start, limit, issueListUri));
 
