@@ -13,7 +13,8 @@
     </h3>
     <div>
         <span>Issue Search:</span>
-        <form action="<c:out value="${it.issueSearchURI}"/>">
+        <c:set var="formSubmitUri"><c:out value="${it.issueSearchURI}"/></c:set>
+        <form action="${formSubmitUri}">
             <dl>
                 <dt>
                     <label for="limit">Limit</label>

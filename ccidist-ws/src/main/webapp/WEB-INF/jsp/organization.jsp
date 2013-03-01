@@ -12,7 +12,8 @@
     <h3>${it.organizationName}</h3>
     <ul class="organization">
         <c:forEach items="${it.publicationMap}" var="publicationMap">
-            <li><a href="<c:out value="${publicationMap.value}"/>"><c:out value="${publicationMap.key}" /></a></li>
+            <c:set var="publicationUri"><c:out value="${publicationMap.value}"/></c:set>
+            <li><a href="${publicationUri}"><c:out value="${publicationMap.key}" /></a></li>
         </c:forEach>
     </ul>
 </body>
