@@ -24,10 +24,10 @@
             </dl>
             <dl>
                 <dt>
-                    <label for="offset">Offset</label>
+                    <label for="start">Start</label>
                 </dt>
                 <dd>
-                    <input type="text" name="start" id="offset" />
+                    <input type="text" name="start" id="start" />
                 </dd>
             </dl>
             <dl>
