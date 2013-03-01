@@ -136,8 +136,8 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(2, nodeList.getLength());
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
-        assertEquals("/cciService/polaris/addressa/issue/accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
-        assertEquals("accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
+        assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
+        assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
 
         ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024");
         clientResponse = ws.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -159,7 +159,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertNotNull(responseString);
 
         NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals("Default number of entry: ", 10, nodeList.getLength());
+        assertEquals("Default number of entry: ", 1, nodeList.getLength());
 
         //TODO: 404 error should be checked
         /*ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue");
@@ -178,20 +178,16 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals("number of entry limit default: ", 10, nodeList.getLength());
+        assertEquals("number of entry limit default: ", 1, nodeList.getLength());
 
         ws = resource().queryParam("start", "2").queryParam("limit", "-8").path(BASE_URL).path("polaris").path("addressa").path("issue");
-        responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
-        assertNotNull(responseString);
-
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals(0, nodeList.getLength());
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
-        assertEquals("number of links for limit = -8: " ,1, nodeList.getLength());
+        clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        assertEquals("Bad request 400: ", 400, clientResponse.getStatus());
 
         ws = resource().queryParam("start", "40").path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
+        System.out.println(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry for problematic start and limit: ", 0, nodeList.getLength());

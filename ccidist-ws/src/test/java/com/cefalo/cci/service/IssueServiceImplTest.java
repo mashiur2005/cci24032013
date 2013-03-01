@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -112,6 +113,7 @@ public class IssueServiceImplTest {
     }
 
     public void testAtomFeedHelper(int start, int limit, int numberOfIssues, int expectedLinkCount, int expectedEntryCount) {
+        assertFalse("start or limit might not be negative: ", start < 0 || limit < 0);
         String organizationId = "polaris";
         String publicationId = "addressa";
 
