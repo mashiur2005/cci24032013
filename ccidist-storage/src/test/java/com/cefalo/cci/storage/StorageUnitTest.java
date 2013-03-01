@@ -9,10 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.fail;
 
 public class StorageUnitTest {
-    private CacheStorage cacheStorage;
+    private final CacheStorage cacheStorage;
 
     public StorageUnitTest() {
         cacheStorage = new CacheStorage();

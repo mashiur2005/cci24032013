@@ -1,7 +1,5 @@
 package com.cefalo.cci.model;
 
-import org.hibernate.annotations.Cascade;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
@@ -10,7 +8,7 @@ import java.util.Set;
 @Table(name = "organization")
 public class Organization  extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     private String id;
     private String name;
     private Set<Publication> publications;
