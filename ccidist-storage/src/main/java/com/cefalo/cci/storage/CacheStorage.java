@@ -28,12 +28,28 @@ public class CacheStorage implements Storage {
         checkNotNull(fragmentPath, "Fragment Path can not be null");
 
         String fileName = fragmentPath.getPath();
-        InputStream in = databaseStorage.get(resourceID);
-        ZipInputStream zipInputStream = new ZipInputStream(in);
-        ZipEntry zipEntry;
-        while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-            if (fileName.equals(zipEntry.getName())) {
-                return zipInputStream;
+        boolean exceptionHappened = false;
+        InputStream in = null;
+        ZipInputStream zipInputStream = null;
+        try {
+            in = databaseStorage.get(resourceID);
+            zipInputStream = new ZipInputStream(in);
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (fileName.equals(zipEntry.getName())) {
+                    return zipInputStream;
+                }
+            }
+        } catch (FileNotFoundException fnfe) {
+            exceptionHappened = true;
+            throw new FileNotFoundException();
+        } catch (IOException io) {
+            exceptionHappened = true;
+            throw new IOException();
+        } finally {
+            if (exceptionHappened) {
+                Closeables.close(zipInputStream, exceptionHappened);
+                Closeables.close(in, exceptionHappened);
             }
         }
         throw new FileNotFoundException();
