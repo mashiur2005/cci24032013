@@ -2,6 +2,7 @@ package com.cefalo.cci.storage;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.io.Closeables;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import java.io.*;

@@ -145,6 +145,56 @@ public class CciResourceIntegrationTest extends JerseyTest{
     }
 
     @Test
+    public void downloadEpubTest() {
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024_345.epub");
+        ClientResponse clientResponse = ws.accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+        assertEquals("Content found error code: ", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/  /issue/accessible_epub_3-20121024.epub");
+        clientResponse = ws.accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+        assertEquals("Bad request error code: ", 400, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/testing/issue/accessible_epub_3-20121024.epub");
+        clientResponse = ws.accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+        assertEquals("Content found error code: ", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/testing/issue/accessible_epub_3-20121024.epub");
+        clientResponse = ws.accept(MediaType.APPLICATION_OCTET_STREAM).get(ClientResponse.class);
+        assertEquals("Mime Type found error code: ", 406, clientResponse.getStatus());
+
+
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024.epub");
+        clientResponse = ws.accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+        assertEquals("content found error code: ", 200, clientResponse.getStatus());
+        assertNotNull(clientResponse);
+
+    }
+
+    @Test
+    public void getEpubContentTest() {
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/xyz.epub/META-INF/container.xml");
+        ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        assertEquals("Content found error code: ", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/ /addressa/issue/ /META-INF/container.xml");
+        clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        assertEquals("Bad request found error code: ", 400, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/con.xml");
+        clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        assertEquals("Content found error code: ", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/");
+        clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        assertEquals("Content found error code: ", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/container.xml");
+        clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        assertEquals("Content found error code: ", 200, clientResponse.getStatus());
+        assertNotNull(clientResponse);
+    }
+
+    @Test
     public void getIssueListTest() {
         String organizationName = "polaris";
         String publicationName = "addressa";
