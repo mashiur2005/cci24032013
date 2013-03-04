@@ -10,6 +10,31 @@
     <name>CCI Distribution Service :: Parent POM project</name>
     <description>CCI Distribution Service root project</description>
     <url>http://www.cefalo.no/</url>
+    
+    <developers>
+        <developer>
+            <id>cefalo-partha</id>
+            <name>Partha Guha Roy</name>
+            <email>partha@cefalo.no</email>
+        </developer>
+        <developer>
+            <id>cefalo-nadim</id>
+            <name>Nadim Sumon</name>
+            <email>nadim.sumon@​cefalo.​no</email>
+        </developer>
+        <developer>
+            <id>cefalo-mashiur</id>
+            <name>Mashiur Rahman</name>
+            <email>mashiur@cefalo.no</email>
+        </developer>
+    </developers>
+    
+    <scm>
+        <tag>HEAD</tag>
+        <connection>scm:git:https://github.com/Cefalo/ccidist</connection>
+        <developerConnection>scm:git:https://github.com/Cefalo/ccidist.git</developerConnection>
+        <url>scm:git:https://github.com/Cefalo/ccidist</url>
+    </scm>
 
     <properties>
     	<!-- 
