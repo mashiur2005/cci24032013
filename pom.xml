@@ -11,6 +11,16 @@
     <description>CCI Distribution Service root project</description>
     <url>http://www.cefalo.no/</url>
     
+    <organization>
+        <name>CCI</name>
+        <url>http://www.ccieurope.com/</url>
+    </organization>
+
+    <issueManagement>
+        <system>jira</system>
+        <url>http://jira.cefalo.com.bd/browse/CCIDIST</url>
+    </issueManagement>
+    
     <developers>
         <developer>
             <id>cefalo-partha</id>
