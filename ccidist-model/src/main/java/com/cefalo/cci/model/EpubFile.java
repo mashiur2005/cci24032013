@@ -12,6 +12,14 @@ public class EpubFile extends Persistent implements Serializable {
     private long id;
     private Blob file;
 
+
+    public EpubFile() {
+
+    }
+
+    public EpubFile(long id) {
+        this.id = id;
+    }
     @Id
     @GeneratedValue
     @Column(name = "id")

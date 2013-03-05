@@ -2,7 +2,10 @@ package com.cefalo.cci.dao;
 
 import com.cefalo.cci.model.EpubFile;
 import com.cefalo.cci.model.Issue;
+import com.cefalo.cci.model.Publication;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public interface IssueDao {
@@ -15,4 +18,8 @@ public interface IssueDao {
     EpubFile getEpubFile(long id);
 
     Issue getIssue(String id);
+
+    Publication getPublication(String id);
+
+    void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException;
 }

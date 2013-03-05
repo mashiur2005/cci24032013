@@ -11,13 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -28,6 +22,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,6 +173,48 @@ public class IssueResource {
         }
     }
 
+    //testing purpose
+    @GET
+    @Path("/upload")
+    @Produces(MediaType.APPLICATION_XHTML_XML)
+    public Response getUploadForm() {
+        Map<String, Object> model = new HashMap<>();
+        URI uri = uriInfo.getBaseUriBuilder().path(IssueResource.class).build();
+        model.put("binaryUri", uri);
+        return Response.ok(new Viewable("/upload", model)).build();
+    }
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadEpub(
+            @PathParam("organization") @DefaultValue("") final String organizationId,
+            @PathParam("publication") @DefaultValue("") final String publicationId,
+            @FormDataParam("file") InputStream uploadedInputStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
+        boolean exceptionHandled = false;
+        try {
+            checkForValidPublication(organizationId, publicationId);
+            checkValidFileContent(fileDetail);
+
+            if (uploadedInputStream == null) {
+                throw new NotFoundException();
+            }
+            issueService.uploadEpubFile(publicationId, fileDetail.getFileName(), uploadedInputStream);
+        } catch (NotFoundException ex) {
+            exceptionHandled = true;
+            throw ex;
+        } catch (IOException ex) {
+            exceptionHandled = true;
+            throw new NotFoundException();
+        } finally {
+            if (exceptionHandled) {
+                Closeables.close(uploadedInputStream, true);
+            }
+        }
+        return Response.status(200).entity("File Successfully Uploaded").build();
+    }
+
+
     @GET
     @Path("/{file: [^/]+.epub?}")
     @Produces(MediaType.TEXT_PLAIN)
@@ -240,4 +278,27 @@ public class IssueResource {
 
         return issue;
     }
+
+    private void checkValidFileContent(FormDataContentDisposition fileDetail) {
+        if (fileDetail == null || isBlank(fileDetail.getFileName())) {
+            throw new NotFoundException("File Name is empty");
+        }
+        if (!fileDetail.getFileName().matches(".+.epub")) {
+            throw new NotFoundException("Only epub type file can be uploaded");
+        }
+
+    }
+    private void checkForValidPublication(String organizationId, String publicationId) throws WebApplicationException {
+        if (isBlank(organizationId) || isBlank(publicationId)) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+
+        Publication publication = issueService.getPublication(publicationId);
+        if (publication == null ||
+                !Objects.equals(publicationId, publication.getId()) ||
+                !Objects.equals(organizationId, publication.getOrganization().getId())) {
+            throw new NotFoundException();
+        }
+    }
+
 }

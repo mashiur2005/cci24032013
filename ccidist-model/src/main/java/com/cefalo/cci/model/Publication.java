@@ -22,6 +22,14 @@ public class Publication extends Persistent implements Serializable {
     private Organization organization;
     private Set<Platform> platforms;
 
+    public Publication() {
+
+    }
+
+    public Publication(String id) {
+        this.id = id;
+    }
+
     @Id
     @Column(name = "id")
     public String getId() {

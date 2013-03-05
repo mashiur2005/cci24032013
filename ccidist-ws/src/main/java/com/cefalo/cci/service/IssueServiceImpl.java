@@ -8,6 +8,8 @@ import com.cefalo.cci.model.Publication;
 import com.google.inject.Inject;
 import com.sun.syndication.feed.synd.*;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +24,11 @@ public class IssueServiceImpl implements IssueService {
         // TODO: Maybe throw an exception from here if issue not found????
         return issueDao.getIssue(issueId);
     }
+
+    public Publication getPublication(String publicationId) {
+        return  issueDao.getPublication(publicationId);
+    }
+
 
     @Override
     public List<Issue> getIssueListByPublicationId(String publicationId) {
@@ -106,4 +113,9 @@ public class IssueServiceImpl implements IssueService {
         self.setHref(String.format("%s?start=%s&limit=%s", baseIssueListUri, start, limit));
         return self;
     }
+
+    public void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException {
+        issueDao.uploadEpubFile(publicationId, fileName, inputStream);
+    }
+
 }

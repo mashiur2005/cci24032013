@@ -150,6 +150,12 @@
             <version>${apache.jersey.version}</version>
         </dependency>
 
+          <dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-multipart</artifactId>
+			<version>${apache.jersey.version}</version>
+		</dependency>
+
         <!--guice dependencies-->
         <dependency>
             <groupId>com.google.inject</groupId>
