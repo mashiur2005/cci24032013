@@ -3,12 +3,19 @@ package com.cefalo.cci.restResource;
 import com.cefalo.cci.utils.XpathUtils;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.FormDataMultiPart;
+import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import org.junit.Test;
 import org.w3c.dom.NodeList;
 
 import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -192,6 +199,45 @@ public class CciResourceIntegrationTest extends JerseyTest{
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         assertEquals("Content found error code: ", 200, clientResponse.getStatus());
         assertNotNull(clientResponse);
+    }
+
+    @Test
+    public void uploadEpubTest() {
+        Path directoryPath = Paths.get("src", "test", "resources", "epubs");
+        File fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/widget-figure-gallery-20121023.epub");
+        final FormDataMultiPart multiPart = new FormDataMultiPart();
+        multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload,
+                MediaType.APPLICATION_OCTET_STREAM_TYPE));
+
+        ws = resource().path(BASE_URL).path("/polaris/addre/issue");
+        ClientResponse clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
+        assertEquals("Content not found error", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/pol/addressa/issue");
+        clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
+        assertEquals("Content not found error", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue");
+        fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/fileTest.txt");
+        multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload,
+                MediaType.APPLICATION_OCTET_STREAM_TYPE));
+        clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
+        assertEquals("Content not found error", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue");
+        multiPart.bodyPart(new FormDataBodyPart("file", new ByteArrayInputStream("".getBytes()), MediaType.APPLICATION_OCTET_STREAM_TYPE));
+        clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
+        assertEquals("Content not found error", 404, clientResponse.getStatus());
+
+/*
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue");
+        fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/widget-figure-gallery-20121023.epub");
+        multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+        clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
+        assertEquals("Content not found error", 200, clientResponse.getStatus());
+        assertNotNull(clientResponse);
+*/
+
     }
 
     @Test

@@ -124,6 +124,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     public void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException {
+        ///need to discuss how to set primary key of multiple issues
         issueDao.uploadEpubFile(publicationId, fileName, inputStream);
     }
 

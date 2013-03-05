@@ -26,7 +26,7 @@ public class CciServiceUnitTest {
 
         Path directoryPath = Paths.get("src", "test", "resources", "epubs");
         List<String> listFileNames = cciService.getAllFileNamesInDirectory(directoryPath.toAbsolutePath().toString());
-        assertEquals(2, listFileNames.size());
+        assertEquals(3, listFileNames.size());
         assertTrue(listFileNames.contains("widget-quiz-20121022.epub"));
     }
 
