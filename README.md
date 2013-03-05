@@ -24,11 +24,20 @@ Installation instructions
    You do  ot need to create the root directory of the as this will be create when the project is cloned in the next
    step.
 2. Clone the CCIDIST repository
-   git clone https://github.com/Cefalo/ccidist.git`
+
+   `git clone https://github.com/Cefalo/ccidist.git`
+
 3. Change directory to the project root
-   ´cd ccidist
-4. Build the code: `mvn clean package`
+
+   `cd ccidist`
+
+4. Build the code
+
+   `mvn clean package`
+
 5. Create the database:
+
 6. Make sure the application can access the database.
+
 7. Start the server: `mvn jetty:run`
 
