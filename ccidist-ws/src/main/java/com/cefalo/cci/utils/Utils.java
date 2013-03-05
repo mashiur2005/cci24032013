@@ -1,11 +1,11 @@
 package com.cefalo.cci.utils;
 
+import com.google.common.base.Strings;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Strings;
 
 public class Utils {
 
@@ -14,6 +14,7 @@ public class Utils {
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
     public static String FILE_BASE_DIR= "epubs";
     public static String FILE_BASE_PATH = HOME_DIR + FILE_SEPARATOR + FILE_BASE_DIR;
+    public static int FILE_REMOVING_DAY = 30;
 
     static {
          ORGANIZATION_DETAILS.put("Polaris", Arrays.asList("Addressa", "Harstadtidende"));

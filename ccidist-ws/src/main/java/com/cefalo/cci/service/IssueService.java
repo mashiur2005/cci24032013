@@ -10,12 +10,16 @@ import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.sun.syndication.feed.synd.SyndFeed;
 
+import java.util.Date;
+
 public interface IssueService {
     Issue getIssue(String issueId);
 
     Publication getPublication(String publicationId);
 
     List<Issue> getIssueListByPublicationId(String publicationId);
+
+    List<Issue> getOldIssueList(Date date);
 
     SyndFeed getIssuesAsAtomFeed(Organization organization, Publication publication, long start, long limit,
             ResourceLocator resourceLocator);

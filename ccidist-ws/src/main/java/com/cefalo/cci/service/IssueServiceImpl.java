@@ -36,6 +36,15 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
+    public List<Issue> getOldIssueList(Date date) {
+        List<Issue> issueList = issueDao.getOldIssueList(date);
+        if (issueList == null) {
+            return new ArrayList<Issue>();
+        }
+        return issueList;
+    }
+
+    @Override
     public SyndFeed getIssuesAsAtomFeed(
             Organization organization,
             Publication publication,

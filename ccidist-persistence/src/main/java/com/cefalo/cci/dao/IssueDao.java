@@ -6,6 +6,7 @@ import com.cefalo.cci.model.Publication;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 public interface IssueDao {
@@ -22,4 +23,7 @@ public interface IssueDao {
     Publication getPublication(String id);
 
     void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException;
+
+    List<Issue> getOldIssueList(Date date);
+
 }

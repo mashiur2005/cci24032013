@@ -237,12 +237,11 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().queryParam("start", "40").path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
-        System.out.println(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry for problematic start and limit: ", 0, nodeList.getLength());
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
-        assertEquals("number f links for start = 40 exceeding total number of files: ", 1, nodeList.getLength());
+        assertEquals("number f links for start = 40 exceeding total number of files: ", 2, nodeList.getLength());
     }
 
 }

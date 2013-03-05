@@ -15,6 +15,8 @@ import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import org.hibernate.Session;
 
+import java.util.Date;
+
 public class IssueDaoImpl implements IssueDao {
     @Inject
     private EntityManager entityManager;
@@ -43,7 +45,9 @@ public class IssueDaoImpl implements IssueDao {
                 .createQuery("select i from Issue i where i.publication.id like :pName order by i.updated  desc")
                 .setParameter("pName", publicationId).setFirstResult((int) start).setMaxResults((int) maxResult)
                 .getResultList();
-    }    @Override
+    }
+
+    @Override
     @Transactional
     public EpubFile getEpubFile(long id) {
         return entityManager.find(EpubFile.class, id);
@@ -86,6 +90,13 @@ public class IssueDaoImpl implements IssueDao {
         issue.setPublication(new Publication(publicationId));
         issue.setEpubFile(new EpubFile((Long) id));
         entityManager.persist(issue);
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<Issue> getOldIssueList(Date date) {
+        return (List<Issue>)entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
     }
 
 }
