@@ -77,13 +77,6 @@ insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polar
 insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\sash-for-you-20120827.epub'));
 insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\widget-figure-gallery-20121022.epub'));
 insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\widget-quiz-20121022.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\accessible_epub_3-20121024.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\GhV-oeb-page-20121015.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\israelsailing-20130127.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\kusamakura-japanese-vertical-writing-20121124.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\page-blanche-20121022.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\sous-le-vent_svg-in-spine-20121022.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\sous-le-vent-20121022.epub'));
 
 
 
@@ -93,13 +86,5 @@ insert into issue (id, epub_file_id, name, platform_id, publication_id, created,
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('sash-for-you-20120827', 3, 'sash-for-you-20120827.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-figure-gallery-20121022', 4, 'widget-figure-gallery-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-quiz-20121022', 5, 'widget-quiz-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('accessible_epub_3-20121024', 6, 'accessible_epub_3-20121024.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('GhV-oeb-page-20121015', 7, 'GhV-oeb-page-20121015.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('israelsailing-20130127', 8, 'israelsailing-20130127.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('kusamakura-japanese-vertical-writing-20121124', 9, 'kusamakura-japanese-vertical-writing-20121124.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('page-blanche-20121022', 10, 'page-blanche-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('sous-le-vent_svg-in-spine-20121022', 11, 'sous-le-vent_svg-in-spine-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('sous-le-vent-20121022', 12, 'sous-le-vent-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 
 
