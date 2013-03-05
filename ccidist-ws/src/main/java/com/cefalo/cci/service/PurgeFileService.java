@@ -38,6 +38,7 @@ public class PurgeFileService implements org.quartz.Job{
 
         for (Issue anIssueList : issueList) {
             file = new File(baseDirPath + seprator + anIssueList.getPublication().getOrganization().getId() + seprator + anIssueList.getPublication().getId() + seprator + anIssueList.getName());
+            logger.info("Epubs to be deleted: " + file.getAbsolutePath());
             if (file.exists()) {
                 if (!file.delete()) {
                     logger.info("can't delete file");
