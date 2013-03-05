@@ -19,9 +19,14 @@ this application you need the following to be installed on your computer
 Installation instructions
 -------------------------
 
-1. Create a new directory: `mkdir ccidist`
-2. Change to the new directory:`cd ccidist`
-3. Clone the CCIDIST repository:
+1. Change directory to wherever you store your git projects
+   eg:`cd ~/gitrepos`
+   You do  ot need to create the root directory of the as this will be create when the project is cloned in the next
+   step.
+2. Clone the CCIDIST repository
+   git clone https://github.com/Cefalo/ccidist.git`
+3. Change directory to the project root
+   ´cd ccidist
 4. Build the code: `mvn clean package`
 5. Create the database:
 6. Make sure the application can access the database.
