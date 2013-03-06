@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @javax.inject.Singleton
-@org.nnsoft.guice.guartz.Scheduled(jobName = "test", cronExpression = "0/25 * * * * ?")
+@org.nnsoft.guice.guartz.Scheduled(jobName = "test", cronExpression = "0 0 0 * * ?")
 public class PurgeFileService implements org.quartz.Job{
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
