@@ -21,11 +21,19 @@ public class IssueDaoImpl implements IssueDao {
     @Inject
     private EntityManager entityManager;
 
+
     @Override
     @Transactional
     public long getIssueCountByPublicationId(String publicationId) {
         return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName")
                 .setParameter("pName", publicationId).getSingleResult();
+    }
+
+    @Override
+    @Transactional
+    public long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType) {
+        return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType")
+                .setParameter("pName", publicationId).setParameter("deviceType", deviceType).getSingleResult();
     }
 
     @Override
@@ -46,6 +54,17 @@ public class IssueDaoImpl implements IssueDao {
                 .setParameter("pName", publicationId).setFirstResult((int) start).setMaxResults((int) maxResult)
                 .getResultList();
     }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType) {
+        return entityManager
+                .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType order by i.updated  desc")
+                .setParameter("pName", publicationId).setParameter("deviceType", deviceType).setFirstResult((int) start).setMaxResults((int) maxResult)
+                .getResultList();
+    }
+
 
     @Override
     @Transactional

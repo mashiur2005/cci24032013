@@ -50,10 +50,10 @@ public class IssueServiceImplTest {
         selfNextList.add("next");
 
         String issueListUri = "/cciService/polaris/addressa/issue";
-        List<SyndLink> syndLinkList = issueServiceImpl.getLinks(1, 5, 12, issueListUri);
+        List<SyndLink> syndLinkList = issueServiceImpl.getLinks(1, 5, "ipad", 12, issueListUri);
         assertEquals(2, syndLinkList.size());
-        assertEquals("self: start=1&limit=5", issueListUri + "?start=1&limit=5", syndLinkList.get(0).getHref());
-        assertEquals("next: start=6&limit=5", issueListUri + "?start=6&limit=5", syndLinkList.get(1).getHref());
+        assertEquals("self: start=1&limit=5&device-type=ipad", issueListUri + "?start=1&limit=5&device-type=ipad", syndLinkList.get(0).getHref());
+        assertEquals("next: start=6&limit=5&device-type=ipad", issueListUri + "?start=6&limit=5&device-type=ipad", syndLinkList.get(1).getHref());
 
         List<String> actualList = new ArrayList<String>();
         for (SyndLink aSyndLinkList : syndLinkList) {
@@ -61,11 +61,11 @@ public class IssueServiceImplTest {
         }
         assertEquals("relation by relation check: self next", selfNextList, actualList);
 
-        syndLinkList = issueServiceImpl.getLinks(2, 5, 12, issueListUri);
+        syndLinkList = issueServiceImpl.getLinks(2, 5, "ipad", 12, issueListUri);
         assertEquals(3, syndLinkList.size());
-        assertEquals("self: start=2&limit=5",issueListUri + "?start=2&limit=5", syndLinkList.get(0).getHref());
-        assertEquals("prev: start=1&limit=5", issueListUri + "?start=1&limit=5", syndLinkList.get(1).getHref());
-        assertEquals("next: start=7&limit=5", issueListUri + "?start=7&limit=5", syndLinkList.get(2).getHref());
+        assertEquals("self: start=2&limit=5&device-type=ipad",issueListUri + "?start=2&limit=5&device-type=ipad", syndLinkList.get(0).getHref());
+        assertEquals("prev: start=1&limit=5&device-type=ipad", issueListUri + "?start=1&limit=5&device-type=ipad", syndLinkList.get(1).getHref());
+        assertEquals("next: start=7&limit=5&device-type=ipad", issueListUri + "?start=7&limit=5&device-type=ipad", syndLinkList.get(2).getHref());
 
         actualList = new ArrayList<String>();
         for (SyndLink aSyndLinkList : syndLinkList) {
@@ -74,11 +74,11 @@ public class IssueServiceImplTest {
 
         assertEquals("relation by relation check: self prev next", expectedAllRelList, actualList);
 
-        syndLinkList = issueServiceImpl.getLinks(7, 5, 12, issueListUri);
+        syndLinkList = issueServiceImpl.getLinks(7, 5, "ipad", 12, issueListUri);
         assertEquals(3, syndLinkList.size());
-        assertEquals("self: start=7&limit=5",issueListUri + "?start=7&limit=5", syndLinkList.get(0).getHref());
-        assertEquals("prev: start=2&limit=5", issueListUri + "?start=2&limit=5", syndLinkList.get(1).getHref());
-        assertEquals("next: start=12&limit=5", issueListUri + "?start=12&limit=5", syndLinkList.get(2).getHref());
+        assertEquals("self: start=7&limit=5&device-type=ipad",issueListUri + "?start=7&limit=5&device-type=ipad", syndLinkList.get(0).getHref());
+        assertEquals("prev: start=2&limit=5&device-type=ipad", issueListUri + "?start=2&limit=5&device-type=ipad", syndLinkList.get(1).getHref());
+        assertEquals("next: start=12&limit=5&device-type=ipad", issueListUri + "?start=12&limit=5&device-type=ipad", syndLinkList.get(2).getHref());
 
         actualList = new ArrayList<String>();
 
@@ -88,10 +88,10 @@ public class IssueServiceImplTest {
 
         assertEquals("relation by relation check: self prev next", expectedAllRelList, actualList);
 
-        syndLinkList = issueServiceImpl.getLinks(7, 6, 12, issueListUri);
+        syndLinkList = issueServiceImpl.getLinks(7, 6, "ipad", 12, issueListUri);
         assertEquals(2, syndLinkList.size());
-        assertEquals("self: start=7&limit=6",issueListUri + "?start=7&limit=6", syndLinkList.get(0).getHref());
-        assertEquals("prev: start=1&limit=6", issueListUri + "?start=1&limit=6", syndLinkList.get(1).getHref());
+        assertEquals("self: start=7&limit=6&device-type=ipad",issueListUri + "?start=7&limit=6&device-type=ipad", syndLinkList.get(0).getHref());
+        assertEquals("prev: start=1&limit=6&device-type=ipad", issueListUri + "?start=1&limit=6&device-type=ipad", syndLinkList.get(1).getHref());
 
         actualList = new ArrayList<String>();
 
@@ -116,6 +116,7 @@ public class IssueServiceImplTest {
         assertFalse("start or limit might not be negative: ", start < 0 || limit < 0);
         String organizationId = "polaris";
         String publicationId = "addressa";
+        String deviceType = "ipad";
 
         Organization organization = new Organization();
         organization.setId(organizationId);
@@ -142,7 +143,7 @@ public class IssueServiceImplTest {
             toIndex = start + limit - 1;
         }
 
-        SyndFeed syndFeed = issueServiceImpl.getIssueAsAtomFeed(dummyIssueList.subList(start - 1, toIndex), organization, publication, start,limit, numberOfIssues, mockResourceLocator);
+        SyndFeed syndFeed = issueServiceImpl.getIssueAsAtomFeed(dummyIssueList.subList(start - 1, toIndex), organization, publication, start,limit, deviceType, numberOfIssues, mockResourceLocator);
 
         Assert.assertEquals("number of links: ", syndFeed.getLinks().size(), expectedLinkCount);
         Assert.assertEquals("number of entry: ", syndFeed.getEntries().size(), expectedEntryCount);

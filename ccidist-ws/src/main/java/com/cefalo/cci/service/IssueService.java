@@ -22,7 +22,7 @@ public interface IssueService {
     List<Issue> getOldIssueList(Date date);
 
     SyndFeed getIssuesAsAtomFeed(Organization organization, Publication publication, long start, long limit,
-            ResourceLocator resourceLocator);
+            String deviceType, ResourceLocator resourceLocator);
 
     void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException;
 }

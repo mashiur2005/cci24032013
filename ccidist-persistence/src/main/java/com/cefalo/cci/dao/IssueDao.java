@@ -12,9 +12,13 @@ import java.util.List;
 public interface IssueDao {
     long getIssueCountByPublicationId(String publicationId);
 
+    long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType);
+
     List<Issue> getIssueListByPublicationId(String publicationId);
 
     List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult);
+
+    List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType);
 
     EpubFile getEpubFile(long id);
 

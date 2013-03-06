@@ -32,6 +32,14 @@
                 </dd>
             </dl>
             <dl>
+                <dt>
+                    <label for="deviceType">Device Type</label>
+                </dt>
+                <dd>
+                    <input type="text" name="device-type" id="deviceType" />
+                </dd>
+            </dl>
+            <dl>
                 <dd>
                     <input type="submit" name="submit" />
                 </dd>

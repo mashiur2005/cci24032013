@@ -50,23 +50,25 @@ public class IssueServiceImpl implements IssueService {
             Publication publication,
             long start,
             long limit,
+            String deviceType,
             ResourceLocator resourceLocator) {
         checkArgument(start > 0 && limit > 0);
 
         // Remember that the DB layer expects 0 based indexing while we use 1 based indexing in the resource layer.
         return getIssueAsAtomFeed(
-                issueDao.getIssueListByPublicationId(publication.getId(), start - 1, limit),
+                issueDao.getIssueListByPublicationAndDeviceId(publication.getId(), start - 1, limit, deviceType),
                 organization,
                 publication,
                 start,
                 limit,
-                (int)issueDao.getIssueCountByPublicationId(publication.getId()),
+                deviceType,
+                (int)issueDao.getIssueCountByPublicationAndDeviceId(publication.getId(), deviceType),
                 resourceLocator);
     }
 
     @SuppressWarnings("unchecked")
     SyndFeed getIssueAsAtomFeed(List<Issue> issues, Organization organization, Publication publication,
-            long start, long limit, long total, ResourceLocator resourceLocator) {
+            long start, long limit, String deviceType, long total, ResourceLocator resourceLocator) {
         String publicationName = publication.getName();
         String organizationName = organization.getName();
 
@@ -80,7 +82,7 @@ public class IssueServiceImpl implements IssueService {
         syndPerson.setName(publicationName);
         feed.getAuthors().add(syndPerson);
 
-        List<SyndLink> links = getLinks(start, limit, total,
+        List<SyndLink> links = getLinks(start, limit, deviceType, total,
                 resourceLocator.getIssueListURI(organization.getId(), publication.getId()).toString());
         feed.setLinks(links);
 
@@ -100,26 +102,26 @@ public class IssueServiceImpl implements IssueService {
         return feed;
     }
 
-    List<SyndLink> getLinks(long start, long limit, long total, String issueListUri) {
+    List<SyndLink> getLinks(long start, long limit, String deviceType, long total, String issueListUri) {
         List<SyndLink> links = new ArrayList<SyndLink>();
-        links.add(createAtomLink("self", start, limit, issueListUri));
+        links.add(createAtomLink("self", start, limit, deviceType, issueListUri));
 
         if (start > 1) {
             // There is a prev link
-            links.add(createAtomLink("prev", Math.max(1, start - limit), limit, issueListUri));
+            links.add(createAtomLink("prev", Math.max(1, start - limit), limit, deviceType, issueListUri));
         }
         if ((start + limit) < (total + 1)) {
             // There is a next link
-            links.add(createAtomLink("next", Math.min(start + limit, total), limit, issueListUri));
+            links.add(createAtomLink("next", Math.min(start + limit, total), limit, deviceType, issueListUri));
         }
 
         return links;
     }
 
-    private SyndLink createAtomLink(String relation, long start, long limit, String baseIssueListUri) {
+    private SyndLink createAtomLink(String relation, long start, long limit, String deviceType, String baseIssueListUri) {
         SyndLink self = new SyndLinkImpl();
         self.setRel(relation);
-        self.setHref(String.format("%s?start=%s&limit=%s", baseIssueListUri, start, limit));
+        self.setHref(String.format("%s?start=%s&limit=%s&device-type=%s", baseIssueListUri, start, limit, deviceType));
         return self;
     }
 

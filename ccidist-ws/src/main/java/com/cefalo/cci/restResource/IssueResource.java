@@ -73,11 +73,15 @@ public class IssueResource {
             @PathParam("organization") @DefaultValue("") final String organizationName,
             @PathParam("publication") @DefaultValue("") final String publicationName,
             @QueryParam("start") @DefaultValue("1") final int start,
-            @QueryParam("limit") @DefaultValue("1") final int limit) {
-
+            @QueryParam("limit") @DefaultValue("1") final int limit,
+            @QueryParam("device-type") @DefaultValue("") final String deviceType) {
         if (Utils.isBlank(publicationName) || Utils.isBlank(organizationName)) {
             return Responses.clientError().entity("Organization or publication name may not be blank.").build();
         }
+        if (Utils.isBlank(deviceType)) {
+            return Responses.clientError().entity("Device Type can not be blank").build();
+        }
+
         if (start <= 0 || limit <= 0) {
             return Responses.clientError().entity("Start & limit params should have positive non-zero values.").build();
         }
@@ -88,7 +92,7 @@ public class IssueResource {
         }
 
         SyndFeed feed = issueService.getIssuesAsAtomFeed(publication.getOrganization(), publication, start, limit,
-                JerseyResourceLocator.from(uriInfo));
+                deviceType, JerseyResourceLocator.from(uriInfo));
 
         return Response.ok(feed).build();
     }

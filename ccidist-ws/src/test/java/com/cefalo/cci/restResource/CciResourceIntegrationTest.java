@@ -244,7 +244,8 @@ public class CciResourceIntegrationTest extends JerseyTest{
     public void getIssueListTest() {
         String organizationName = "polaris";
         String publicationName = "addressa";
-        ws = resource().path(BASE_URL).path(organizationName).path(publicationName).path("issue");
+        String deviceType = "ipad";
+        ws = resource().queryParam("device-type", "ipad").path(BASE_URL).path(organizationName).path(publicationName).path("issue");
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("content found error code: ", 200, clientResponse.getStatus());
 
@@ -262,25 +263,30 @@ public class CciResourceIntegrationTest extends JerseyTest{
         clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("Html code not found: ", 404, clientResponse.getStatus());*/
 
-        ws = resource().queryParam("start", "2").queryParam("limit", "8").path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().path(BASE_URL).path(organizationName).path(publicationName).path("issue");
+        clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        assertEquals("Device Type not found error: ", 400, clientResponse.getStatus());
+
+
+        ws = resource().queryParam("start", "2").queryParam("limit", "8").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry start 2: ", 8, nodeList.getLength());
 
-        ws = resource().queryParam("start", "2").path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().queryParam("start", "2").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry limit default: ", 1, nodeList.getLength());
 
-        ws = resource().queryParam("start", "2").queryParam("limit", "-8").path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().queryParam("start", "2").queryParam("limit", "-8").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
         clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("Bad request 400: ", 400, clientResponse.getStatus());
 
-        ws = resource().queryParam("start", "40").path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().queryParam("start", "40").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
