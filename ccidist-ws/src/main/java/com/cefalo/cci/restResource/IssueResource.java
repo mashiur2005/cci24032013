@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import com.google.common.collect.Sets;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
+import org.joda.time.DateMidnight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,9 @@ public class IssueResource {
             @PathParam("publication") @DefaultValue("") final String publicationName,
             @QueryParam("start") @DefaultValue("1") final int start,
             @QueryParam("limit") @DefaultValue("1") final int limit,
-            @QueryParam("device-type") @DefaultValue("") final String deviceType) {
+            @QueryParam("device-type") @DefaultValue("") final String deviceType,
+            @QueryParam("from") @DefaultValue("") final String from,
+            @QueryParam("order") @DefaultValue("desc") final String order) {
         if (Utils.isBlank(publicationName) || Utils.isBlank(organizationName)) {
             return Responses.clientError().entity("Organization or publication name may not be blank.").build();
         }
@@ -90,13 +93,20 @@ public class IssueResource {
             return Responses.clientError().entity("Start & limit params should have positive non-zero values.").build();
         }
 
+        Date fromDate = null;
+        if (Utils.isBlank(from)) {
+            fromDate = new DateMidnight().toDate();
+        } else {
+            ///parse dateStr to date
+        }
+
         Publication publication = publicationService.getPublication(publicationName);
         if (publication == null || !Objects.equals(publication.getOrganization().getId(), organizationName)) {
             return Responses.notFound().build();
         }
 
         SyndFeed feed = issueService.getIssuesAsAtomFeed(publication.getOrganization(), publication, start, limit,
-                deviceType, JerseyResourceLocator.from(uriInfo));
+                deviceType, fromDate, order, JerseyResourceLocator.from(uriInfo));
 
         return Response.ok(feed).build();
     }

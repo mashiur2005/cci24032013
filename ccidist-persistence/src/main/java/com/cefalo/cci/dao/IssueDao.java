@@ -13,13 +13,13 @@ import java.util.Set;
 public interface IssueDao {
     long getIssueCountByPublicationId(String publicationId);
 
-    long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType);
+    long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType, Date fromDate);
 
     List<Issue> getIssueListByPublicationId(String publicationId);
 
     List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult);
 
-    List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType);
+    List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType, Date fromDate, String order);
 
     EpubFile getEpubFile(long id);
 

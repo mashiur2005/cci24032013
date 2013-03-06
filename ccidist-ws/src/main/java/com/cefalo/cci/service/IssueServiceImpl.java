@@ -52,18 +52,20 @@ public class IssueServiceImpl implements IssueService {
             long start,
             long limit,
             String deviceType,
+            Date fromDate,
+            String order,
             ResourceLocator resourceLocator) {
         checkArgument(start > 0 && limit > 0);
 
         // Remember that the DB layer expects 0 based indexing while we use 1 based indexing in the resource layer.
         return getIssueAsAtomFeed(
-                issueDao.getIssueListByPublicationAndDeviceId(publication.getId(), start - 1, limit, deviceType),
+                issueDao.getIssueListByPublicationAndDeviceId(publication.getId(), start - 1, limit, deviceType, fromDate, order),
                 organization,
                 publication,
                 start,
                 limit,
                 deviceType,
-                (int)issueDao.getIssueCountByPublicationAndDeviceId(publication.getId(), deviceType),
+                (int)issueDao.getIssueCountByPublicationAndDeviceId(publication.getId(), deviceType, fromDate),
                 resourceLocator);
     }
 
