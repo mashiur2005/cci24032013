@@ -64,4 +64,14 @@ public class DatabaseStorage implements Storage {
     public URI delete(URI resourceID) throws IOException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public void fetchAndWriteEpub(URI resourceId, String organizationId, String publicationId) throws IOException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public InputStream getFragmentFromCache(URI resourceId, URI fragmentPath, String filePath) throws IOException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

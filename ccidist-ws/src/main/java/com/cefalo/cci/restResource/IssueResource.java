@@ -43,6 +43,11 @@ import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.syndication.feed.synd.SyndFeed;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 
 @Path("/{organization}/{publication}/issue/")
 public class IssueResource {
@@ -140,10 +145,17 @@ public class IssueResource {
         URI resourceUri = URI.create(issue.getId());
         URI fragmentPath = URI.create(contentLocInEpub);
 
+        String fileName = fragmentPath.getPath();
+        String filePath = Utils.HOME_DIR + Utils.FILE_SEPARATOR + "writeTest" + Utils.FILE_SEPARATOR + organizationId + Utils.FILE_SEPARATOR + publicationId + Utils.FILE_SEPARATOR + resourceUri.getPath() + Utils.FILE_SEPARATOR + fileName;
+
         boolean exceptionHappened = false;
         InputStream binaryStream = null;
         try {
-            binaryStream = storage.getFragment(resourceUri, fragmentPath);
+            if (!new File(filePath).exists()) {
+                storage.fetchAndWriteEpub(resourceUri, organizationId, publicationId);
+            }
+            binaryStream = storage.getFragmentFromCache(resourceUri, fragmentPath, filePath);
+            /*binaryStream = storage.getFragment(resourceUri, fragmentPath);*/
 
             final InputStream finalVarBinaryStream = binaryStream;
             StreamingOutput sout = new StreamingOutput() {

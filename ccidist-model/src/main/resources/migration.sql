@@ -79,6 +79,7 @@ insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polar
 insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\sash-for-you-20120827.epub'));
 insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\widget-figure-gallery-20121022.epub'));
 insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\widget-quiz-20121022.epub'));
+insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\cc-shared-culture-20120130.epub'));
 
 
 
@@ -88,5 +89,7 @@ insert into issue (id, epub_file_id, name, platform_id, publication_id, created,
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('sash-for-you-20120827', 3, 'sash-for-you-20120827.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-figure-gallery-20121022', 4, 'widget-figure-gallery-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-quiz-20121022', 5, 'widget-quiz-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
+insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('cc-shared-culture-20120130.epub', 13, 'cc-shared-culture-20120130.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
+
 
 
