@@ -205,7 +205,6 @@ public class IssueResource {
             return Responses.clientError().entity("Device Type must be required").build();
         }
 
-        System.out.println("device ids..." + deviceIds.length());
         try {
             checkForValidPublication(organizationId, publicationId);
             checkValidFileContent(fileDetail);
