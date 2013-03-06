@@ -204,34 +204,38 @@ public class CciResourceIntegrationTest extends JerseyTest{
     @Test
     public void uploadEpubTest() {
         Path directoryPath = Paths.get("src", "test", "resources", "epubs");
-        File fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/widget-figure-gallery-20121023.epub");
+        File fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/widget-figure-gallery-20121024.epub");
         final FormDataMultiPart multiPart = new FormDataMultiPart();
         multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload,
                 MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
-        ws = resource().path(BASE_URL).path("/polaris/addre/issue");
+        ws = resource().path(BASE_URL).path("/polaris/addre/issue/ipad");
         ClientResponse clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
+        assertEquals("Content not found error", 404, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/pol/addressa/issue/ipad");
+        clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
         assertEquals("Content not found error", 404, clientResponse.getStatus());
 
         ws = resource().path(BASE_URL).path("/pol/addressa/issue");
         clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
-        assertEquals("Content not found error", 404, clientResponse.getStatus());
+        assertEquals("Content not found error", 405, clientResponse.getStatus());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/ipad");
         fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/fileTest.txt");
         multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload,
                 MediaType.APPLICATION_OCTET_STREAM_TYPE));
         clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
         assertEquals("Content not found error", 404, clientResponse.getStatus());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/ipad");
         multiPart.bodyPart(new FormDataBodyPart("file", new ByteArrayInputStream("".getBytes()), MediaType.APPLICATION_OCTET_STREAM_TYPE));
         clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
         assertEquals("Content not found error", 404, clientResponse.getStatus());
 
 /*
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue");
-        fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/widget-figure-gallery-20121023.epub");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/ipad,mini-ipad");
+        fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/widget-figure-gallery-20121024.epub");
         multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload, MediaType.APPLICATION_OCTET_STREAM_TYPE));
         clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multiPart);
         assertEquals("Content not found error", 200, clientResponse.getStatus());

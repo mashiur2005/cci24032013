@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface IssueDao {
     long getIssueCountByPublicationId(String publicationId);
@@ -26,7 +27,7 @@ public interface IssueDao {
 
     Publication getPublication(String id);
 
-    void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException;
+    void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException;
 
     List<Issue> getOldIssueList(Date date);
 

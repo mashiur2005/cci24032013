@@ -69,7 +69,9 @@ insert into publication (id, name, organization_id) values ('axelSpringer-sports
 insert into publication (id, name, organization_id) values ('axelSpringer-entertainment', 'AxelSpringer-ENTERTAINMENT', 'axelspringer');
 
 /*Platform Data*/
-insert into platform (id, name) value ('ipad', 'ipad');
+insert into platform (id, name) value ('ipad', 'iPad');
+insert into platform (id, name) value ('mini-ipad', 'Mini-iPad');
+insert into platform (id, name) value ('iphone', 'iPhone');
 
 /*epub Files*/
 insert into epub_file (file) values (LOAD_FILE('C:\\Users\\mashiur\\epubs\\Polaris\\Addressa\\epub30-spec-20121128.epub'));

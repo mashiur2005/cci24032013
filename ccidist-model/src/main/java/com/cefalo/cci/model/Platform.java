@@ -15,6 +15,14 @@ public class Platform  extends Persistent implements Serializable {
     private String id;
     private String name;
 
+    public Platform() {
+
+    }
+
+    public Platform(String id) {
+        this.id = id;
+    }
+
     @Id
     @Column(name = "id")
     public String getId() {

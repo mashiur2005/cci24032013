@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -22,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.collect.Sets;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -179,23 +178,34 @@ public class IssueResource {
 
     //testing purpose
     @GET
-    @Path("/upload")
+    @Path("/{deviceIds}/upload")
     @Produces(MediaType.APPLICATION_XHTML_XML)
     public Response getUploadForm(@PathParam("organization") @DefaultValue("") final String organizationId,
-                                 @PathParam("publication") @DefaultValue("") final String publicationId) {
+                                 @PathParam("publication") @DefaultValue("") final String publicationId,
+                                 @PathParam("deviceIds") @DefaultValue("") final String deviceIds) {
         Map<String, Object> model = new HashMap<>();
-        URI uri = uriInfo.getBaseUriBuilder().path(IssueResource.class).build(organizationId, publicationId);
+        URI uri = uriInfo.getBaseUriBuilder().path(IssueResource.class).path(IssueResource.class, "uploadEpub")
+                .build(organizationId, publicationId, deviceIds);
         model.put("binaryUri", uri);
         return Response.ok(new Viewable("/upload", model)).build();
     }
 
     @POST
+    @Path("/{deviceIds}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadEpub(
             @PathParam("organization") @DefaultValue("") final String organizationId,
             @PathParam("publication") @DefaultValue("") final String publicationId,
+            @PathParam("deviceIds") @DefaultValue("") final String deviceIds,
             @FormDataParam("file") InputStream uploadedInputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
+
+        Set<String> deviceSet = Sets.newHashSet(deviceIds.split(","));
+        if (deviceSet == null || deviceIds.isEmpty()) {
+            return Responses.clientError().entity("Device Type must be required").build();
+        }
+
+        System.out.println("device ids..." + deviceIds.length());
         try {
             checkForValidPublication(organizationId, publicationId);
             checkValidFileContent(fileDetail);
@@ -203,7 +213,7 @@ public class IssueResource {
             if (uploadedInputStream == null) {
                 throw new NotFoundException();
             }
-            issueService.uploadEpubFile(publicationId, fileDetail.getFileName(), uploadedInputStream);
+            issueService.uploadEpubFile(publicationId, fileDetail.getFileName(), deviceSet, uploadedInputStream);
         } catch (NotFoundException ex) {
             throw ex;
         } catch (IOException ex) {

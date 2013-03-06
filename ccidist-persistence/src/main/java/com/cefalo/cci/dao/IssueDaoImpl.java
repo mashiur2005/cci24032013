@@ -10,12 +10,14 @@ import javax.persistence.EntityManager;
 
 import com.cefalo.cci.model.EpubFile;
 import com.cefalo.cci.model.Issue;
+import com.cefalo.cci.model.Platform;
 import com.cefalo.cci.model.Publication;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import org.hibernate.Session;
 
 import java.util.Date;
+import java.util.Set;
 
 public class IssueDaoImpl implements IssueDao {
     @Inject
@@ -86,7 +88,7 @@ public class IssueDaoImpl implements IssueDao {
 
     @Override
     @Transactional
-    public void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException {
+    public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
         Session session = (Session) entityManager.getDelegate();
         Blob fileContent;
         try {
@@ -101,14 +103,12 @@ public class IssueDaoImpl implements IssueDao {
         EpubFile epubFile = new EpubFile();
         epubFile.setFile(fileContent);
 
-        Serializable id = session.save(epubFile);
+        Serializable epubId = session.save(epubFile);
 
-        Issue issue = new Issue();
-        issue.setId(fileName.substring(0, fileName.indexOf(".epub")));
-        issue.setName(fileName);
-        issue.setPublication(new Publication(publicationId));
-        issue.setEpubFile(new EpubFile((Long) id));
-        entityManager.persist(issue);
+        for (String deviceId : deviceSet) {
+            Issue issue = getIssue(publicationId, fileName, deviceId, epubId);
+            entityManager.persist(issue);
+        }
     }
 
     @Override
@@ -118,4 +118,14 @@ public class IssueDaoImpl implements IssueDao {
         return (List<Issue>)entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
     }
 
+    public Issue getIssue(String publicationId, String fileName, String deviceId,  Serializable epubId) {
+        Issue issue = new Issue();
+        String issueId = fileName.substring(0, fileName.indexOf(".epub")) + "," +  deviceId;
+        issue.setId(issueId);
+        issue.setName(fileName);
+        issue.setPlatform(new Platform(deviceId));
+        issue.setPublication(new Publication(publicationId));
+        issue.setEpubFile(new EpubFile((Long) epubId));
+        return issue;
+    }
 }

@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -125,9 +126,9 @@ public class IssueServiceImpl implements IssueService {
         return self;
     }
 
-    public void uploadEpubFile(String publicationId, String fileName, InputStream inputStream) throws IOException {
+    public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
         ///need to discuss how to set primary key of multiple issues
-        issueDao.uploadEpubFile(publicationId, fileName, inputStream);
+        issueDao.uploadEpubFile(publicationId, fileName, deviceSet, inputStream);
     }
 
 }
