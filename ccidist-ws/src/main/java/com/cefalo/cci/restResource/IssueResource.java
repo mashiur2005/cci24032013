@@ -177,9 +177,10 @@ public class IssueResource {
     @GET
     @Path("/upload")
     @Produces(MediaType.APPLICATION_XHTML_XML)
-    public Response getUploadForm() {
+    public Response getUploadForm(@PathParam("organization") @DefaultValue("") final String organizationId,
+                                 @PathParam("publication") @DefaultValue("") final String publicationId) {
         Map<String, Object> model = new HashMap<>();
-        URI uri = uriInfo.getBaseUriBuilder().path(IssueResource.class).build();
+        URI uri = uriInfo.getBaseUriBuilder().path(IssueResource.class).build(organizationId, publicationId);
         model.put("binaryUri", uri);
         return Response.ok(new Viewable("/upload", model)).build();
     }
@@ -191,7 +192,6 @@ public class IssueResource {
             @PathParam("publication") @DefaultValue("") final String publicationId,
             @FormDataParam("file") InputStream uploadedInputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
-        boolean exceptionHandled = false;
         try {
             checkForValidPublication(organizationId, publicationId);
             checkValidFileContent(fileDetail);
@@ -201,15 +201,11 @@ public class IssueResource {
             }
             issueService.uploadEpubFile(publicationId, fileDetail.getFileName(), uploadedInputStream);
         } catch (NotFoundException ex) {
-            exceptionHandled = true;
             throw ex;
         } catch (IOException ex) {
-            exceptionHandled = true;
             throw new NotFoundException();
         } finally {
-            if (exceptionHandled) {
-                Closeables.close(uploadedInputStream, true);
-            }
+            Closeables.close(uploadedInputStream, true);
         }
         return Response.status(200).entity("File Successfully Uploaded").build();
     }
