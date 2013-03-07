@@ -8,7 +8,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.*;
 
 public class StorageUnitTest {
     private final CacheStorage cacheStorage;
@@ -41,6 +41,24 @@ public class StorageUnitTest {
        } catch (NullPointerException | IOException ex) {
 
        }
+    }
+
+    @Test
+    public void fetchAndWriteEpubTest() {
+        boolean isResourceIdNull = false;
+        boolean isIoException = false;
+
+        try {
+            cacheStorage.fetchAndWriteEpub(null, "polaris", "addressa");
+        } catch (NullPointerException e) {
+            isResourceIdNull = true;
+        } catch (IOException e) {
+            isIoException = true;
+        }
+
+        assertTrue("Resource Id can not be null" , isResourceIdNull);
+        assertFalse("IOException thrown ..........", isIoException);
+
     }
 
 }
