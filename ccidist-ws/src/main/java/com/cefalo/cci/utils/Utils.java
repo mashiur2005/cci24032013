@@ -12,9 +12,11 @@ public class Utils {
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
     public static String HOME_DIR = System.getProperty("user.home");
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
-    public static String FILE_BASE_DIR= "epubs";
+    public static String FILE_BASE_DIR = "epubs";
     public static String FILE_BASE_PATH = HOME_DIR + FILE_SEPARATOR + FILE_BASE_DIR;
     public static int FILE_REMOVING_DAY = 30;
+    public static String CACHE_DIR_NAME = "CachedStorate";
+    public static String CACHE_DIR_FULLPATH = HOME_DIR + FILE_SEPARATOR + CACHE_DIR_NAME + FILE_SEPARATOR;
 
     static {
          ORGANIZATION_DETAILS.put("Polaris", Arrays.asList("Addressa", "Harstadtidende"));

@@ -14,12 +14,17 @@ import java.util.zip.ZipInputStream;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CacheStorage implements Storage {
-    private String HOME_DIR = System.getProperty("user.home");
-    private String SEPERATOR = System.getProperty("file.separator");
-
     @Inject
     @Named("databaseStorage")
     Storage databaseStorage;
+
+    @Inject
+    @Named("cacheDirFullPath")
+    private String cacheDirFullPath;
+
+    @Inject
+    @Named("fileSystemSeperator")
+    private String fileSystemSeperator;
 
     @Override
     public InputStream get(URI resourceID) throws IOException {
@@ -98,13 +103,13 @@ public class CacheStorage implements Storage {
             zipInputStream = new ZipInputStream(inputStream);
             ZipEntry entry;
             String name;
-            file = new File(HOME_DIR + SEPERATOR + "writeTest"+ SEPERATOR + organizationId + SEPERATOR + publicationId + SEPERATOR + resourceId.getPath() + SEPERATOR);
+            file = new File(cacheDirFullPath + fileSystemSeperator + organizationId + fileSystemSeperator + publicationId + fileSystemSeperator + resourceId.getPath() + fileSystemSeperator);
             if (!file.exists()) {
                 Files.createParentDirs(file);
             }
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 name = entry.getName();
-                file = new File(HOME_DIR + SEPERATOR + "writeTest"+ SEPERATOR + organizationId + SEPERATOR + publicationId + SEPERATOR + resourceId.getPath() + SEPERATOR + name);
+                file = new File(cacheDirFullPath + fileSystemSeperator + organizationId + fileSystemSeperator + publicationId + fileSystemSeperator + resourceId.getPath() + fileSystemSeperator + name);
                 if (name.endsWith("/")) {
                     file.mkdirs();
                     continue;

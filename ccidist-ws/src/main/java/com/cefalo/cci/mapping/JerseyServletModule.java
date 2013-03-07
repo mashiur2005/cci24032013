@@ -34,6 +34,8 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         bind(IssueService.class).to(IssueServiceImpl.class);
 
         bindConstant().annotatedWith(Names.named("epubFileDirPath")).to(Utils.FILE_BASE_PATH);
+        bindConstant().annotatedWith(Names.named("cacheDirFullPath")).to(Utils.CACHE_DIR_FULLPATH);
+        bindConstant().annotatedWith(Names.named("fileSystemSeperator")).to(Utils.FILE_SEPARATOR);
 
         Map<String, String> params = new HashMap<String, String>();
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.cefalo.cci.restResource");

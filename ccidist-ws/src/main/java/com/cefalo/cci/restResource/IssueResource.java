@@ -1,32 +1,5 @@
 package com.cefalo.cci.restResource;
 
-import static com.cefalo.cci.utils.Utils.isBlank;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.*;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
-
-import com.google.common.collect.Sets;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
-import org.joda.time.DateMidnight;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.cefalo.cci.mapping.JerseyResourceLocator;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
@@ -36,18 +9,31 @@ import com.cefalo.cci.service.IssueService;
 import com.cefalo.cci.service.PublicationService;
 import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.view.Viewable;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
 import com.sun.syndication.feed.synd.SyndFeed;
+import org.joda.time.DateMidnight;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.net.URI;
+import java.util.*;
+
+import static com.cefalo.cci.utils.Utils.isBlank;
 
 
 @Path("/{organization}/{publication}/issue/")
@@ -71,6 +57,14 @@ public class IssueResource {
 
     @Context
     private UriInfo uriInfo;
+
+    @Inject
+    @Named("cacheDirFullPath")
+    private String cacheDirFullPath;
+
+    @Inject
+    @Named("fileSystemSeperator")
+    private String fileSystemSeperator;
 
     @GET
     @Produces(MediaType.APPLICATION_ATOM_XML)
@@ -156,7 +150,7 @@ public class IssueResource {
         URI fragmentPath = URI.create(contentLocInEpub);
 
         String fileName = fragmentPath.getPath();
-        String filePath = Utils.HOME_DIR + Utils.FILE_SEPARATOR + "writeTest" + Utils.FILE_SEPARATOR + organizationId + Utils.FILE_SEPARATOR + publicationId + Utils.FILE_SEPARATOR + resourceUri.getPath() + Utils.FILE_SEPARATOR + fileName;
+        String filePath = cacheDirFullPath + fileSystemSeperator + organizationId + fileSystemSeperator + publicationId + fileSystemSeperator + resourceUri.getPath() + fileSystemSeperator + fileName;
 
         boolean exceptionHappened = false;
         InputStream binaryStream = null;
