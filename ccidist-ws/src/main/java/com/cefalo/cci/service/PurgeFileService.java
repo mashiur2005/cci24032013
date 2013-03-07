@@ -1,8 +1,8 @@
 package com.cefalo.cci.service;
 
 import com.cefalo.cci.model.Issue;
-import com.cefalo.cci.utils.Utils;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.joda.time.DateTime;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -18,35 +18,53 @@ import java.util.List;
 public class PurgeFileService implements org.quartz.Job{
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String baseDirPath = Utils.HOME_DIR;
-    private String seprator = Utils.FILE_SEPARATOR;
-    private int daysBack = Utils.FILE_REMOVING_DAY;
-
     @Inject
     private IssueService issueService;
+
+    @Inject
+    @Named("cacheDirFullPath")
+    private String cacheDirFullPath;
+
+    @Inject
+    @Named("fileSystemSeperator")
+    private String fileSystemSeperator;
+
+    @Inject
+    @Named("interval")
+    private int interval;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         logger.info("cron job working for removing old files ......." + System.currentTimeMillis());
         DateTime prevDate = new DateTime();
-        long purgeTime = prevDate.minusDays(daysBack).getMillis();
+        long purgeTime = prevDate.minusDays(interval).getMillis();
         Date purgeDate = new Date(purgeTime);
         List<Issue> issueList = issueService.getOldIssueList(purgeDate);
 
         File file = null;
 
         for (Issue anIssueList : issueList) {
-            file = new File(baseDirPath + seprator + anIssueList.getPublication().getOrganization().getId() + seprator + anIssueList.getPublication().getId() + seprator + anIssueList.getName());
-            logger.info("Epubs to be deleted: " + file.getAbsolutePath());
+            file = new File(cacheDirFullPath + fileSystemSeperator + anIssueList.getPublication().getOrganization().getId() + fileSystemSeperator + anIssueList.getPublication().getId() + fileSystemSeperator + anIssueList.getId());
+            logger.info("Files to be deleted: " + file.getAbsolutePath());
             if (file.exists()) {
-                if (!file.delete()) {
-                    logger.info("can't delete file");
-                } else {
-                    logger.info("file deleted..........." + file.getAbsolutePath());
-                }
-            } else {
-                logger.info("file does not exists..........." + file.getAbsolutePath());
+                deleteRecursive(file);
             }
         }
+    }
+
+    public void deleteRecursive(File path){
+        File[] c = path.listFiles();
+        logger.info("Cleaning out folder:" + path.toString());
+        for (File file : c){
+            if (file.isDirectory()){
+                logger.info("Deleting file:" + file.toString());
+                deleteRecursive(file);
+                file.delete();
+            } else {
+                file.delete();
+            }
+        }
+
+        path.delete();
     }
 }

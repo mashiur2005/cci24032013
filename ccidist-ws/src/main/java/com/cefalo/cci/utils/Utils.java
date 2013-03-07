@@ -14,7 +14,7 @@ public class Utils {
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
     public static String FILE_BASE_DIR = "epubs";
     public static String FILE_BASE_PATH = HOME_DIR + FILE_SEPARATOR + FILE_BASE_DIR;
-    public static int FILE_REMOVING_DAY = 30;
+    public static int CLEANING_INTERVAL = 30;
     public static String CACHE_DIR_NAME = "CachedStorate";
     public static String CACHE_DIR_FULLPATH = HOME_DIR + FILE_SEPARATOR + CACHE_DIR_NAME + FILE_SEPARATOR;
 
