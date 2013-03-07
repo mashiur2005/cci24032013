@@ -110,7 +110,9 @@ public class IssueDaoImpl implements IssueDao {
         Serializable epubId = session.save(epubFile);
 
         for (String deviceId : deviceSet) {
-            Issue issue = getIssue(publicationId, fileName, deviceId, epubId);
+            //generating issue primary key....based on fileName and count on existing fileName
+            String issuePK = generateIssuePrimaryKey(fileName.substring(0, fileName.indexOf(".epub")));
+            Issue issue = createIssue(publicationId, issuePK, fileName, deviceId, epubId);
             entityManager.persist(issue);
         }
     }
@@ -122,14 +124,19 @@ public class IssueDaoImpl implements IssueDao {
         return (List<Issue>)entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
     }
 
-    public Issue getIssue(String publicationId, String fileName, String deviceId,  Serializable epubId) {
+    public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId) {
         Issue issue = new Issue();
-        String issueId = fileName.substring(0, fileName.indexOf(".epub")) + "," +  deviceId;
-        issue.setId(issueId);
+        issue.setId(issuePK);
         issue.setName(fileName);
         issue.setPlatform(new Platform(deviceId));
         issue.setPublication(new Publication(publicationId));
         issue.setEpubFile(new EpubFile((Long) epubId));
         return issue;
+    }
+
+    public String generateIssuePrimaryKey(String fileName) {
+        long countDuplicateIssue = (Long) entityManager.createQuery("SELECT COUNT(i) FROM Issue i Where i.id LIKE :fileName").setParameter("fileName", fileName + "_%")
+                .getSingleResult();
+        return fileName + "_" + (countDuplicateIssue + 1);
     }
 }
