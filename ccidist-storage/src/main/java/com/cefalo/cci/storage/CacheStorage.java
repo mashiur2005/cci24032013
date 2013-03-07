@@ -97,10 +97,22 @@ public class CacheStorage implements Storage {
             inputStream = databaseStorage.get(resourceId);
             zipInputStream = new ZipInputStream(inputStream);
             ZipEntry entry;
+            String name;
+            file = new File(HOME_DIR + SEPERATOR + "writeTest"+ SEPERATOR + organizationId + SEPERATOR + publicationId + SEPERATOR + resourceId.getPath() + SEPERATOR);
+            if (!file.exists()) {
+                Files.createParentDirs(file);
+            }
             while ((entry = zipInputStream.getNextEntry()) != null) {
-                file = new File(HOME_DIR + SEPERATOR + "writeTest"+ SEPERATOR + organizationId + SEPERATOR + publicationId + SEPERATOR + resourceId.getPath() + SEPERATOR + entry.getName());
-                if (!file.exists()) {
-                    Files.createParentDirs(file);
+                name = entry.getName();
+                file = new File(HOME_DIR + SEPERATOR + "writeTest"+ SEPERATOR + organizationId + SEPERATOR + publicationId + SEPERATOR + resourceId.getPath() + SEPERATOR + name);
+                if (name.endsWith("/")) {
+                    file.mkdirs();
+                    continue;
+                }
+
+                File parent = file.getParentFile();
+                if (parent != null) {
+                    parent.mkdirs();
                 }
                 fileOutputStream = new FileOutputStream(file);
                 ByteStreams.copy(zipInputStream, fileOutputStream);
