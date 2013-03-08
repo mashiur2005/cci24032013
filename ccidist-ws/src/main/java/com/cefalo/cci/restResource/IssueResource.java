@@ -151,11 +151,20 @@ public class IssueResource {
 
         String fileName = fragmentPath.getPath();
         String filePath = cacheDirFullPath + fileSystemSeperator + organizationId + fileSystemSeperator + publicationId + fileSystemSeperator + resourceUri.getPath() + fileSystemSeperator + fileName;
+        File cachedFile = new File(filePath);
+
+        if (cachedFile.exists()) {
+            ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
+                    .createETagHeaderValue(cachedFile.lastModified())));
+            if (notModifiedResponseBuilder != null) {
+                return notModifiedResponseBuilder.header("Last-Modified", cachedFile.lastModified()).build();
+            }
+        }
 
         boolean exceptionHappened = false;
         InputStream binaryStream = null;
         try {
-            if (!new File(filePath).exists()) {
+            if (!cachedFile.exists()) {
                 storage.fetchAndWriteEpub(resourceUri, organizationId, publicationId);
             }
             binaryStream = storage.getFragmentFromCache(resourceUri, fragmentPath, filePath);
@@ -177,7 +186,7 @@ public class IssueResource {
             if (mediaType == null) {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
             }
-            return Response.ok(sout, mediaType).build();
+            return Response.ok(sout, mediaType).tag(String.valueOf(cachedFile.lastModified())).header("Last-Modified", cachedFile.lastModified()).build();
         } catch (FileNotFoundException fnfe) {
             exceptionHappened = true;
             throw new NotFoundException();
