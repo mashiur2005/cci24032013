@@ -1,24 +1,5 @@
 package com.cefalo.cci.restResource;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriInfo;
-
 import com.cefalo.cci.mapping.JerseyResourceLocator;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Organization;
@@ -29,6 +10,15 @@ import com.google.inject.Inject;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.view.Viewable;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import java.net.URI;
+import java.util.*;
 
 @Path("/")
 public class OrganizationResource {
@@ -49,6 +39,13 @@ public class OrganizationResource {
             throw new NotFoundException();
         }
 
+        long latestOrgUpdateTime = organizations.get(0).getUpdated().getTime();
+        ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
+                .createETagHeaderValue(latestOrgUpdateTime)));
+        if (unmodifiedResponseBuilder != null) {
+            return unmodifiedResponseBuilder.header("Last-Modified", latestOrgUpdateTime).build();
+        }
+
         ResourceLocator resourceLocator = JerseyResourceLocator.from(uriInfo);
         Map<Organization, URI> orgNameUriMap = new LinkedHashMap<>();
 
@@ -61,7 +58,7 @@ public class OrganizationResource {
 
         //TODO: we have to add version here
 
-        return Response.ok(new Viewable("/orgList", model)).build();
+        return Response.ok(new Viewable("/orgList", model)).tag(String.valueOf(latestOrgUpdateTime)).header("Last-Modified", latestOrgUpdateTime).build();
     }
 
     @GET
@@ -80,7 +77,7 @@ public class OrganizationResource {
         ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
                 .createETagHeaderValue(organization.getVersion())));
         if (unmodifiedResponseBuilder != null) {
-            return unmodifiedResponseBuilder.build();
+            return unmodifiedResponseBuilder.header("Last-Modified", organization.getUpdated().getTime()).build();
         }
 
         ResourceLocator resourceLocator = JerseyResourceLocator.from(uriInfo);
@@ -95,6 +92,6 @@ public class OrganizationResource {
         model.put("organizationName", organization.getName());
         model.put("publicationMap", publicationNameUriMap);
 
-        return Response.ok(new Viewable("/organization", model)).tag(String.valueOf(organization.getVersion())).build();
+        return Response.ok(new Viewable("/organization", model)).tag(String.valueOf(organization.getVersion())).header("Last-Modified", organization.getUpdated().getTime()).build();
     }
 }

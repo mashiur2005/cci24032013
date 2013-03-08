@@ -8,6 +8,9 @@ name varchar(255),
 primary key(id)
 );
 
+alter table organization add column created datetime;
+alter table organization add column updated datetime;
+
 create table publication (
 id varchar(255) not null,
 version int not null,

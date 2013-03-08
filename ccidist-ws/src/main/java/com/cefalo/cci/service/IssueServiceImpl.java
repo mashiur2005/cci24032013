@@ -33,7 +33,11 @@ public class IssueServiceImpl implements IssueService {
 
     @Override
     public List<Issue> getIssueListByPublicationId(String publicationId) {
-        return issueDao.getIssueListByPublicationId(publicationId);
+        List<Issue> issueList = issueDao.getIssueListByPublicationId(publicationId);
+        if (issueList == null) {
+            new ArrayList<Issue>();
+        }
+        return issueList;
     }
 
     @Override

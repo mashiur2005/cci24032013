@@ -16,10 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -70,6 +67,11 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("/");
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         assertEquals(406, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/");
+        clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
+        assertNotNull("Entity Tag Organization List: ", clientResponse.getEntityTag());
+        assertNotNull("Last-Modified Header Organization List: ", clientResponse.getHeaders().getFirst("Last-Modified"));
     }
 
     @Test
@@ -99,8 +101,12 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
         ws = resource().path(BASE_URL).path("/polaris");
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
-
         assertEquals("Unsupported MediaType error code: ", 406, clientResponse.getStatus());
+
+        ws = resource().path(BASE_URL).path("/polaris");
+        clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
+        assertNotNull("Entity tag Organization Detail: ", clientResponse.getEntityTag());
+        assertNotNull("Last-Modified Header Organization Detail: ", clientResponse.getHeaders().getFirst("Last-Modified"));
     }
 
     @Test
@@ -117,6 +123,9 @@ public class CciResourceIntegrationTest extends JerseyTest{
         clientResponse = ws.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(406, clientResponse.getStatus());
 
+        ws = resource().path(BASE_URL).path("polaris").path("Addressa");
+        clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
+        assertNotNull("Publiation Detail Entity Tag: ", clientResponse.getEntityTag());
     }
 
     @Test
@@ -298,6 +307,10 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("number of entry for problematic start and limit: ", 0, nodeList.getLength());
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
         assertEquals("number f links for start = 40 exceeding total number of files: ", 2, nodeList.getLength());
+
+        ws = resource().queryParam("start", "1").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
+        clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        assertNotNull("Last-Modified Header Issue List: ", clientResponse.getHeaders().getFirst("Last-Modified"));
     }
 
 }

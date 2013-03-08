@@ -16,7 +16,7 @@ public class OrganizationDaoImpl implements OrganizationDao {
     @Override
     @Transactional
     public List<Organization> getAllOrganizations() {
-        return entityManager.createQuery("select o from Organization o order by o.name").getResultList();
+        return entityManager.createQuery("select o from Organization o order by o.updated desc").getResultList();
     }
 
     @Override

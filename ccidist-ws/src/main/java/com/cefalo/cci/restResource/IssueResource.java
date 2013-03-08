@@ -101,8 +101,10 @@ public class IssueResource {
 
         SyndFeed feed = issueService.getIssuesAsAtomFeed(publication.getOrganization(), publication, start, limit,
                 deviceType, fromDate, order, JerseyResourceLocator.from(uriInfo));
+        List<Issue> issueList = issueService.getIssueListByPublicationId(publication.getId());
+        long lastModifiedIssueTime = issueList.get(0).getUpdated().getTime();
 
-        return Response.ok(feed).build();
+        return Response.ok(feed).header("Last-Modified", lastModifiedIssueTime).build();
     }
 
     @GET
@@ -118,7 +120,7 @@ public class IssueResource {
         ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
                 .createETagHeaderValue(issue.getVersion())));
         if (notModifiedResponseBuilder != null) {
-            return notModifiedResponseBuilder.build();
+            return notModifiedResponseBuilder.header("Last-Modified", issue.getUpdated().getTime()).build();
         }
 
         Map<String, Object> model = new HashMap<>();
@@ -131,7 +133,7 @@ public class IssueResource {
         model.put("containerUri",
                 locator.getEpubContentURI(organizationId, publicationId, issueId, "META-INF/container.xml"));
 
-        return Response.ok(new Viewable("/issueDetail", model)).tag(String.valueOf(issue.getVersion())).build();
+        return Response.ok(new Viewable("/issueDetail", model)).tag(String.valueOf(issue.getVersion())).header("Last-Modified", issue.getUpdated().getTime()).build();
     }
 
     @Path("/{issue}/{contentLocInEpub: .+}")

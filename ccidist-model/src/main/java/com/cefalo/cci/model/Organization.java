@@ -2,6 +2,7 @@ package com.cefalo.cci.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -11,6 +12,8 @@ public class Organization  extends Persistent implements Serializable {
 
     private String id;
     private String name;
+    private Date created;
+    private Date updated;
     private Set<Publication> publications;
 
 
@@ -30,6 +33,35 @@ public class Organization  extends Persistent implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Temporal(value = TemporalType.TIMESTAMP)
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    @Temporal(value = TemporalType.TIMESTAMP)
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        setCreated(new Date());
+        setUpdated(new Date());
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        setUpdated(new Date());
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "organization", orphanRemoval = true)
