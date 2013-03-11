@@ -20,7 +20,7 @@ public class StorageUnitTest {
 
     @Test
     public void getFragmentTest() {
-        List<String> resourceIds = Arrays.asList(null, "/Polaris", "/Polaris/Addressa");
+        List<String> resourceIds = Arrays.asList(null, "/Polaris", "200");
         List<String> fragmentIds = Arrays.asList("/META-INF/container.xml", null, "/META-INF/container.xml");
 
         for (int i = 0; i < 3; i++) {

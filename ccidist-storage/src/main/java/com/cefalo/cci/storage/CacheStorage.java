@@ -8,6 +8,10 @@ import com.google.inject.name.Named;
 
 import java.io.*;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -26,6 +30,9 @@ public class CacheStorage implements Storage {
     @Named("fileSystemSeperator")
     private String fileSystemSeperator;
 
+    //used as temporarily. Will be removed
+    private ConcurrentMap<String, String> keyStor = new ConcurrentHashMap<String, String> ();
+
     @Override
     public InputStream get(URI resourceID) throws IOException {
         checkNotNull(resourceID, "Resource Id can not be null");
@@ -39,10 +46,16 @@ public class CacheStorage implements Storage {
         checkNotNull(fragmentPath, "Fragment Path can not be null");
 
         String fileId = resourceID.getPath();
+
+        //used as temporarily. Will be removed....
+        keyStor.putIfAbsent(fileId, fileId);
+
         String fileName = fragmentPath.getPath();
         String fileDirPath =  cacheDirFullPath + fileSystemSeperator + fileId;
         File resourceFile = new File(fileDirPath);
-        synchronized (fileId) {
+
+        //Same fileId  value might have different reference. temporary soluation
+        synchronized (keyStor.get(fileId)) {
             if (!resourceFile.exists()) {
                 extractAndStoreEpub(resourceID);
             }
