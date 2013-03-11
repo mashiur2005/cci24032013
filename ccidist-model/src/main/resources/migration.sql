@@ -5,17 +5,18 @@ create table organization(
 id varchar(255) not null,
 version int not null,
 name varchar(255),
+created datetime,
+updated datetime,
 primary key(id)
 );
-
-alter table organization add column created datetime;
-alter table organization add column updated datetime;
 
 create table publication (
 id varchar(255) not null,
 version int not null,
 name varchar(255),
 organization_id varchar(255),
+created datetime,
+updated datetime,
 primary key (id),
 FOREIGN KEY (organization_id) REFERENCES organization (id)
 );

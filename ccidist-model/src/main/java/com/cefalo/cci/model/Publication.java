@@ -1,16 +1,9 @@
 package com.cefalo.cci.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "publication")
@@ -20,6 +13,8 @@ public class Publication extends Persistent implements Serializable {
     private String id;
     private String name;
     private Organization organization;
+    private Date created;
+    private Date updated;
     private Set<Platform> platforms;
 
     public Publication() {
@@ -56,6 +51,35 @@ public class Publication extends Persistent implements Serializable {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    @Temporal(value = TemporalType.TIMESTAMP)
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    @Temporal(value = TemporalType.TIMESTAMP)
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        setCreated(new Date());
+        setUpdated(new Date());
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        setUpdated(new Date());
     }
 
     @OneToMany

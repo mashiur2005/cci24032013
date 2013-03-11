@@ -39,11 +39,11 @@ public class OrganizationResource {
             throw new NotFoundException();
         }
 
-        long latestOrgUpdateTime = organizations.get(0).getUpdated().getTime();
-        ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
-                .createETagHeaderValue(latestOrgUpdateTime)));
+        Date latestModifiedDate = organizations.get(0).getUpdated();
+        ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(latestModifiedDate, EntityTag.valueOf(Utils
+                .createETagHeaderValue(latestModifiedDate.getTime())));
         if (unmodifiedResponseBuilder != null) {
-            return unmodifiedResponseBuilder.header("Last-Modified", latestOrgUpdateTime).build();
+            return unmodifiedResponseBuilder.tag(String.valueOf(latestModifiedDate.getTime())).lastModified(latestModifiedDate).build();
         }
 
         ResourceLocator resourceLocator = JerseyResourceLocator.from(uriInfo);
@@ -58,7 +58,7 @@ public class OrganizationResource {
 
         //TODO: we have to add version here
 
-        return Response.ok(new Viewable("/orgList", model)).tag(String.valueOf(latestOrgUpdateTime)).header("Last-Modified", latestOrgUpdateTime).build();
+        return Response.ok(new Viewable("/orgList", model)).tag(String.valueOf(latestModifiedDate.getTime())).lastModified(latestModifiedDate).build();
     }
 
     @GET
@@ -74,10 +74,10 @@ public class OrganizationResource {
             throw new NotFoundException();
         }
 
-        ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
+        ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(organization.getUpdated(), EntityTag.valueOf(Utils
                 .createETagHeaderValue(organization.getVersion())));
         if (unmodifiedResponseBuilder != null) {
-            return unmodifiedResponseBuilder.header("Last-Modified", organization.getUpdated().getTime()).build();
+            return unmodifiedResponseBuilder.lastModified(organization.getUpdated()).tag(String.valueOf(organization.getVersion())).build();
         }
 
         ResourceLocator resourceLocator = JerseyResourceLocator.from(uriInfo);
@@ -92,6 +92,6 @@ public class OrganizationResource {
         model.put("organizationName", organization.getName());
         model.put("publicationMap", publicationNameUriMap);
 
-        return Response.ok(new Viewable("/organization", model)).tag(String.valueOf(organization.getVersion())).header("Last-Modified", organization.getUpdated().getTime()).build();
+        return Response.ok(new Viewable("/organization", model)).tag(String.valueOf(organization.getVersion())).lastModified(organization.getUpdated()).build();
     }
 }

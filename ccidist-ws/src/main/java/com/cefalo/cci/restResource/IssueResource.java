@@ -99,12 +99,19 @@ public class IssueResource {
             return Responses.notFound().build();
         }
 
+        List<Issue> issueList = issueService.getIssueListByPublicationId(publication.getId());
+
+        Date lastModifiedIssueDate = issueList.get(0).getUpdated();
+        ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(lastModifiedIssueDate, EntityTag.valueOf(Utils
+                .createETagHeaderValue(lastModifiedIssueDate.getTime())));
+        if (unmodifiedResponseBuilder != null) {
+            return unmodifiedResponseBuilder.tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();
+        }
+
         SyndFeed feed = issueService.getIssuesAsAtomFeed(publication.getOrganization(), publication, start, limit,
                 deviceType, fromDate, order, JerseyResourceLocator.from(uriInfo));
-        List<Issue> issueList = issueService.getIssueListByPublicationId(publication.getId());
-        long lastModifiedIssueTime = issueList.get(0).getUpdated().getTime();
 
-        return Response.ok(feed).header("Last-Modified", lastModifiedIssueTime).build();
+        return Response.ok(feed).tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();
     }
 
     @GET
@@ -117,10 +124,10 @@ public class IssueResource {
 
         Issue issue = retrieveIssue(organizationId, publicationId, issueId);
 
-        ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
+        ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(issue.getUpdated(), EntityTag.valueOf(Utils
                 .createETagHeaderValue(issue.getVersion())));
         if (notModifiedResponseBuilder != null) {
-            return notModifiedResponseBuilder.header("Last-Modified", issue.getUpdated().getTime()).build();
+            return notModifiedResponseBuilder.tag(String.valueOf(issue.getVersion())).lastModified(issue.getUpdated()).build();
         }
 
         Map<String, Object> model = new HashMap<>();
@@ -133,7 +140,7 @@ public class IssueResource {
         model.put("containerUri",
                 locator.getEpubContentURI(organizationId, publicationId, issueId, "META-INF/container.xml"));
 
-        return Response.ok(new Viewable("/issueDetail", model)).tag(String.valueOf(issue.getVersion())).header("Last-Modified", issue.getUpdated().getTime()).build();
+        return Response.ok(new Viewable("/issueDetail", model)).tag(String.valueOf(issue.getVersion())).lastModified(issue.getUpdated()).build();
     }
 
     @Path("/{issue}/{contentLocInEpub: .+}")
@@ -157,10 +164,10 @@ public class IssueResource {
         File resourceFile = new File(fileLocationPath);
 
         if (resourceFile.exists()) {
-            ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
+            ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(new Date(resourceFile.lastModified()), EntityTag.valueOf(Utils
                     .createETagHeaderValue(resourceFile.lastModified())));
             if (notModifiedResponseBuilder != null) {
-                return notModifiedResponseBuilder.header("Last-Modified", resourceFile.lastModified()).build();
+                return notModifiedResponseBuilder.tag(String.valueOf(resourceFile.lastModified())).lastModified(new Date(resourceFile.lastModified())).build();
             }
         }
 
@@ -185,7 +192,7 @@ public class IssueResource {
             if (mediaType == null) {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
             }
-            return Response.ok(sout, mediaType).tag(String.valueOf(resourceFile.lastModified())).header("Last-Modified", resourceFile.lastModified()).build();
+            return Response.ok(sout, mediaType).tag(String.valueOf(resourceFile.lastModified())).lastModified(new Date(resourceFile.lastModified())).build();
         } catch (FileNotFoundException fnfe) {
             exceptionHappened = true;
             throw new NotFoundException();
