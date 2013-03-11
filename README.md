@@ -20,9 +20,12 @@ Installation instructions
 -------------------------
 
 1. Change directory to wherever you store your git projects
-   eg:`cd ~/gitrepos`
+
+   e.g. `cd ~/gitrepos`
+
    You do  ot need to create the root directory of the as this will be create when the project is cloned in the next
    step.
+
 2. Clone the CCIDIST repository
 
    `git clone https://github.com/Cefalo/ccidist.git`
@@ -31,13 +34,36 @@ Installation instructions
 
    `cd ccidist`
 
-4. Build the code
+4. Build the application
 
    `mvn clean package`
 
-5. Create the database:
+   This will download all necessary packages, compile, and package the server
 
-6. Make sure the application can access the database.
+5. Create the database tables and populate them with some sample data.
 
-7. Start the server: `mvn jetty:run`
+   This is the most shaky part of the installation, because you need to edit an sql script.
+   There is a script that will create the database, create it's tables, and insert some sample data into it. The script
+   can be found here:
+
+   `ccidist/ccidist-model/src/main/resources/migration.sql`
+
+   The section "epub files" in the script inserts some sample epub files into the database. The script needs to be
+   edited to provide the absolute path of these files. Do this by replacing the string <absolute-path> with the
+   corresponding path on you machine.
+
+6. Make sure the application can access the database
+
+   By default the application tries to connect to the database server with username 'root' and no password.
+   If your database server will not accept this, you can set the correct user name and password by editing the file
+
+   `ccidist/ccidist-ws/src/main/resources/META-INF/persistence.xml`
+
+7. Start the server
+
+    `mvn jetty:run`
+
+8. Test that the server works
+
+   Point your browser at http://localhost:8080/cci
 
