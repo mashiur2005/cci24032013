@@ -49,7 +49,7 @@ Installation instructions
    `ccidist/ccidist-model/src/main/resources/migration.sql`
 
    The section "epub files" in the script inserts some sample epub files into the database. The script needs to be
-   edited to provide the absolute path of these files. Do this by replacing the string <absolute-path> with the
+   edited to provide the absolute path of these files. Do this by replacing the string `<absolute-root` with the
    corresponding path on you machine.
 
 6. Make sure the application can access the database
