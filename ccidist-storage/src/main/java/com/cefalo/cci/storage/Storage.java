@@ -111,7 +111,4 @@ public interface Storage {
 	 */
 	URI delete(final URI resourceID) throws IOException;
 
-    void fetchAndWriteEpub(URI resourceId, String organizationId, String publicationId) throws IOException;
-
-    InputStream getFragmentFromCache(URI resourceId, URI fragmentPath, String filePath) throws IOException;
 }

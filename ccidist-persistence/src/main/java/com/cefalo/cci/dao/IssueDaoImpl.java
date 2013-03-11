@@ -15,11 +15,16 @@ import com.cefalo.cci.model.Publication;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Set;
 
 public class IssueDaoImpl implements IssueDao {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Inject
     private EntityManager entityManager;
 
@@ -75,6 +80,8 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @Transactional
     public EpubFile getEpubFile(long id) {
+
+        logger.info("epub...id.." + id);
         return entityManager.find(EpubFile.class, id);
     }
 

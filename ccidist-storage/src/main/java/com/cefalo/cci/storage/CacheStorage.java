@@ -38,32 +38,21 @@ public class CacheStorage implements Storage {
         checkNotNull(resourceID, "Resource Id can not be null");
         checkNotNull(fragmentPath, "Fragment Path can not be null");
 
+        String fileId = resourceID.getPath();
         String fileName = fragmentPath.getPath();
-        boolean exceptionHappened = false;
-        InputStream in = null;
-        ZipInputStream zipInputStream = null;
-        try {
-            in = databaseStorage.get(resourceID);
-            zipInputStream = new ZipInputStream(in);
-            ZipEntry zipEntry;
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                if (fileName.equals(zipEntry.getName())) {
-                    return zipInputStream;
-                }
+        String fileDirPath =  cacheDirFullPath + fileSystemSeperator + fileId;
+        File resourceFile = new File(fileDirPath);
+        synchronized (fileId) {
+            if (!resourceFile.exists()) {
+                extractAndStoreEpub(resourceID);
             }
-        } catch (FileNotFoundException fnfe) {
-            exceptionHappened = true;
+            String fileLocationPath = fileDirPath + fileSystemSeperator + fileName;
+
+            if (new File(fileLocationPath).exists()) {
+                return new FileInputStream(fileLocationPath);
+            }
             throw new FileNotFoundException();
-        } catch (IOException io) {
-            exceptionHappened = true;
-            throw new IOException();
-        } finally {
-            if (exceptionHappened) {
-                Closeables.close(zipInputStream, exceptionHappened);
-                Closeables.close(in, exceptionHappened);
-            }
         }
-        throw new FileNotFoundException();
     }
 
     @Override
@@ -86,30 +75,26 @@ public class CacheStorage implements Storage {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public void fetchAndWriteEpub(URI resourceId, String organizationId, String publicationId) throws IOException {
+    public void extractAndStoreEpub(URI resourceId) throws IOException {
         checkNotNull(resourceId, "Resource Id can not be null");
-        checkNotNull(organizationId, "Organization Id can not be null");
-        checkNotNull(publicationId, "Publication Id can not be null");
 
         InputStream inputStream = null;
         ZipInputStream zipInputStream = null;
         FileOutputStream fileOutputStream = null;
-        File file = null;
-        boolean exceptionHappened = false;
+        String fileName = resourceId.getPath();
 
         try {
             inputStream = databaseStorage.get(resourceId);
             zipInputStream = new ZipInputStream(inputStream);
             ZipEntry entry;
             String name;
-            file = new File(cacheDirFullPath + fileSystemSeperator + organizationId + fileSystemSeperator + publicationId + fileSystemSeperator + resourceId.getPath() + fileSystemSeperator);
+            File file = new File(cacheDirFullPath + fileSystemSeperator + fileName);
             if (!file.exists()) {
                 Files.createParentDirs(file);
             }
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 name = entry.getName();
-                file = new File(cacheDirFullPath + fileSystemSeperator + organizationId + fileSystemSeperator + publicationId + fileSystemSeperator + resourceId.getPath() + fileSystemSeperator + name);
+                file = new File(cacheDirFullPath + fileSystemSeperator + fileName+ fileSystemSeperator + name);
                 if (name.endsWith("/")) {
                     file.mkdirs();
                     continue;
@@ -123,26 +108,18 @@ public class CacheStorage implements Storage {
                 ByteStreams.copy(zipInputStream, fileOutputStream);
                 fileOutputStream.close();
             }
-            inputStream.close();
-            zipInputStream.close();
         } catch (FileNotFoundException fn) {
-            exceptionHappened = true;
-            fn.printStackTrace();
             throw new FileNotFoundException();
         } catch (IOException io) {
-            exceptionHappened = true;
-            io.printStackTrace();
             throw new IOException();
         } finally {
-            if (exceptionHappened) {
-                Closeables.close(inputStream, exceptionHappened);
-                Closeables.close(zipInputStream, exceptionHappened);
-                Closeables.close(fileOutputStream, exceptionHappened);
-            }
+            //need to discuss with partha bhai
+            Closeables.close(inputStream, false);
+            Closeables.close(zipInputStream, false);
+            Closeables.close(fileOutputStream, false);
         }
     }
 
-    @Override
     public InputStream getFragmentFromCache(URI resourceId, URI fragmentPath, String filePath) throws IOException {
         checkNotNull(resourceId, "Resource Id can not be null");
         checkNotNull(fragmentPath, "fragmentPath can not be null");

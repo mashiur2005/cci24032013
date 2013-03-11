@@ -148,29 +148,26 @@ public class IssueResource {
             return Responses.clientError().entity("Content location may not be blank.").build();
         }
 
-        URI resourceUri = URI.create(issue.getId());
+        String fileId = Long.toString(issue.getEpubFile().getId());
+        URI resourceUri = URI.create(fileId);
         URI fragmentPath = URI.create(contentLocInEpub);
 
         String fileName = fragmentPath.getPath();
-        String filePath = cacheDirFullPath + fileSystemSeperator + organizationId + fileSystemSeperator + publicationId + fileSystemSeperator + resourceUri.getPath() + fileSystemSeperator + fileName;
-        File cachedFile = new File(filePath);
+        String fileLocationPath = cacheDirFullPath + fileSystemSeperator + fileId + fileSystemSeperator + fileName;
+        File resourceFile = new File(fileLocationPath);
 
-        if (cachedFile.exists()) {
+        if (resourceFile.exists()) {
             ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
-                    .createETagHeaderValue(cachedFile.lastModified())));
+                    .createETagHeaderValue(resourceFile.lastModified())));
             if (notModifiedResponseBuilder != null) {
-                return notModifiedResponseBuilder.header("Last-Modified", cachedFile.lastModified()).build();
+                return notModifiedResponseBuilder.header("Last-Modified", resourceFile.lastModified()).build();
             }
         }
 
         boolean exceptionHappened = false;
         InputStream binaryStream = null;
         try {
-            if (!cachedFile.exists()) {
-                storage.fetchAndWriteEpub(resourceUri, organizationId, publicationId);
-            }
-            binaryStream = storage.getFragmentFromCache(resourceUri, fragmentPath, filePath);
-            /*binaryStream = storage.getFragment(resourceUri, fragmentPath);*/
+           binaryStream = storage.getFragment(resourceUri, fragmentPath);
 
             final InputStream finalVarBinaryStream = binaryStream;
             StreamingOutput sout = new StreamingOutput() {
@@ -188,7 +185,7 @@ public class IssueResource {
             if (mediaType == null) {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
             }
-            return Response.ok(sout, mediaType).tag(String.valueOf(cachedFile.lastModified())).header("Last-Modified", cachedFile.lastModified()).build();
+            return Response.ok(sout, mediaType).tag(String.valueOf(resourceFile.lastModified())).header("Last-Modified", resourceFile.lastModified()).build();
         } catch (FileNotFoundException fnfe) {
             exceptionHappened = true;
             throw new NotFoundException();
@@ -199,7 +196,7 @@ public class IssueResource {
             if (exceptionHappened) {
                 // We only close when exception happened. Otherwise, the StreamingOutput.write will close it.
                 Closeables.close(binaryStream, exceptionHappened);
-            }
+              }
         }
     }
 
@@ -262,6 +259,10 @@ public class IssueResource {
         final String issueId = Files.getNameWithoutExtension(binaryFileName);
         Issue issue = retrieveIssue(organizationId, publicationId, issueId);
 
+        if (issue.getEpubFile() == null || issue.getEpubFile().getId() == 0) {
+            throw new FileNotFoundException(String.format("No binary file for: %s", binaryFileName));
+        }
+
         long binaryVersion = issue.getEpubFile().getVersion();
         ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(EntityTag.valueOf(Utils
                 .createETagHeaderValue(binaryVersion)));
@@ -271,8 +272,9 @@ public class IssueResource {
 
         InputStream binaryStream = null;
         boolean exceptionHappened = false;
+
         try {
-            binaryStream = storage.get(URI.create(issue.getId()));
+            binaryStream = storage.get(URI.create(Long.toString(issue.getEpubFile().getId())));
             final InputStream finalVarBinaryStream = binaryStream;
 
             StreamingOutput streamingOutput = new StreamingOutput() {

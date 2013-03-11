@@ -1,6 +1,7 @@
 package com.cefalo.cci.storage;
 
 import com.cefalo.cci.dao.IssueDao;
+import com.cefalo.cci.model.EpubFile;
 import com.cefalo.cci.model.Issue;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
@@ -23,16 +24,16 @@ public class DatabaseStorage implements Storage {
     @Override
     public InputStream get(URI resourceID) throws IOException {
         Preconditions.checkNotNull(resourceID);
-
+        long fileId = Long.valueOf(resourceID.getPath());
         if (logger.isInfoEnabled()) {
             logger.info("path...." + resourceID.getPath());
         }
-        Issue issue = issueDao.getIssue(resourceID.getPath());
-        if (issue == null || issue.getEpubFile() == null || issue.getEpubFile().getFile() == null) {
+        EpubFile epubFile = issueDao.getEpubFile(fileId);
+        if (epubFile == null || epubFile.getFile() == null) {
             throw new FileNotFoundException(String.format("No binary file for: %s", resourceID));
         }
 
-        Blob blob = issue.getEpubFile().getFile();
+        Blob blob = epubFile.getFile();
         try {
             return blob.getBinaryStream();
         } catch (SQLException e) {
@@ -65,12 +66,12 @@ public class DatabaseStorage implements Storage {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
+  //  @Override
     public void fetchAndWriteEpub(URI resourceId, String organizationId, String publicationId) throws IOException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
+  //  @Override
     public InputStream getFragmentFromCache(URI resourceId, URI fragmentPath, String filePath) throws IOException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }

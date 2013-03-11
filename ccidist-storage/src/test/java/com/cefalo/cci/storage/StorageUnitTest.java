@@ -49,7 +49,7 @@ public class StorageUnitTest {
         boolean isIoException = false;
 
         try {
-            cacheStorage.fetchAndWriteEpub(null, "polaris", "addressa");
+            cacheStorage.extractAndStoreEpub(null);
         } catch (NullPointerException e) {
             isResourceIdNull = true;
         } catch (IOException e) {
