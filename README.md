@@ -10,10 +10,17 @@ Installation prerequisites
 The distribution server is written in Java 7. The build system it Maven 3. Thus, to be able to clone, build and run
 this application you need the following to be installed on your computer
 
- 1. Git. Git must be configured with the necessary certificates to connect to your GitHub account.
+ 1. Git.
+
+    Git must be configured with the necessary certificates to connect to your GitHub account.
+
  2. Java 7
+
  3. Maven 3
- 4. A MySQL database. According to plan, the distribution service will eventually support Oracle, but currently it
+
+ 4. A MySQL database.
+
+    According to plan, the distribution service will eventually support Oracle, but currently it
     has only been tested with MySQL
 
 Installation instructions
@@ -49,7 +56,7 @@ Installation instructions
    `ccidist/ccidist-model/src/main/resources/migration.sql`
 
    The section "epub files" in the script inserts some sample epub files into the database. The script needs to be
-   edited to provide the absolute path of these files. Do this by replacing the string `<absolute-root` with the
+   edited to provide the absolute path of these files. Do this by replacing the string `<absolute-root> with the
    corresponding path on you machine.
 
 6. Make sure the application can access the database
