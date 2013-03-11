@@ -72,5 +72,5 @@ Installation instructions
 
 8. Test that the server works
 
-   Point your browser at http://localhost:8080/cci
+   Point your browser at `http://localhost:8080/cciService` to get the root document, and navigate from there.
 
