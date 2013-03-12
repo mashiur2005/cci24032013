@@ -398,4 +398,17 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("If-Modified-Since less than stored data ", 200, clientResponse.getStatus());*/
     }
 
+    @Test
+    public void updateEpubTest() {
+        Path directoryPath = Paths.get("src", "test", "resources", "epubs");
+        File fileToUpdate = new File(directoryPath.toAbsolutePath().toString() + "/widget-quiz-20121022.epub");
+        final FormDataMultiPart multiPart = new FormDataMultiPart();
+        multiPart.bodyPart(new FileDataBodyPart("epubFile", fileToUpdate, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+
+        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("ipad");
+        ClientResponse clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).put(ClientResponse.class, multiPart);
+        assertEquals(200, clientResponse.getStatus());
+        String responseString = ws.type(MediaType.MULTIPART_FORM_DATA).put(String.class, multiPart);
+        assertNotNull(responseString);
+    }
 }

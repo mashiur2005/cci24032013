@@ -254,6 +254,39 @@ public class IssueResource {
         return Response.status(200).entity("File Successfully Uploaded").build();
     }
 
+    @PUT
+    @Path("/{deviceIds}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uodateEpub(@PathParam("organization") @DefaultValue("") final String organizationId,
+                               @PathParam("publication") @DefaultValue("") final String publicationId,
+                               @PathParam("deviceIds") @DefaultValue("") final String deviceIds,
+                               @FormDataParam("epubFile") InputStream fileInputStream,
+                               @FormDataParam("epubFile") FormDataContentDisposition epubDetail) throws Exception{
+
+        Set<String> deviceSet = Sets.newHashSet(deviceIds.split(","));
+        if (deviceSet == null || deviceIds.isEmpty() || fileInputStream == null) {
+            return Responses.clientError().entity("Device Type and epub attachment must be required").build();
+        }
+
+        long epubId;
+        try {
+            checkForValidPublication(organizationId, publicationId);
+            checkValidFileContent(epubDetail);
+            Issue epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), epubDetail.getFileName());
+            epubId = epubIssue.getEpubFile().getId();
+            issueService.updateEpub(epubId, fileInputStream);
+        } catch (NotFoundException ne) {
+            throw ne;
+        } catch (Exception e) {
+            throw new NotFoundException("Epub updating problem");
+        }
+        finally {
+            Closeables.close(fileInputStream, true);
+        }
+
+        return Response.ok("Epub Successfully Updated and id is :" + epubId).build();
+    }
+
 
     @GET
     @Path("/{file: [^/]+.epub?}")

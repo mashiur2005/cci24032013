@@ -136,4 +136,18 @@ public class IssueServiceImpl implements IssueService {
         issueDao.uploadEpubFile(publicationId, fileName, deviceSet, inputStream);
     }
 
+    @Override
+    public Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName) {
+        List<Issue> issueList = issueDao.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceId, issueName, "desc");
+        if (issueList == null) {
+            return new Issue();
+        }
+        return issueList.get(0);
+    }
+
+    @Override
+    public void updateEpub(long id, InputStream updateInputStream) throws Exception{
+        issueDao.updateEpub(id, updateInputStream);
+    }
+
 }

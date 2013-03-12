@@ -1,13 +1,5 @@
 package com.cefalo.cci.dao;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.sql.Blob;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-
 import com.cefalo.cci.model.EpubFile;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Platform;
@@ -18,7 +10,13 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.sql.Blob;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class IssueDaoImpl implements IssueDao {
@@ -129,6 +127,31 @@ public class IssueDaoImpl implements IssueDao {
     @SuppressWarnings("unchecked")
     public List<Issue> getOldIssueList(Date date) {
         return (List<Issue>)entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String order) {
+        return entityManager
+                .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.name like :issueName order by i.updated " + order)
+                .setParameter("pName", publicationId).setParameter("deviceType", deviceId).setParameter("issueName", issueName)
+                .getResultList();
+    }
+
+    @Override
+    public void updateEpub(long Id, InputStream updateInputStream) throws Exception{
+        Session session = (Session) entityManager.getDelegate();
+        Blob blobContent;
+        try {
+            blobContent = session.getLobHelper().createBlob(updateInputStream, 1024L);
+        } catch (Exception e) {
+            throw e;
+        }
+        EpubFile epubFile = entityManager.find(EpubFile.class, Id);
+        epubFile.setFile(blobContent);
+        session.update(epubFile);
+        session.flush();
     }
 
     public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId) {

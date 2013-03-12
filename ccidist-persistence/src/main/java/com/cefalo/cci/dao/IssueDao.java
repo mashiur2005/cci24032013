@@ -31,4 +31,7 @@ public interface IssueDao {
 
     List<Issue> getOldIssueList(Date date);
 
+    List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String order);
+
+    void updateEpub(long id, InputStream updateInputStream) throws Exception;
 }
