@@ -118,7 +118,7 @@ public class IssueDaoImpl implements IssueDao {
 
         for (String deviceId : deviceSet) {
             //generating issue primary key....based on fileName and count on existing fileName
-            String issuePK = generateIssuePrimaryKey(fileName.substring(0, fileName.indexOf(".epub")));
+            String issuePK = generateIssuePrimaryKey(fileName.substring(0, fileName.length() - 1 - 4)); //length of .epub = 4
             Issue issue = createIssue(publicationId, issuePK, fileName, deviceId, epubId);
             entityManager.persist(issue);
         }
