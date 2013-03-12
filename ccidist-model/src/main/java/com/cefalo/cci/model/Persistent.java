@@ -12,6 +12,7 @@ public class Persistent implements Serializable {
     @Version
     long version;
 
+    @Version
     public long getVersion() {
         return version;
     }
