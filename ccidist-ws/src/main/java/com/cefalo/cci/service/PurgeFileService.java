@@ -44,7 +44,7 @@ public class PurgeFileService implements org.quartz.Job{
         File file = null;
 
         for (Issue anIssueList : issueList) {
-            file = new File(cacheDirFullPath + fileSystemSeperator + anIssueList.getPublication().getOrganization().getId() + fileSystemSeperator + anIssueList.getPublication().getId() + fileSystemSeperator + anIssueList.getId());
+            file = new File(cacheDirFullPath + fileSystemSeperator +  anIssueList.getEpubFile().getId());
             logger.info("Files to be deleted: " + file.getAbsolutePath());
             if (file.exists()) {
                 deleteRecursive(file);
