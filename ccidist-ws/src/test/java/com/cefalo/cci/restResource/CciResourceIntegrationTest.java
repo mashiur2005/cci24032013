@@ -186,7 +186,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(404, notFoundResponse.getStatus());
 */
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022");
         String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         NodeList nodeList;
@@ -197,18 +197,18 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals(2, nodeList.getLength());
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
-        assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/accessible_epub_3-20121024.epub", nodeList.item(0).getTextContent());
-        assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/container.xml", nodeList.item(1).getTextContent());
+        assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022.epub", nodeList.item(0).getTextContent());
+        assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022/META-INF/container.xml", nodeList.item(1).getTextContent());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022");
         clientResponse = ws.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(406, clientResponse.getStatus());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022");
         clientResponse = ws.header("If-None-Match", "\"" + "0" + "\"").accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         assertEquals("If-None-Match Header matched....", 304, clientResponse.getStatus());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022");
         clientResponse = ws.header("If-None-Match", "\"" + "1" + "\"").accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         assertEquals("If-None-Match Header mismatched....", 200, clientResponse.getStatus());
 
@@ -244,7 +244,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("Mime Type found error code: ", 406, clientResponse.getStatus());
 
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024.epub");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022.epub");
         clientResponse = ws.accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
         assertEquals("content found error code: ", 200, clientResponse.getStatus());
         assertNotNull(clientResponse);
@@ -261,15 +261,15 @@ public class CciResourceIntegrationTest extends JerseyTest{
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         assertEquals("Bad request found error code: ", 400, clientResponse.getStatus());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/con.xml");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022/META-INF/con.xml");
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         assertEquals("Content found error code: ", 404, clientResponse.getStatus());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022/META-INF/");
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         assertEquals("Content found error code: ", 404, clientResponse.getStatus());
 
-        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/accessible_epub_3-20121024/META-INF/container.xml");
+        ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022/META-INF/container.xml");
         clientResponse = ws.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         assertEquals("Content found error code: ", 200, clientResponse.getStatus());
         assertNotNull(clientResponse);
@@ -315,6 +315,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("Content not found error", 404, clientResponse.getStatus());
 
 /*
+        NOTE: This integration test works...
         ws = resource().path(BASE_URL).path("/polaris/addressa/issue/ipad,mini-ipad");
         fileToUpload = new File(directoryPath.toAbsolutePath().toString() + "/widget-figure-gallery-20121024.epub");
         multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload, MediaType.APPLICATION_OCTET_STREAM_TYPE));
@@ -358,7 +359,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals("number of entry start 2: ", 8, nodeList.getLength());
+        assertEquals("number of entry start 2: ", 4, nodeList.getLength());
 
         ws = resource().queryParam("start", "2").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
