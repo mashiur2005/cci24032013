@@ -101,17 +101,18 @@ public class IssueResource {
 
         List<Issue> issueList = issueService.getIssueListByPublicationId(publication.getId());
 
-        Date lastModifiedIssueDate = issueList.get(0).getUpdated();
+        /*Date lastModifiedIssueDate = issueList.get(0).getUpdated();
         ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(lastModifiedIssueDate, EntityTag.valueOf(Utils
                 .createETagHeaderValue(lastModifiedIssueDate.getTime())));
         if (unmodifiedResponseBuilder != null) {
             return unmodifiedResponseBuilder.tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();
-        }
+        }*/
 
         SyndFeed feed = issueService.getIssuesAsAtomFeed(publication.getOrganization(), publication, start, limit,
                 deviceType, fromDate, order, JerseyResourceLocator.from(uriInfo));
 
-        return Response.ok(feed).tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();
+        /*return Response.ok(feed).tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();*/
+        return Response.ok(feed).build();
     }
 
     @GET
