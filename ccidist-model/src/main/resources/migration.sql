@@ -59,18 +59,18 @@ foreign key (platform_id) references platform (id)
 /*DML*/
 
 /*Organization Data*/
-insert into organization (id, name) values ('polaris', 'Polaris');
-insert into organization (id, name) values ('nhst', 'NHST');
-insert into organization (id, name) values ('axelspringer', 'AxelSpringer');
+insert into organization (id, name, created, updated) values ('polaris', 'Polaris', current_timestamp, current_timestamp);
+insert into organization (id, name, created, updated) values ('nhst', 'NHST', current_timestamp, current_timestamp);
+insert into organization (id, name, created, updated) values ('axelspringer', 'AxelSpringer', current_timestamp, current_timestamp);
 
 /*Publication Data*/
 
-insert into publication (id, name, organization_id) values ('addressa', 'Addressa', 'polaris');
-insert into publication (id, name, organization_id) values ('harstadtidende', 'Harstadtidende', 'polaris');
-insert into publication (id, name, organization_id) values ('nhst-sports', 'NHST-SPORTS', 'nhst');
-insert into publication (id, name, organization_id) values ('nhst-news', 'NHST-NEWS', 'nhst');
-insert into publication (id, name, organization_id) values ('axelSpringer-sports', 'AxelSpringer-SPORTS', 'axelspringer');
-insert into publication (id, name, organization_id) values ('axelSpringer-entertainment', 'AxelSpringer-ENTERTAINMENT', 'axelspringer');
+insert into publication (id, name, organization_id, created, updated) values ('addressa', 'Addressa', 'polaris', current_timestamp, current_timestamp);
+insert into publication (id, name, organization_id, created, updated) values ('harstadtidende', 'Harstadtidende', 'polaris', current_timestamp, current_timestamp);
+insert into publication (id, name, organization_id, created, updated) values ('nhst-sports', 'NHST-SPORTS', 'nhst', current_timestamp, current_timestamp);
+insert into publication (id, name, organization_id, created, updated) values ('nhst-news', 'NHST-NEWS', 'nhst', current_timestamp, current_timestamp);
+insert into publication (id, name, organization_id, created, updated) values ('axelSpringer-sports', 'AxelSpringer-SPORTS', 'axelspringer', current_timestamp, current_timestamp);
+insert into publication (id, name, organization_id, created, updated) values ('axelSpringer-entertainment', 'AxelSpringer-ENTERTAINMENT', 'axelspringer', current_timestamp, current_timestamp);
 
 /*Platform Data*/
 insert into platform (id, name) value ('ipad', 'iPad');
