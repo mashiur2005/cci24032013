@@ -409,7 +409,5 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("ipad");
         ClientResponse clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).put(ClientResponse.class, multiPart);
         assertEquals(200, clientResponse.getStatus());
-        String responseString = ws.type(MediaType.MULTIPART_FORM_DATA).put(String.class, multiPart);
-        assertNotNull(responseString);
     }
 }

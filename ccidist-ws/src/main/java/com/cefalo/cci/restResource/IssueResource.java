@@ -258,7 +258,7 @@ public class IssueResource {
     @PUT
     @Path("/{deviceIds}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uodateEpub(@PathParam("organization") @DefaultValue("") final String organizationId,
+    public Response updateEpub(@PathParam("organization") @DefaultValue("") final String organizationId,
                                @PathParam("publication") @DefaultValue("") final String publicationId,
                                @PathParam("deviceIds") @DefaultValue("") final String deviceIds,
                                @FormDataParam("epubFile") InputStream fileInputStream,
