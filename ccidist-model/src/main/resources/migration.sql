@@ -78,16 +78,14 @@ insert into platform (id, name) value ('mini-ipad', 'Mini-iPad');
 insert into platform (id, name) value ('iphone', 'iPhone');
 
 /*epub Files*/
-insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resouces/epub30-spec-20121128.epub'));
-insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resouces/regime-anticancer-arabic-20121022.epub'));
-insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resouces/sash-for-you-20120827.epub'));
-insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resouces/widget-figure-gallery-20121022.epub'));
-insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resouces/widget-quiz-20121022.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/regime-anticancer-arabic-20121022.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/sash-for-you-20120827.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/widget-figure-gallery-20121022.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/widget-quiz-20121022.epub'));
 
 
 
 /*Issue Data*/
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('epub30-spec-20121128', 1, 'epub30-spec-20121128.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('regime-anticancer-arabic-20121022', 2, 'regime-anticancer-arabic-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('sash-for-you-20120827', 3, 'sash-for-you-20120827.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-figure-gallery-20121022', 4, 'widget-figure-gallery-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
