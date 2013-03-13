@@ -8,8 +8,6 @@ import com.google.inject.name.Named;
 
 import java.io.*;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.zip.ZipEntry;

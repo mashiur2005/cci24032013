@@ -29,6 +29,11 @@
             <artifactId>ccidist-persistence</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+        </dependency>
+
         <!-- guice dependencies-->
         <dependency>
             <groupId>com.google.inject</groupId>

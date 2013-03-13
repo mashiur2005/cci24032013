@@ -1,5 +1,10 @@
 package com.cefalo.cci.model;
 
+
+import org.hibernate.annotations.Cache;
+
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -7,6 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "organization")
+@Cache(region = "com.cefalo.cci.model.Organization", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Organization  extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
 

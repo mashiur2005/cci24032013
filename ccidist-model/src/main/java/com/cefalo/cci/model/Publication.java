@@ -1,12 +1,16 @@
 package com.cefalo.cci.model;
 
 import javax.persistence.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
 @Entity
 @Table(name = "publication")
+@Cache(region = "com.cefalo.cci.model.Publication", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Publication extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
 

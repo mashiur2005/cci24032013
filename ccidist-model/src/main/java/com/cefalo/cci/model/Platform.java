@@ -1,5 +1,8 @@
 package com.cefalo.cci.model;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -9,6 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "platform")
+@Cache(region = "com.cefalo.cci.model.Platform", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class Platform  extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
     

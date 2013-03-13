@@ -1,14 +1,17 @@
 package com.cefalo.cci.model;
 
-import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.*;
 
 import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "issue")
+@org.hibernate.annotations.Cache(region = "com.cefalo.cci.model.Issue", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Issue extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
 

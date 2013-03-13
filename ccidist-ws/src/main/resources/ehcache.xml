@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <!--need to change configuration-->
+    <defaultCache eternal="true" maxElementsInMemory="100" overflowToDisk="false"/>
+
+    <cache
+            name="com.cefalo.cci.model.Organization"
+            maxElementsInMemory="100"
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="1800"
+            >
+        <cacheEventListenerFactory class="com.cefalo.cci.listener.EhcacheListenerFactory"/>
+
+    </cache>
+    <cache
+            name="com.cefalo.cci.model.Publication"
+            maxElementsInMemory="300"
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="1800"
+            />
+    <cache
+            name="com.cefalo.cci.model.Platform"
+            maxElementsInMemory="20"
+            eternal="true"
+            overflowToDisk="false"
+            />
+    <cache
+            name="com.cefalo.cci.model.Issue"
+            maxElementsInMemory="1000"
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="1800"
+            >
+    </cache>
+</ehcache>

@@ -99,9 +99,11 @@ public class IssueResource {
             return Responses.notFound().build();
         }
 
+
+        /*
         List<Issue> issueList = issueService.getIssueListByPublicationId(publication.getId());
 
-        /*Date lastModifiedIssueDate = issueList.get(0).getUpdated();
+        Date lastModifiedIssueDate = issueList.get(0).getUpdated();
         ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(lastModifiedIssueDate, EntityTag.valueOf(Utils
                 .createETagHeaderValue(lastModifiedIssueDate.getTime())));
         if (unmodifiedResponseBuilder != null) {

@@ -28,14 +28,12 @@ public class IssueDaoImpl implements IssueDao {
 
 
     @Override
-    @Transactional
     public long getIssueCountByPublicationId(String publicationId) {
         return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName")
                 .setParameter("pName", publicationId).getSingleResult();
     }
 
     @Override
-    @Transactional
     public long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType, Date fromDate) {
         //form date need to be set
         return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType")
@@ -43,7 +41,6 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId) {
         return entityManager
@@ -52,7 +49,6 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult) {
         return entityManager
@@ -62,7 +58,6 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType, Date fromDate, String order) {
 
@@ -76,20 +71,15 @@ public class IssueDaoImpl implements IssueDao {
 
 
     @Override
-    @Transactional
     public EpubFile getEpubFile(long id) {
-
-        logger.info("epub...id.." + id);
         return entityManager.find(EpubFile.class, id);
     }
 
     @Override
-    @Transactional
     public Issue getIssue(String id) {
         return entityManager.find(Issue.class, id);
     }
 
-    @Transactional
     public Publication getPublication(String id) {
         return entityManager.find(Publication.class, id);
     }
@@ -123,7 +113,6 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getOldIssueList(Date date) {
         return (List<Issue>)entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
