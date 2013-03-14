@@ -68,6 +68,7 @@ Installation instructions
 
 7. Start the server
 
+    `cd ccidist-ws`
     `mvn jetty:run`
 
 8. Test that the server works
