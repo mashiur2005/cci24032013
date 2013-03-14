@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <ehcache>
     <!--need to change configuration-->
-    <defaultCache eternal="true" maxElementsInMemory="100" overflowToDisk="false"/>
+    <defaultCache eternal="true" overflowToDisk="false"/>
 
     <cache
             name="com.cefalo.cci.model.Organization"
@@ -11,8 +10,7 @@
             timeToIdleSeconds="1800"
             timeToLiveSeconds="1800"
             >
-        <cacheEventListenerFactory class="com.cefalo.cci.listener.EhcacheListenerFactory"/>
-
+        <!--<cacheEventListenerFactory class="com.cefalo.cci.listener.EhcacheListenerFactory"/>-->
     </cache>
     <cache
             name="com.cefalo.cci.model.Publication"
@@ -37,4 +35,35 @@
             timeToLiveSeconds="1800"
             >
     </cache>
+
+
+    <!--
+        NOTE: configuration for query cache:
+        Here customized query cache regions are defined by adding region name in createQuery of
+        entityManger to gain full control of those cache regions. If we don't mention region
+        name in create query than Ehcache by default use org.hibernate.cache.StandardQueryCache.
+    -->
+    <cache
+            name="query.organizationList"
+            maxElementsInMemory="20"
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="1800"
+            >
+    </cache>
+
+    <!--can be used memory off heap size here-->
+    <cache
+            name="query.issueList"
+            maxElementsInMemory="5"
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="1800"
+            >
+        <!--<cacheEventListenerFactory class="com.cefalo.cci.listener.EhcacheListenerFactory"/>-->
+    </cache>
+
+
 </ehcache>

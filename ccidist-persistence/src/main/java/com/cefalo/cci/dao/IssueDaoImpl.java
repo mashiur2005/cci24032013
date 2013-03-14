@@ -37,7 +37,11 @@ public class IssueDaoImpl implements IssueDao {
     public long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType, Date fromDate) {
         //form date need to be set
         return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType")
-                .setParameter("pName", publicationId).setParameter("deviceType", deviceType).getSingleResult();
+                .setHint("org.hibernate.cacheable", true)
+                .setHint("org.hibernate.cacheRegion", "query.issueList")
+                .setParameter("pName", publicationId).
+                setParameter("deviceType", deviceType)
+                .getSingleResult();
     }
 
     @Override
@@ -64,8 +68,12 @@ public class IssueDaoImpl implements IssueDao {
         //form date need to be compared
         return entityManager
                 .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType order by i.updated " + order)
-                .setParameter("pName", publicationId).setParameter("deviceType", deviceType)
-                .setFirstResult((int) start).setMaxResults((int) maxResult)
+                .setHint("org.hibernate.cacheable", true)
+                .setHint("org.hibernate.cacheRegion", "query.issueList")
+                .setParameter("pName", publicationId)
+                .setParameter("deviceType", deviceType)
+                .setFirstResult((int) start)
+                .setMaxResults((int) maxResult)
                 .getResultList();
     }
 

@@ -41,9 +41,8 @@ public class Issue extends Persistent implements Serializable {
         this.name = name;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "epub_file_id")
-    @LazyToOne(org.hibernate.annotations.LazyToOneOption.PROXY)
     public EpubFile getEpubFile() {
         return epubFile;
     }

@@ -16,7 +16,10 @@ public class OrganizationDaoImpl implements OrganizationDao {
     @SuppressWarnings("unchecked")
     @Override
     public List<Organization> getAllOrganizations() {
-        return entityManager.createQuery("select o from Organization o order by o.updated desc").getResultList();
+        return entityManager.createQuery("select o from Organization o order by o.updated desc")
+                .setHint("org.hibernate.cacheable", true)
+                .setHint("org.hibernate.cacheRegion", "query.organizationList")
+                .getResultList();
     }
 
     @Override
