@@ -131,16 +131,9 @@ public class CacheStorage implements Storage {
         }
     }
 
-    public InputStream getFragmentFromCache(URI resourceId, URI fragmentPath, String filePath) throws IOException {
-        checkNotNull(resourceId, "Resource Id can not be null");
-        checkNotNull(fragmentPath, "fragmentPath can not be null");
-
+    public InputStream getFragmentFromCache(String filePath) throws IOException {
         FileInputStream fileInputStream = null;
         boolean exceptionhappened = false;
-
-        if (!new File(filePath).exists()) {
-             throw new FileNotFoundException();
-        }
 
         try {
             fileInputStream = new FileInputStream(filePath);

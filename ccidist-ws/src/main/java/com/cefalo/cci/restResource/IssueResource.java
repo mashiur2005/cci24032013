@@ -62,10 +62,6 @@ public class IssueResource {
     @Named("cacheDirFullPath")
     private String cacheDirFullPath;
 
-    @Inject
-    @Named("fileSystemSeperator")
-    private String fileSystemSeperator;
-
     @GET
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getIssueList(
@@ -163,7 +159,7 @@ public class IssueResource {
         URI fragmentPath = URI.create(contentLocInEpub);
 
         String fileName = fragmentPath.getPath();
-        String fileLocationPath = cacheDirFullPath + fileSystemSeperator + fileId + fileSystemSeperator + fileName;
+        String fileLocationPath = cacheDirFullPath + "/" + fileId + "/" + fileName;
         File resourceFile = new File(fileLocationPath);
 
         if (resourceFile.exists()) {
@@ -265,31 +261,56 @@ public class IssueResource {
                                @PathParam("deviceIds") @DefaultValue("") final String deviceIds,
                                @FormDataParam("epubFile") InputStream fileInputStream,
                                @FormDataParam("epubFile") FormDataContentDisposition epubDetail) throws Exception{
-
         Set<String> deviceSet = Sets.newHashSet(deviceIds.split(","));
         if (deviceSet == null || deviceIds.isEmpty() || fileInputStream == null) {
             return Responses.clientError().entity("Device Type and epub attachment must be required").build();
         }
 
         long epubId;
+        InputStream oldInputStream = null;
+        Issue epubIssue = new Issue();
+
+
         try {
             checkForValidPublication(organizationId, publicationId);
             checkValidFileContent(epubDetail);
-            Issue epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), epubDetail.getFileName());
+
+            epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), epubDetail.getFileName());
             epubId = epubIssue.getEpubFile().getId();
+            oldInputStream = storage.get(URI.create(Long.toString(epubId)));
+
+            issueService.writeZipFileToTmpDir(fileInputStream, cacheDirFullPath + epubDetail.getFileName());
+            issueService.writeZipFileToTmpDir(oldInputStream, cacheDirFullPath + "old/" + epubIssue.getName());
+
+            issueService.findDifferenceAndSaveToDb(cacheDirFullPath + epubDetail.getFileName(), cacheDirFullPath + "old/" + epubIssue.getName());
+
+            fileInputStream = issueService.readFromTempFile(cacheDirFullPath + epubDetail.getFileName());
             issueService.updateEpub(epubId, fileInputStream);
+            fileInputStream.close();
         } catch (NotFoundException ne) {
             throw ne;
         } catch (Exception e) {
             throw new NotFoundException("Epub updating problem");
-        }
-        finally {
+        } finally {
             Closeables.close(fileInputStream, true);
+            Closeables.close(oldInputStream, true);
+            File tmpNewFile = new File(cacheDirFullPath + epubDetail.getFileName());
+            if (tmpNewFile.delete()) {
+                log.info("Temp File : " + tmpNewFile.getAbsolutePath() + " deleted properly");
+            } else {
+                log.info("Temp File : " + tmpNewFile.getAbsolutePath() + " delete problem");
+            }
+
+            File tmpOldFile = new File(cacheDirFullPath + "old/" + epubIssue.getName());
+            if (tmpOldFile.delete()) {
+                log.info("Temp File : " + tmpOldFile.getAbsolutePath() + " deleted properly");
+            } else {
+                log.info("Temp File : " + tmpOldFile.getAbsolutePath() + " delete problem");
+            }
         }
 
         return Response.ok("Epub Successfully Updated and id is :" + epubId).build();
     }
-
 
     @GET
     @Path("/{file: [^/]+.epub?}")

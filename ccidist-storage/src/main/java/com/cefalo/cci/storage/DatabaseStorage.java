@@ -2,7 +2,6 @@ package com.cefalo.cci.storage;
 
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.model.EpubFile;
-import com.cefalo.cci.model.Issue;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import org.slf4j.Logger;

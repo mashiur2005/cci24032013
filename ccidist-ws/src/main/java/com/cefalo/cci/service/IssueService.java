@@ -29,4 +29,10 @@ public interface IssueService {
     Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName);
 
     void updateEpub(long id, InputStream updateInputStream) throws Exception;
+
+    void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception;
+
+    void writeZipFileToTmpDir(InputStream inputStream, String fileAbsolutePath) throws Exception;
+
+    InputStream readFromTempFile(String fileAbsolutePath) throws Exception;
 }

@@ -5,21 +5,33 @@ import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
+import com.cefalo.cci.storage.CacheStorage;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.sun.syndication.feed.synd.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class IssueServiceImpl implements IssueService {
+    private  final Logger log = LoggerFactory.getLogger(getClass());
+
     @Inject
     private IssueDao issueDao;
+
+    @Inject
+    private CacheStorage cacheStorage;
 
     public Issue getIssue(String issueId) {
         // TODO: Maybe throw an exception from here if issue not found????
@@ -149,5 +161,110 @@ public class IssueServiceImpl implements IssueService {
     public void updateEpub(long id, InputStream updateInputStream) throws Exception{
         issueDao.updateEpub(id, updateInputStream);
     }
+
+    @Override
+    public void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception{
+        InputStream newInputStream = null;
+        InputStream oldInputStream = null;
+        ZipInputStream newZipInputStream = null;
+        ZipInputStream oldZipInputStream = null;
+        ZipEntry newZipEntry;
+        ZipEntry oldZipEntry;
+        boolean isEqual;
+
+        try{
+            newInputStream = readFromTempFile(newFilePath);
+            oldInputStream = readFromTempFile(oldFilePath);
+            newZipInputStream = new ZipInputStream(newInputStream);
+            oldZipInputStream = new ZipInputStream(oldInputStream);
+            /*listOfFilesInDir(newZipInputStream, "new");
+            listOfFilesInDir(oldZipInputStream, "old");*/
+            newInputStream.close();
+            oldInputStream.close();
+            newZipInputStream.close();
+            oldZipInputStream.close();
+
+            newInputStream = readFromTempFile(newFilePath);
+            oldInputStream = readFromTempFile(oldFilePath);
+            newZipInputStream = new ZipInputStream(newInputStream);
+            oldZipInputStream = new ZipInputStream(oldInputStream);
+
+            newZipEntry = newZipInputStream.getNextEntry();
+            oldZipEntry = oldZipInputStream.getNextEntry();
+            while (newZipEntry != null || oldZipEntry != null) {
+
+                if (newZipEntry != null && oldZipEntry != null && newZipEntry.getName().equals(oldZipEntry.getName())) {
+                    /*log.info("Comparing " + newZipEntry.getName() + " and " + oldZipEntry.getName());*/
+                    isEqual = ByteStreams.equal(ByteStreams.newInputStreamSupplier(ByteStreams.toByteArray(oldZipInputStream)),
+                            ByteStreams.newInputStreamSupplier(ByteStreams.toByteArray(newZipInputStream)));
+                    if (isEqual) {
+                        /*log.info("New file : " + newZipEntry.getName() + " and Old file : " + oldZipEntry.getName() + " are equal");*/
+                    } else {
+                        log.info("New file : " + newZipEntry.getName() + " and Old file : " + oldZipEntry.getName() + " are different");
+                    }
+                } else if (newZipEntry != null && oldZipEntry == null){
+                    log.info("Added File : " + newZipEntry.getName());
+                } else if (oldZipEntry != null && newZipEntry == null) {
+                    log.info("Deleted File : " + oldZipEntry.getName());
+                } else {
+                    log.info(oldZipEntry.getName() + " is replaced by " + newZipEntry.getName());
+                }
+                newZipEntry = newZipInputStream.getNextEntry();
+                oldZipEntry = oldZipInputStream.getNextEntry();
+            }
+        } catch (Exception io) {
+            throw io;
+        } finally {
+            Closeables.close(newInputStream, true);
+            Closeables.close(oldInputStream, true);
+            Closeables.close(newZipInputStream, true);
+            Closeables.close(oldZipInputStream, true);
+        }
+    }
+
+    public void writeZipFileToTmpDir(InputStream inputStream, String fileAbsolutePath) throws Exception {
+        File tmpFile;
+        FileOutputStream tmpFileOutputStream = null;
+
+        tmpFile = new File(fileAbsolutePath);
+        try {
+            Files.createParentDirs(tmpFile);
+            tmpFileOutputStream = new FileOutputStream(tmpFile);
+            ByteStreams.copy(inputStream, tmpFileOutputStream);
+        } catch (FileNotFoundException fnfe) {
+            throw fnfe;
+        } catch (IOException io) {
+            throw io;
+        } finally {
+            Closeables.close(tmpFileOutputStream, true);
+        }
+    }
+
+    public InputStream readFromTempFile(String fileAbsolutePath) throws Exception {
+        File tmpFile = new File(fileAbsolutePath);
+        FileInputStream tmpFileInputStream = null;
+
+        try {
+            tmpFileInputStream = new FileInputStream(tmpFile);
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+            throw fnfe;
+        }
+        return tmpFileInputStream;
+    }
+
+    /*public void listOfFilesInDir(ZipInputStream zipInputStream, String type) throws Exception{
+        System.out.println(type);
+        ZipEntry zipEntry;
+        try {
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                System.out.println(zipEntry.getName());
+                *//*fileList.add(zipEntry.getName());*//*
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }*/
 
 }

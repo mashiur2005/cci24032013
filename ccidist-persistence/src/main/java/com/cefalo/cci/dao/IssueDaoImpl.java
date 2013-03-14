@@ -137,18 +137,19 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
+    @Transactional
     public void updateEpub(long Id, InputStream updateInputStream) throws Exception{
         Session session = (Session) entityManager.getDelegate();
         Blob blobContent;
         try {
             blobContent = session.getLobHelper().createBlob(updateInputStream, 1024L);
         } catch (Exception e) {
+            e.printStackTrace();
             throw e;
         }
-        EpubFile epubFile = entityManager.find(EpubFile.class, Id);
+        EpubFile epubFile = getEpubFile(Id);
         epubFile.setFile(blobContent);
-        session.update(epubFile);
-        session.flush();
+        entityManager.persist(epubFile);
     }
 
     public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId) {
