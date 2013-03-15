@@ -4,6 +4,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import java.io.*;
@@ -15,6 +16,7 @@ import java.util.zip.ZipInputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@Singleton
 public class CacheStorage implements Storage {
     @Inject
     @Named("databaseStorage")
@@ -28,7 +30,6 @@ public class CacheStorage implements Storage {
     @Named("fileSystemSeperator")
     private String fileSystemSeperator;
 
-    //used as temporarily. Will be removed
     private ConcurrentMap<String, String> keyStor = new ConcurrentHashMap<String, String> ();
 
     @Override

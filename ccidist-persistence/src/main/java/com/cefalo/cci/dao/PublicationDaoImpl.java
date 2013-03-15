@@ -1,10 +1,12 @@
 package com.cefalo.cci.dao;
 
 import com.cefalo.cci.model.Publication;
+import com.google.inject.Singleton;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+@Singleton
 public class PublicationDaoImpl implements PublicationDao {
     @Inject
     private EntityManager entityManager;

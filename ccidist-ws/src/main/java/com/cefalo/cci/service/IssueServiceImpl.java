@@ -10,6 +10,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.sun.syndication.feed.synd.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import java.util.zip.ZipInputStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+@Singleton
 public class IssueServiceImpl implements IssueService {
     private  final Logger log = LoggerFactory.getLogger(getClass());
 

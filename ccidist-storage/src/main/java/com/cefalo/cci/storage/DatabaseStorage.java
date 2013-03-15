@@ -4,6 +4,7 @@ import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.model.EpubFile;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import java.net.URI;
 import java.sql.Blob;
 import java.sql.SQLException;
 
+@Singleton
 public class DatabaseStorage implements Storage {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

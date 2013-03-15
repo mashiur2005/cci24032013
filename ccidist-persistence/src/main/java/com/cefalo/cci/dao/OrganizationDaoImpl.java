@@ -7,8 +7,10 @@ import javax.persistence.EntityManager;
 
 import com.cefalo.cci.model.Organization;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
+@Singleton
 public class OrganizationDaoImpl implements OrganizationDao {
     @Inject
     private EntityManager entityManager;

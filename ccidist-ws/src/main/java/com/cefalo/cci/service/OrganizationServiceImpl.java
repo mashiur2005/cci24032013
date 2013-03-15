@@ -3,10 +3,12 @@ package com.cefalo.cci.service;
 import com.cefalo.cci.dao.OrganizationDao;
 import com.cefalo.cci.model.Organization;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Singleton
 public class OrganizationServiceImpl implements OrganizationService {
     @Inject
     private OrganizationDao organizationDao;

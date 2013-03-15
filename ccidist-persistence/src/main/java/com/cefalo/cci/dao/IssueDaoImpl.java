@@ -5,6 +5,7 @@ import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Platform;
 import com.cefalo.cci.model.Publication;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+@Singleton
 public class IssueDaoImpl implements IssueDao {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
