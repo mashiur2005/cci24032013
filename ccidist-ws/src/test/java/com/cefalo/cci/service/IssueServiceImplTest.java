@@ -9,6 +9,9 @@ import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndLink;
 import junit.framework.Assert;
+import org.joda.time.DateMidnight;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +39,11 @@ public class IssueServiceImplTest {
 
     @Test
     public void getLinksTest() {
+        DateMidnight fromDate = new DateMidnight().withDayOfMonth(1).withYear(2013);
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+        String fromDateStr = fmt.print(fromDate);
+        String sortOrder = "desc";
+
         List<String> expectedAllRelList = new ArrayList<String>();
         expectedAllRelList.add("self");
         expectedAllRelList.add("prev");
@@ -50,10 +58,10 @@ public class IssueServiceImplTest {
         selfNextList.add("next");
 
         String issueListUri = "/cciService/polaris/addressa/issue";
-        List<SyndLink> syndLinkList = issueServiceImpl.getLinks(1, 5, "ipad", 12, issueListUri);
+        List<SyndLink> syndLinkList = issueServiceImpl.getLinks(1, 5, "ipad", fromDate.toDate(), sortOrder, 12, issueListUri);
         assertEquals(2, syndLinkList.size());
-        assertEquals("self: start=1&limit=5&device-type=ipad", issueListUri + "?start=1&limit=5&device-type=ipad", syndLinkList.get(0).getHref());
-        assertEquals("next: start=6&limit=5&device-type=ipad", issueListUri + "?start=6&limit=5&device-type=ipad", syndLinkList.get(1).getHref());
+        assertEquals("self: start=1&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, issueListUri + "?start=1&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(0).getHref());
+        assertEquals("next: start=6&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, issueListUri + "?start=6&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(1).getHref());
 
         List<String> actualList = new ArrayList<String>();
         for (SyndLink aSyndLinkList : syndLinkList) {
@@ -61,11 +69,11 @@ public class IssueServiceImplTest {
         }
         assertEquals("relation by relation check: self next", selfNextList, actualList);
 
-        syndLinkList = issueServiceImpl.getLinks(2, 5, "ipad", 12, issueListUri);
+        syndLinkList = issueServiceImpl.getLinks(2, 5, "ipad", fromDate.toDate(), sortOrder, 12, issueListUri);
         assertEquals(3, syndLinkList.size());
-        assertEquals("self: start=2&limit=5&device-type=ipad",issueListUri + "?start=2&limit=5&device-type=ipad", syndLinkList.get(0).getHref());
-        assertEquals("prev: start=1&limit=5&device-type=ipad", issueListUri + "?start=1&limit=5&device-type=ipad", syndLinkList.get(1).getHref());
-        assertEquals("next: start=7&limit=5&device-type=ipad", issueListUri + "?start=7&limit=5&device-type=ipad", syndLinkList.get(2).getHref());
+        assertEquals("self: start=2&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr,issueListUri + "?start=2&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(0).getHref());
+        assertEquals("prev: start=1&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, issueListUri + "?start=1&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(1).getHref());
+        assertEquals("next: start=7&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, issueListUri + "?start=7&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(2).getHref());
 
         actualList = new ArrayList<String>();
         for (SyndLink aSyndLinkList : syndLinkList) {
@@ -74,11 +82,11 @@ public class IssueServiceImplTest {
 
         assertEquals("relation by relation check: self prev next", expectedAllRelList, actualList);
 
-        syndLinkList = issueServiceImpl.getLinks(7, 5, "ipad", 12, issueListUri);
+        syndLinkList = issueServiceImpl.getLinks(7, 5, "ipad", fromDate.toDate(), sortOrder, 12, issueListUri);
         assertEquals(3, syndLinkList.size());
-        assertEquals("self: start=7&limit=5&device-type=ipad",issueListUri + "?start=7&limit=5&device-type=ipad", syndLinkList.get(0).getHref());
-        assertEquals("prev: start=2&limit=5&device-type=ipad", issueListUri + "?start=2&limit=5&device-type=ipad", syndLinkList.get(1).getHref());
-        assertEquals("next: start=12&limit=5&device-type=ipad", issueListUri + "?start=12&limit=5&device-type=ipad", syndLinkList.get(2).getHref());
+        assertEquals("self: start=7&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr,issueListUri + "?start=7&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(0).getHref());
+        assertEquals("prev: start=2&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, issueListUri + "?start=2&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(1).getHref());
+        assertEquals("next: start=12&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, issueListUri + "?start=12&limit=5&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(2).getHref());
 
         actualList = new ArrayList<String>();
 
@@ -88,10 +96,10 @@ public class IssueServiceImplTest {
 
         assertEquals("relation by relation check: self prev next", expectedAllRelList, actualList);
 
-        syndLinkList = issueServiceImpl.getLinks(7, 6, "ipad", 12, issueListUri);
+        syndLinkList = issueServiceImpl.getLinks(7, 6, "ipad", fromDate.toDate(), sortOrder, 12, issueListUri);
         assertEquals(2, syndLinkList.size());
-        assertEquals("self: start=7&limit=6&device-type=ipad",issueListUri + "?start=7&limit=6&device-type=ipad", syndLinkList.get(0).getHref());
-        assertEquals("prev: start=1&limit=6&device-type=ipad", issueListUri + "?start=1&limit=6&device-type=ipad", syndLinkList.get(1).getHref());
+        assertEquals("self: start=7&limit=6&device-type=ipad&sortOrder=desc&from=" + fromDateStr,issueListUri + "?start=7&limit=6&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(0).getHref());
+        assertEquals("prev: start=1&limit=6&device-type=ipad&sortOrder=desc&from=" + fromDateStr, issueListUri + "?start=1&limit=6&device-type=ipad&sortOrder=desc&from=" + fromDateStr, syndLinkList.get(1).getHref());
 
         actualList = new ArrayList<String>();
 
@@ -117,6 +125,8 @@ public class IssueServiceImplTest {
         String organizationId = "polaris";
         String publicationId = "addressa";
         String deviceType = "ipad";
+        String sortOrder = "desc";
+        DateMidnight fromDate = new DateMidnight().withDayOfMonth(1).withYear(2013);
 
         Organization organization = new Organization();
         organization.setId(organizationId);
@@ -143,7 +153,8 @@ public class IssueServiceImplTest {
             toIndex = start + limit - 1;
         }
 
-        SyndFeed syndFeed = issueServiceImpl.getIssueAsAtomFeed(dummyIssueList.subList(start - 1, toIndex), organization, publication, start,limit, deviceType, numberOfIssues, mockResourceLocator);
+        SyndFeed syndFeed = issueServiceImpl.getIssueAsAtomFeed(dummyIssueList.subList(start - 1, toIndex), organization, publication,
+                start,limit, deviceType, fromDate.toDate(), sortOrder, numberOfIssues, mockResourceLocator);
 
         Assert.assertEquals("number of links: ", syndFeed.getLinks().size(), expectedLinkCount);
         Assert.assertEquals("number of entry: ", syndFeed.getEntries().size(), expectedEntryCount);

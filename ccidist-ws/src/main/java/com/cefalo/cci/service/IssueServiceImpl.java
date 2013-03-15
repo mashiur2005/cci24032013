@@ -13,6 +13,9 @@ import com.google.inject.Inject;
 import com.sun.syndication.feed.synd.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.joda.time.DateMidnight;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -69,25 +72,27 @@ public class IssueServiceImpl implements IssueService {
             long limit,
             String deviceType,
             Date fromDate,
-            String order,
+            String sortOrder,
             ResourceLocator resourceLocator) {
         checkArgument(start > 0 && limit > 0);
 
         // Remember that the DB layer expects 0 based indexing while we use 1 based indexing in the resource layer.
         return getIssueAsAtomFeed(
-                issueDao.getIssueListByPublicationAndDeviceId(publication.getId(), start - 1, limit, deviceType, fromDate, order),
+                issueDao.getIssueListByPublicationAndDeviceId(publication.getId(), start - 1, limit, deviceType, fromDate, sortOrder),
                 organization,
                 publication,
                 start,
                 limit,
                 deviceType,
+                fromDate,
+                sortOrder,
                 (int)issueDao.getIssueCountByPublicationAndDeviceId(publication.getId(), deviceType, fromDate),
                 resourceLocator);
     }
 
     @SuppressWarnings("unchecked")
     SyndFeed getIssueAsAtomFeed(List<Issue> issues, Organization organization, Publication publication,
-            long start, long limit, String deviceType, long total, ResourceLocator resourceLocator) {
+            long start, long limit, String deviceType, Date fromDate, String sortOrder, long total, ResourceLocator resourceLocator) {
         String publicationName = publication.getName();
         String organizationName = organization.getName();
 
@@ -101,7 +106,7 @@ public class IssueServiceImpl implements IssueService {
         syndPerson.setName(publicationName);
         feed.getAuthors().add(syndPerson);
 
-        List<SyndLink> links = getLinks(start, limit, deviceType, total,
+        List<SyndLink> links = getLinks(start, limit, deviceType, fromDate, sortOrder, total,
                 resourceLocator.getIssueListURI(organization.getId(), publication.getId()).toString());
         feed.setLinks(links);
 
@@ -121,26 +126,29 @@ public class IssueServiceImpl implements IssueService {
         return feed;
     }
 
-    List<SyndLink> getLinks(long start, long limit, String deviceType, long total, String issueListUri) {
+    List<SyndLink> getLinks(long start, long limit, String deviceType, Date fromDate, String sortOrder, long total, String issueListUri) {
         List<SyndLink> links = new ArrayList<SyndLink>();
-        links.add(createAtomLink("self", start, limit, deviceType, issueListUri));
+        links.add(createAtomLink("self", start, limit, deviceType, fromDate, sortOrder, issueListUri));
 
         if (start > 1) {
             // There is a prev link
-            links.add(createAtomLink("prev", Math.max(1, start - limit), limit, deviceType, issueListUri));
+            links.add(createAtomLink("prev", Math.max(1, start - limit), limit, deviceType, fromDate, sortOrder, issueListUri));
         }
         if ((start + limit) < (total + 1)) {
             // There is a next link
-            links.add(createAtomLink("next", Math.min(start + limit, total), limit, deviceType, issueListUri));
+            links.add(createAtomLink("next", Math.min(start + limit, total), limit, deviceType, fromDate, sortOrder, issueListUri));
         }
 
         return links;
     }
 
-    private SyndLink createAtomLink(String relation, long start, long limit, String deviceType, String baseIssueListUri) {
+    private SyndLink createAtomLink(String relation, long start, long limit, String deviceType, Date fromDate, String sortOrder, String baseIssueListUri) {
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+        String fromDateStr = fmt.print(new DateMidnight(fromDate));
+
         SyndLink self = new SyndLinkImpl();
         self.setRel(relation);
-        self.setHref(String.format("%s?start=%s&limit=%s&device-type=%s", baseIssueListUri, start, limit, deviceType));
+        self.setHref(String.format("%s?start=%s&limit=%s&device-type=%s&sortOrder=%s&from=%s", baseIssueListUri, start, limit, deviceType, sortOrder, fromDateStr));
         return self;
     }
 

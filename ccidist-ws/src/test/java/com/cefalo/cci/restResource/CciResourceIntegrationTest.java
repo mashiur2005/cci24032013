@@ -8,6 +8,9 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import org.joda.time.DateMidnight;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 import org.w3c.dom.NodeList;
 
@@ -328,10 +331,18 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
     @Test
     public void getIssueListTest() {
+
+        /*NOTE: Here fromDate used to fetch all issues starting from this date. So this Integration test only
+        tests on our supplied epub files in project directory.*/
+
         String organizationName = "polaris";
         String publicationName = "addressa";
         String deviceType = "ipad";
-        ws = resource().queryParam("device-type", "ipad").path(BASE_URL).path(organizationName).path(publicationName).path("issue");
+        DateMidnight fromDate = new DateMidnight().withDayOfMonth(1).withYear(2013);
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+        String fromDateStr = fmt.print(fromDate);
+
+        ws = resource().queryParam("device-type", "ipad").queryParam("from", fromDateStr).path(BASE_URL).path(organizationName).path(publicationName).path("issue");
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("content found error code: ", 200, clientResponse.getStatus());
 
@@ -354,25 +365,25 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("Device Type not found error: ", 400, clientResponse.getStatus());
 
 
-        ws = resource().queryParam("start", "2").queryParam("limit", "8").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().queryParam("start", "2").queryParam("limit", "2").queryParam("device-type", deviceType).queryParam("from", fromDateStr).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
-        assertEquals("number of entry start 2: ", 4, nodeList.getLength());
+        assertEquals("number of entry start 2: ", 2, nodeList.getLength());
 
-        ws = resource().queryParam("start", "2").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().queryParam("start", "2").queryParam("device-type", deviceType).queryParam("from", fromDateStr).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
         nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of entry limit default: ", 1, nodeList.getLength());
 
-        ws = resource().queryParam("start", "2").queryParam("limit", "-8").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().queryParam("start", "2").queryParam("limit", "-8").queryParam("device-type", deviceType).queryParam("from", fromDateStr).path(BASE_URL).path("polaris").path("addressa").path("issue");
         clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("Bad request 400: ", 400, clientResponse.getStatus());
 
-        ws = resource().queryParam("start", "40").queryParam("device-type", deviceType).path(BASE_URL).path("polaris").path("addressa").path("issue");
+        ws = resource().queryParam("start", "40").queryParam("device-type", deviceType).queryParam("from", fromDateStr).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
@@ -399,6 +410,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("If-Modified-Since less than stored data ", 200, clientResponse.getStatus());*/
     }
 
+/*
     @Test
     public void updateEpubTest() {
         Path directoryPath = Paths.get("src", "test", "resources", "epubs");
@@ -410,4 +422,5 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ClientResponse clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).put(ClientResponse.class, multiPart);
         assertEquals(200, clientResponse.getStatus());
     }
+*/
 }

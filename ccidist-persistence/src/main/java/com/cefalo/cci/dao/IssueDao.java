@@ -19,7 +19,7 @@ public interface IssueDao {
 
     List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult);
 
-    List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType, Date fromDate, String order);
+    List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType, Date fromDate, String sortOrder);
 
     EpubFile getEpubFile(long id);
 
@@ -31,7 +31,7 @@ public interface IssueDao {
 
     List<Issue> getOldIssueList(Date date);
 
-    List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String order);
+    List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String sortOrder);
 
     void updateEpub(long id, InputStream updateInputStream) throws Exception;
 }

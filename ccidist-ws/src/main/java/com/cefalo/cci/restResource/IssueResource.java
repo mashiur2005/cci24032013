@@ -22,6 +22,9 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import com.sun.syndication.feed.synd.SyndFeed;
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +74,7 @@ public class IssueResource {
             @QueryParam("limit") @DefaultValue("1") final int limit,
             @QueryParam("device-type") @DefaultValue("") final String deviceType,
             @QueryParam("from") @DefaultValue("") final String from,
-            @QueryParam("order") @DefaultValue("desc") final String order) {
+            @QueryParam("sortOrder") @DefaultValue("desc") final String sortOrder) {
         if (Utils.isBlank(publicationName) || Utils.isBlank(organizationName)) {
             return Responses.clientError().entity("Organization or publication name may not be blank.").build();
         }
@@ -87,7 +90,14 @@ public class IssueResource {
         if (Utils.isBlank(from)) {
             fromDate = new DateMidnight().toDate();
         } else {
-            ///parse dateStr to date
+            try {
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+                DateTime dateTime = formatter.parseDateTime(from);
+                fromDate = dateTime.toDateMidnight().toDate();
+            } catch (IllegalArgumentException e) {
+                return  Responses.clientError().entity("Invalid Date format.").build();
+
+            }
         }
 
         Publication publication = publicationService.getPublication(publicationName);
@@ -107,7 +117,7 @@ public class IssueResource {
         }*/
 
         SyndFeed feed = issueService.getIssuesAsAtomFeed(publication.getOrganization(), publication, start, limit,
-                deviceType, fromDate, order, JerseyResourceLocator.from(uriInfo));
+                deviceType, fromDate, sortOrder, JerseyResourceLocator.from(uriInfo));
 
         /*return Response.ok(feed).tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();*/
         return Response.ok(feed).build();

@@ -36,11 +36,12 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     public long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType, Date fromDate) {
         //form date need to be set
-        return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType")
+        return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.created >= :fromDate")
                 .setHint("org.hibernate.cacheable", true)
                 .setHint("org.hibernate.cacheRegion", "query.issueList")
-                .setParameter("pName", publicationId).
-                setParameter("deviceType", deviceType)
+                .setParameter("pName", publicationId)
+                .setParameter("deviceType", deviceType)
+                .setParameter("fromDate", fromDate)
                 .getSingleResult();
     }
 
@@ -63,15 +64,16 @@ public class IssueDaoImpl implements IssueDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType, Date fromDate, String order) {
+    public List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType, Date fromDate, String sortOrder) {
 
-        //form date need to be compared
+        //Here creaded date used to compare with fromDate
         return entityManager
-                .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType order by i.updated " + order)
+                .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType  and i.created >= :fromDate  order by i.updated "  + sortOrder)
                 .setHint("org.hibernate.cacheable", true)
                 .setHint("org.hibernate.cacheRegion", "query.issueList")
                 .setParameter("pName", publicationId)
                 .setParameter("deviceType", deviceType)
+                .setParameter("fromDate", fromDate)
                 .setFirstResult((int) start)
                 .setMaxResults((int) maxResult)
                 .getResultList();
@@ -129,9 +131,9 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String order) {
+    public List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String sortOrder) {
         return entityManager
-                .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.name like :issueName order by i.updated " + order)
+                .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.name like :issueName order by i.updated " + sortOrder)
                 .setParameter("pName", publicationId).setParameter("deviceType", deviceId).setParameter("issueName", issueName)
                 .getResultList();
     }

@@ -40,6 +40,25 @@
                 </dd>
             </dl>
             <dl>
+                <dt>
+                    <label for="date">From date</label>
+                </dt>
+                <dd>
+                    <input type="text" name="from" id="date" />yyyy-MM-dd
+                </dd>
+            </dl>
+            <dl>
+                <dt>
+                    <label for="sortOrder">Sort order</label>
+                </dt>
+                <dd>
+                    <select id="sortOrder" name="sortOrder">
+                           <option value="desc">Desc</option>
+                           <option value="asc">Asc</option>
+                    </select>
+                </dd>
+            </dl>
+            <dl>
                 <dd>
                     <input type="submit" name="submit" />
                 </dd>
