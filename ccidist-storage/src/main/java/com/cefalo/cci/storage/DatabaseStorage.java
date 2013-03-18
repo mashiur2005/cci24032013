@@ -13,8 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.sql.Blob;
-import java.sql.SQLException;
 
 @Singleton
 public class DatabaseStorage implements Storage {
@@ -67,13 +65,9 @@ public class DatabaseStorage implements Storage {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-  //  @Override
-    public void fetchAndWriteEpub(URI resourceId, String organizationId, String publicationId) throws IOException {
+    @Override
+    public void invalidateExtractedFileCache(String key) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-  //  @Override
-    public InputStream getFragmentFromCache(URI resourceId, URI fragmentPath, String filePath) throws IOException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

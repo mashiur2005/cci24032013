@@ -1,6 +1,5 @@
 package com.cefalo.cci.dao;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,7 +7,6 @@ import javax.persistence.EntityManager;
 import com.cefalo.cci.model.Organization;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.persist.Transactional;
 
 @Singleton
 public class OrganizationDaoImpl implements OrganizationDao {

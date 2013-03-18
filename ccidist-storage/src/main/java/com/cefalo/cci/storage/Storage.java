@@ -111,4 +111,6 @@ public interface Storage {
 	 */
 	URI delete(final URI resourceID) throws IOException;
 
+    void invalidateExtractedFileCache(String key);
+
 }
