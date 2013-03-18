@@ -8,23 +8,16 @@ import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.sql.Blob;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 @Singleton
 public class IssueDaoImpl implements IssueDao {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     private EntityManager entityManager;
@@ -139,7 +132,7 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Issue> getOldIssueList(Date date) {
-        return (List<Issue>)entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
+        return entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
     }
 
     @Override

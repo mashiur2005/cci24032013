@@ -2,7 +2,6 @@ package com.cefalo.cci.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Blob;
 
 @Entity
 @Table(name = "epub_file")

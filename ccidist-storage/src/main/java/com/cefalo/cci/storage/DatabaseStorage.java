@@ -13,8 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.sql.Blob;
-import java.sql.SQLException;
 
 @Singleton
 public class DatabaseStorage implements Storage {
