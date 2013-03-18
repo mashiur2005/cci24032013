@@ -6,6 +6,7 @@ import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.cefalo.cci.storage.CacheStorage;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
@@ -19,10 +20,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.net.URI;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -172,77 +173,120 @@ public class IssueServiceImpl implements IssueService {
         issueDao.updateEpub(id, updateInputStream);
     }
 
+
     @Override
-    public void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception{
-        InputStream newInputStream = null;
-        InputStream oldInputStream = null;
-        ZipInputStream newZipInputStream = null;
-        ZipInputStream oldZipInputStream = null;
-        ZipEntry newZipEntry;
-        ZipEntry oldZipEntry;
-        boolean isEqual;
+    public void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri) throws IOException {
 
-        try{
-            newInputStream = readFromTempFile(newFilePath);
-            oldInputStream = readFromTempFile(oldFilePath);
-            newZipInputStream = new ZipInputStream(newInputStream);
-            oldZipInputStream = new ZipInputStream(oldInputStream);
-            /*listOfFilesInDir(newZipInputStream, "new");
-            listOfFilesInDir(oldZipInputStream, "old");*/
-            newInputStream.close();
-            oldInputStream.close();
-            newZipInputStream.close();
-            oldZipInputStream.close();
+        final Map<String, String> visitedFiles = new HashMap<>();
+        final Set<String> uploadedChangedSet = new HashSet<>();
+        final Set<String> existingChangedSet = new HashSet<>();
 
-            newInputStream = readFromTempFile(newFilePath);
-            oldInputStream = readFromTempFile(oldFilePath);
-            newZipInputStream = new ZipInputStream(newInputStream);
-            oldZipInputStream = new ZipInputStream(oldInputStream);
+        final Map<String, String> env = new HashMap<String, String>();
+        env.put("create", "false");
 
-            newZipEntry = newZipInputStream.getNextEntry();
-            oldZipEntry = oldZipInputStream.getNextEntry();
-            while (newZipEntry != null || oldZipEntry != null) {
-
-                if (newZipEntry != null && oldZipEntry != null && newZipEntry.getName().equals(oldZipEntry.getName())) {
-                    /*log.info("Comparing " + newZipEntry.getName() + " and " + oldZipEntry.getName());*/
-                    isEqual = ByteStreams.equal(ByteStreams.newInputStreamSupplier(ByteStreams.toByteArray(oldZipInputStream)),
-                            ByteStreams.newInputStreamSupplier(ByteStreams.toByteArray(newZipInputStream)));
-                    if (isEqual) {
-                        /*log.info("New file : " + newZipEntry.getName() + " and Old file : " + oldZipEntry.getName() + " are equal");*/
-                    } else {
-                        log.info("New file : " + newZipEntry.getName() + " and Old file : " + oldZipEntry.getName() + " are different");
-                    }
-                } else if (newZipEntry != null && oldZipEntry == null){
-                    log.info("Added File : " + newZipEntry.getName());
-                } else if (oldZipEntry != null && newZipEntry == null) {
-                    log.info("Deleted File : " + oldZipEntry.getName());
-                } else {
-                    log.info(oldZipEntry.getName() + " is replaced by " + newZipEntry.getName());
-                }
-                newZipEntry = newZipInputStream.getNextEntry();
-                oldZipEntry = oldZipInputStream.getNextEntry();
-            }
-        } catch (Exception io) {
-            throw io;
+        FileSystem uploadedFS = null;
+        FileSystem existingFS = null;
+        try {
+            uploadedFS = FileSystems.newFileSystem(uploadedFileUri, env);
+            existingFS = FileSystems.newFileSystem(existingFileUri, env);
+            findDifference(existingFS, uploadedFS, visitedFiles, uploadedChangedSet);
+            findDifference(uploadedFS, existingFS, visitedFiles, existingChangedSet);
+            showModifiedFiles(uploadedChangedSet, existingChangedSet);
         } finally {
-            Closeables.close(newInputStream, true);
-            Closeables.close(oldInputStream, true);
-            Closeables.close(newZipInputStream, true);
-            Closeables.close(oldZipInputStream, true);
+            Closeables.close(uploadedFS, true);
+            Closeables.close(existingFS, true);
+        }
+
+    }
+
+
+    public void findDifference(final FileSystem comparedFromFS, FileSystem comparedToFS, final Map<String, String> visitedFiles, final Set<String> changedSet) throws IOException {
+
+        try {
+            java.nio.file.Files.walkFileTree(comparedToFS.getPath("/"), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path comparedToPath, BasicFileAttributes attrs)
+                        throws IOException {
+                    Path comparedFromPath = comparedFromFS.getPath(comparedToPath.toString());
+
+/*
+                    if (visitedFiles.get(comparedToPath.toAbsolutePath().toString()) != null) {
+                        return FileVisitResult.CONTINUE;
+                    } else
+*/
+                    if (java.nio.file.Files.exists(comparedFromPath.toAbsolutePath())) {
+
+                        visitedFiles.put(comparedToPath.toAbsolutePath().toString(), "visited");
+
+                        byte[] comparedToByte = java.nio.file.Files.readAllBytes(comparedToPath.toAbsolutePath());
+                        byte[] comparedFromByte = java.nio.file.Files.readAllBytes(comparedFromPath.toAbsolutePath());
+                        boolean isEqual = ByteStreams.equal(ByteStreams.newInputStreamSupplier(comparedToByte),
+                                ByteStreams.newInputStreamSupplier(comparedFromByte));
+
+                        if (!isEqual) {
+                            changedSet.add(comparedToPath.toAbsolutePath().toString());
+                            //visitedFiles.put(comparedToPath.toAbsolutePath().toString(), "visited");
+                        }
+                    } else {
+                        changedSet.add(comparedToPath.toAbsolutePath().toString());
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+           throw e;
+        }
+
+
+    }
+
+    public void showModifiedFiles(Set<String> uploadedChangedSet, Set<String> existingChangedSet) {
+        if (uploadedChangedSet.isEmpty() && existingChangedSet.isEmpty()) {
+            System.out.println("No file modified");
+        } else {
+            Set<String> intersectionSet;
+            intersectionSet = Sets.intersection(uploadedChangedSet, existingChangedSet);
+
+            if (!intersectionSet.isEmpty()) {
+                System.out.println("File Modified:");
+
+                for (String link : intersectionSet) {
+                    System.out.println("---> " + link);
+                }
+            }
+
+            Set<String> diffSet = Sets.difference(uploadedChangedSet, intersectionSet);
+
+            if (!diffSet.isEmpty()) {
+                System.out.println("File Added:");
+
+                for (String link : diffSet) {
+                    System.out.println("---> " + link);
+                }
+
+            }
+
+            diffSet = Sets.difference(existingChangedSet, intersectionSet);
+
+            if (!diffSet.isEmpty()) {
+                System.out.println("File Deleted:");
+
+                for (String link : diffSet) {
+                    System.out.println("---> " + link);
+                }
+
+            }
         }
     }
 
     public void writeZipFileToTmpDir(InputStream inputStream, String fileAbsolutePath) throws Exception {
-        File tmpFile;
-        FileOutputStream tmpFileOutputStream = null;
 
-        tmpFile = new File(fileAbsolutePath);
+        FileOutputStream tmpFileOutputStream = null;
         try {
+            File tmpFile = new File(fileAbsolutePath);
             Files.createParentDirs(tmpFile);
             tmpFileOutputStream = new FileOutputStream(tmpFile);
             ByteStreams.copy(inputStream, tmpFileOutputStream);
-        } catch (FileNotFoundException fnfe) {
-            throw fnfe;
         } catch (IOException io) {
             throw io;
         } finally {
@@ -251,10 +295,10 @@ public class IssueServiceImpl implements IssueService {
     }
 
     public InputStream readFromTempFile(String fileAbsolutePath) throws Exception {
-        File tmpFile = new File(fileAbsolutePath);
         FileInputStream tmpFileInputStream = null;
 
         try {
+            File tmpFile = new File(fileAbsolutePath);
             tmpFileInputStream = new FileInputStream(tmpFile);
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();

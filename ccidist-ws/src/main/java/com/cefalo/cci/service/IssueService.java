@@ -8,6 +8,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,8 @@ public interface IssueService {
 
     void updateEpub(long id, InputStream updateInputStream);
 
-    void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception;
+    //void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception;
+    void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri) throws Exception;
 
     void writeZipFileToTmpDir(InputStream inputStream, String fileAbsolutePath) throws Exception;
 

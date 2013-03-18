@@ -8,15 +8,11 @@ import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.sql.Blob;
+import java.io.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -90,7 +86,6 @@ public class IssueDaoImpl implements IssueDao {
 
     @Override
     public Issue getIssue(String id) {
-        entityManager.clear();
         return entityManager.find(Issue.class, id);
     }
 
@@ -100,6 +95,7 @@ public class IssueDaoImpl implements IssueDao {
 
 
     @Override
+    //@Transactional   ---need to fix.here transaction open only for firsttime entityManager calling....!!!!
     public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
         boolean exceptionHappened = false;
         byte[] fileContent;
@@ -133,6 +129,7 @@ public class IssueDaoImpl implements IssueDao {
             } else {
                 entityManager.getTransaction().commit();
             }
+            entityManager.clear();
         }
     }
 
@@ -152,17 +149,27 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    @Transactional
+    //@Transactional   ---need to fix.here transaction open only for firsttime entityManager calling....!!!!
     public void updateEpub(long Id, InputStream updateInputStream) {
+        boolean exceptionHappened = false;
         byte[] fileContent;
         try {
             fileContent = ByteStreams.toByteArray(updateInputStream);
-        } catch (IOException e) {
-             throw new RuntimeException(e);
+
+            entityManager.getTransaction().begin();
+            EpubFile epubFile = getEpubFile(Id);
+            epubFile.setFile(fileContent);
+            entityManager.persist(epubFile);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (exceptionHappened) {
+                entityManager.getTransaction().rollback();
+            } else {
+                entityManager.getTransaction().commit();
+            }
+            entityManager.clear();
         }
-        EpubFile epubFile = getEpubFile(Id);
-        epubFile.setFile(fileContent);
-        entityManager.persist(epubFile);
     }
 
     public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId) {

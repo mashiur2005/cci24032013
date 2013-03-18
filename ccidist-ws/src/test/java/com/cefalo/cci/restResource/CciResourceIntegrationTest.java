@@ -410,7 +410,6 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("If-Modified-Since less than stored data ", 200, clientResponse.getStatus());*/
     }
 
-/*
     @Test
     public void updateEpubTest() {
         Path directoryPath = Paths.get("src", "test", "resources", "epubs");
@@ -422,5 +421,5 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ClientResponse clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).put(ClientResponse.class, multiPart);
         assertEquals(200, clientResponse.getStatus());
     }
-*/
+
 }

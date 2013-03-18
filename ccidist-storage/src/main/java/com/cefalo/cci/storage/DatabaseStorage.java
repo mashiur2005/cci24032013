@@ -34,7 +34,6 @@ public class DatabaseStorage implements Storage {
         if (epubFile == null || epubFile.getFile() == null) {
             throw new FileNotFoundException(String.format("No binary file for: %s", resourceID));
         }
-
         byte[] fileContent = epubFile.getFile();
         try {
             return new ByteArrayInputStream(fileContent);

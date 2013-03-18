@@ -199,7 +199,7 @@ public class IssueServiceImplTest {
         Path oldFilePath = Paths.get("src", "test", "resources", "cciepubs", "old");
 
         String newFileFullPathString = newFilePath.toAbsolutePath().toString() + "/CciNewsRoom_Chronicle_02-13-2013_City-1122.epub";
-        String oldFileFullPathString = oldFilePath.toAbsolutePath().toString() + "/CciNewsRoom_Chronicle_02-13-2013_City-1157.epub";
+        String oldFileFullPathString = oldFilePath.toAbsolutePath().toString() + "/CciNewsRoom_Chronicle_02-13-2013_City-1122.epub";
 
         try {
             issueServiceImpl.findDifferenceAndSaveToDb(newFileFullPathString, oldFileFullPathString);
@@ -207,7 +207,7 @@ public class IssueServiceImplTest {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        newFileFullPathString = newFilePath.toAbsolutePath().toString() + "/CciNewsRoom_Chronicle_02-13-2013_City-1220.epub";
+        newFileFullPathString = newFilePath.toAbsolutePath().toString() + "/CciNewsRoom_Chronicle_02-13-2013_City-1122.epub";
 
         try {
             issueServiceImpl.findDifferenceAndSaveToDb(newFileFullPathString, oldFileFullPathString);

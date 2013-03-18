@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -278,29 +279,39 @@ public class IssueResource {
 
         long epubId;
         InputStream oldInputStream = null;
-        Issue epubIssue = new Issue();
-
-
+        Issue epubIssue = null;
         try {
             checkForValidPublication(organizationId, publicationId);
             checkValidFileContent(epubDetail);
 
             epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), epubDetail.getFileName());
+
+            if (epubIssue == null || epubIssue.getEpubFile() == null) {
+                throw new FileNotFoundException();
+            }
+
             epubId = epubIssue.getEpubFile().getId();
             oldInputStream = storage.get(URI.create(Long.toString(epubId)));
 
             issueService.writeZipFileToTmpDir(fileInputStream, cacheDirFullPath + epubDetail.getFileName());
             issueService.writeZipFileToTmpDir(oldInputStream, cacheDirFullPath + "old/" + epubIssue.getName());
 
-            issueService.findDifferenceAndSaveToDb(cacheDirFullPath + epubDetail.getFileName(), cacheDirFullPath + "old/" + epubIssue.getName());
+            String uploadedFileLoc = "jar:file:/" + cacheDirFullPath + epubDetail.getFileName();
+            String existingFileLoc = "jar:file:/" + cacheDirFullPath + "old/" + epubIssue.getName();
+            URI uploadedFileUri = URI.create(uploadedFileLoc.replace("\\", "/"));
+            URI existingFileUri = URI.create(existingFileLoc.replace("\\", "/"));
+
+            issueService.findDifferenceAndSaveToDb(uploadedFileUri, existingFileUri);
 
             fileInputStream = issueService.readFromTempFile(cacheDirFullPath + epubDetail.getFileName());
             issueService.updateEpub(epubId, fileInputStream);
-            fileInputStream.close();
         } catch (NotFoundException ne) {
             throw ne;
-        } catch (Exception e) {
-            throw new NotFoundException("Epub updating problem");
+        } catch (FileNotFoundException fnfe) {
+            throw new NotFoundException();
+        }
+        catch (IOException ex) {
+             throw new RuntimeException();
         } finally {
             Closeables.close(fileInputStream, true);
             Closeables.close(oldInputStream, true);
