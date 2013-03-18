@@ -168,7 +168,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public void updateEpub(long id, InputStream updateInputStream) throws Exception{
+    public void updateEpub(long id, InputStream updateInputStream){
         issueDao.updateEpub(id, updateInputStream);
     }
 

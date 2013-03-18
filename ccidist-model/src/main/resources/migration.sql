@@ -86,10 +86,10 @@ insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-
 
 
 /*Issue Data*/
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('regime-anticancer-arabic-20121022', 2, 'regime-anticancer-arabic-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('sash-for-you-20120827', 3, 'sash-for-you-20120827.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-figure-gallery-20121022', 4, 'widget-figure-gallery-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
-insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-quiz-20121022', 5, 'widget-quiz-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
+insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('regime-anticancer-arabic-20121022', 1, 'regime-anticancer-arabic-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
+insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('sash-for-you-20120827', 2, 'sash-for-you-20120827.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
+insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-figure-gallery-20121022', 3, 'widget-figure-gallery-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
+insert into issue (id, epub_file_id, name, platform_id, publication_id, created, updated) values ('widget-quiz-20121022', 4, 'widget-quiz-20121022.epub', 'ipad', 'addressa', current_timestamp, current_timestamp);
 
 
 

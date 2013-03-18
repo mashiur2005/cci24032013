@@ -8,6 +8,7 @@ import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,10 +35,10 @@ public class DatabaseStorage implements Storage {
             throw new FileNotFoundException(String.format("No binary file for: %s", resourceID));
         }
 
-        Blob blob = epubFile.getFile();
+        byte[] fileContent = epubFile.getFile();
         try {
-            return blob.getBinaryStream();
-        } catch (SQLException e) {
+            return new ByteArrayInputStream(fileContent);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

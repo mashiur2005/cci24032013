@@ -10,7 +10,7 @@ public class EpubFile extends Persistent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private long id;
-    private Blob file;
+    private byte[] file;
 
 
     public EpubFile() {
@@ -32,11 +32,11 @@ public class EpubFile extends Persistent implements Serializable {
     }
 
     @Lob
-    public Blob getFile() {
+    public byte[] getFile() {
         return file;
     }
 
-    public void setFile(Blob file) {
+    public void setFile(byte[] file) {
         this.file = file;
     }
 }

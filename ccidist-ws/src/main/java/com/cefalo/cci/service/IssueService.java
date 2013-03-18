@@ -28,7 +28,7 @@ public interface IssueService {
 
     Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName);
 
-    void updateEpub(long id, InputStream updateInputStream) throws Exception;
+    void updateEpub(long id, InputStream updateInputStream);
 
     void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception;
 

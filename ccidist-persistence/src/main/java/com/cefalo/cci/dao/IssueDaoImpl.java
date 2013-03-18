@@ -4,6 +4,7 @@ import com.cefalo.cci.model.EpubFile;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Platform;
 import com.cefalo.cci.model.Publication;
+import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
@@ -89,6 +90,7 @@ public class IssueDaoImpl implements IssueDao {
 
     @Override
     public Issue getIssue(String id) {
+        entityManager.clear();
         return entityManager.find(Issue.class, id);
     }
 
@@ -98,29 +100,39 @@ public class IssueDaoImpl implements IssueDao {
 
 
     @Override
-    @Transactional
     public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
-        Session session = (Session) entityManager.getDelegate();
-        Blob fileContent;
+        boolean exceptionHappened = false;
+        byte[] fileContent;
         try {
-/*
-            need to fix file size limit based on disscussion
-            there is a method to get fileSize--- inputStream.avaiable();
-*/
-            fileContent = session.getLobHelper().createBlob(inputStream, 1024L);
-        } catch (Exception ex) {
-            throw new IOException();
+            fileContent = ByteStreams.toByteArray(inputStream);
+        } catch (IOException ex) {
+            throw ex;
         }
-        EpubFile epubFile = new EpubFile();
-        epubFile.setFile(fileContent);
 
-        Serializable epubId = session.save(epubFile);
+        try {
+            entityManager.getTransaction().begin();
+            EpubFile epubFile = new EpubFile();
+            epubFile.setFile(fileContent);
+            entityManager.persist(epubFile);
+            entityManager.flush();
 
-        for (String deviceId : deviceSet) {
-            //generating issue primary key....based on fileName and count on existing fileName
-            String issuePK = generateIssuePrimaryKey(fileName.substring(0, fileName.length() - 1 - 4)); //length of .epub = 4
-            Issue issue = createIssue(publicationId, issuePK, fileName, deviceId, epubId);
-            entityManager.persist(issue);
+            long epubId = epubFile.getId();
+            for (String deviceId : deviceSet) {
+                //generating issue primary key....based on fileName and count on existing fileName
+                String issuePK = generateIssuePrimaryKey(fileName.substring(0, fileName.length() - 1 - 4)); //length of .epub = 4
+                Issue issue = createIssue(publicationId, issuePK, fileName, deviceId, epubId);
+                entityManager.persist(issue);
+                entityManager.flush();
+            }
+        } catch (Exception e) {
+            exceptionHappened = true;
+            throw new RuntimeException();
+        } finally {
+            if (exceptionHappened) {
+                entityManager.getTransaction().rollback();
+            } else {
+                entityManager.getTransaction().commit();
+            }
         }
     }
 
@@ -131,7 +143,6 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    @Transactional
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String sortOrder) {
         return entityManager
@@ -142,17 +153,15 @@ public class IssueDaoImpl implements IssueDao {
 
     @Override
     @Transactional
-    public void updateEpub(long Id, InputStream updateInputStream) throws Exception{
-        Session session = (Session) entityManager.getDelegate();
-        Blob blobContent;
+    public void updateEpub(long Id, InputStream updateInputStream) {
+        byte[] fileContent;
         try {
-            blobContent = session.getLobHelper().createBlob(updateInputStream, 1024L);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+            fileContent = ByteStreams.toByteArray(updateInputStream);
+        } catch (IOException e) {
+             throw new RuntimeException(e);
         }
         EpubFile epubFile = getEpubFile(Id);
-        epubFile.setFile(blobContent);
+        epubFile.setFile(fileContent);
         entityManager.persist(epubFile);
     }
 
