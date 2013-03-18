@@ -1,6 +1,7 @@
 package com.cefalo.cci.service;
 
 import com.cefalo.cci.model.Issue;
+import com.cefalo.cci.storage.Storage;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.joda.time.DateTime;
@@ -26,8 +27,7 @@ public class PurgeFileService implements org.quartz.Job{
     private String cacheDirFullPath;
 
     @Inject
-    @Named("fileSystemSeperator")
-    private String fileSystemSeperator;
+    private Storage cachedStorage;
 
     @Inject
     @Named("interval")
@@ -44,11 +44,12 @@ public class PurgeFileService implements org.quartz.Job{
         File file = null;
 
         for (Issue anIssueList : issueList) {
-            file = new File(cacheDirFullPath + fileSystemSeperator +  anIssueList.getEpubFile().getId());
+            file = new File(cacheDirFullPath + "/" +  anIssueList.getEpubFile().getId());
             logger.info("Files to be deleted: " + file.getAbsolutePath());
             if (file.exists()) {
                 deleteRecursive(file);
             }
+            cachedStorage.invalidateExtractedFileCache(String.valueOf(anIssueList.getEpubFile().getId()));
         }
     }
 

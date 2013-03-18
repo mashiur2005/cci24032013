@@ -6,6 +6,8 @@ import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URI;
@@ -18,6 +20,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class CacheStorage implements Storage {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Inject
     @Named("databaseStorage")
     Storage databaseStorage;
@@ -26,11 +30,7 @@ public class CacheStorage implements Storage {
     @Named("cacheDirFullPath")
     private String cacheDirFullPath;
 
-    @Inject
-    @Named("fileSystemSeperator")
-    private String fileSystemSeperator;
-
-    private ConcurrentMap<String, String> keyStor = new ConcurrentHashMap<String, String> ();
+    private ConcurrentMap<String, String> fileKeyStor = new ConcurrentHashMap<String, String> ();
 
     @Override
     public InputStream get(URI resourceID) throws IOException {
@@ -47,18 +47,18 @@ public class CacheStorage implements Storage {
         String fileId = resourceID.getPath();
 
         //used as temporarily. Will be removed....
-        keyStor.putIfAbsent(fileId, fileId);
+        fileKeyStor.putIfAbsent(fileId, fileId);
 
         String fileName = fragmentPath.getPath();
-        String fileDirPath =  cacheDirFullPath + fileSystemSeperator + fileId;
+        String fileDirPath =  cacheDirFullPath + "/" + fileId;
         File resourceFile = new File(fileDirPath);
 
         //Same fileId  value might have different reference. temporary soluation
-        synchronized (keyStor.get(fileId)) {
+        synchronized (fileKeyStor.get(fileId)) {
             if (!resourceFile.exists()) {
                 extractAndStoreEpub(resourceID);
             }
-            String fileLocationPath = fileDirPath + fileSystemSeperator + fileName;
+            String fileLocationPath = fileDirPath + "/" + fileName;
 
             if (new File(fileLocationPath).exists()) {
                 return new FileInputStream(fileLocationPath);
@@ -87,6 +87,12 @@ public class CacheStorage implements Storage {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void invalidateExtractedFileCache(String key) {
+        logger.info(String.format("Invalidating at : %s and the file id is : %s", System.currentTimeMillis(), key));
+        fileKeyStor.remove(key);
+    }
+
     public void extractAndStoreEpub(URI resourceId) throws IOException {
         checkNotNull(resourceId, "Resource Id can not be null");
 
@@ -100,13 +106,13 @@ public class CacheStorage implements Storage {
             zipInputStream = new ZipInputStream(inputStream);
             ZipEntry entry;
             String name;
-            File file = new File(cacheDirFullPath + fileSystemSeperator + fileName);
+            File file = new File(cacheDirFullPath + "/" + fileName);
             if (!file.exists()) {
                 Files.createParentDirs(file);
             }
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 name = entry.getName();
-                file = new File(cacheDirFullPath + fileSystemSeperator + fileName+ fileSystemSeperator + name);
+                file = new File(cacheDirFullPath + "/" + fileName+ "/" + name);
                 if (name.endsWith("/")) {
                     file.mkdirs();
                     continue;
