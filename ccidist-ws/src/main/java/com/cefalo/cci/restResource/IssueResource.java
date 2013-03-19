@@ -114,21 +114,23 @@ public class IssueResource {
         }
 
 
-        /*
         List<Issue> issueList = issueService.getIssueListByPublicationId(publication.getId());
+
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(60);
+        cacheControl.setMustRevalidate(true);
 
         Date lastModifiedIssueDate = issueList.get(0).getUpdated();
         ResponseBuilder unmodifiedResponseBuilder = request.evaluatePreconditions(lastModifiedIssueDate, EntityTag.valueOf(Utils
                 .createETagHeaderValue(lastModifiedIssueDate.getTime())));
         if (unmodifiedResponseBuilder != null) {
-            return unmodifiedResponseBuilder.tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();
-        }*/
+            return unmodifiedResponseBuilder.tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).cacheControl(cacheControl).build();
+        }
 
         SyndFeed feed = issueService.getIssuesAsAtomFeed(publication.getOrganization(), publication, start, limit,
                 deviceType, fromDate, sortOrder, JerseyResourceLocator.from(uriInfo));
 
-        /*return Response.ok(feed).tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).build();*/
-        return Response.ok(feed).build();
+        return Response.ok(feed).tag(String.valueOf(lastModifiedIssueDate.getTime())).lastModified(lastModifiedIssueDate).cacheControl(cacheControl).build();
     }
 
     @GET
