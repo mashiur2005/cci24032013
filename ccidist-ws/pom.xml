@@ -28,6 +28,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.cefalo</groupId>
+            <artifactId>ccidist-utils</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
         </dependency>

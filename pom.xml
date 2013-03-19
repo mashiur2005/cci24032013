@@ -61,6 +61,7 @@
       <module>ccidist-ws</module>
       <module>ccidist-model</module>
       <module>ccidist-persistence</module>
+      <module>ccidist-utils</module>
     </modules>
     
     <!-- Common dependencies. We'll use these dependencies in all modules. -->
@@ -117,7 +118,13 @@
       		<artifactId>ccidist-storage</artifactId>
       		<version>${project.version}</version>
       	</dependency>
-      	
+
+      	<dependency>
+      		<groupId>com.cefalo</groupId>
+      		<artifactId>ccidist-utils</artifactId>
+      		<version>${project.version}</version>
+      	</dependency>
+
       	<!-- Servlet related dependencies -->
         <dependency>
         	<groupId>javax.servlet</groupId>
