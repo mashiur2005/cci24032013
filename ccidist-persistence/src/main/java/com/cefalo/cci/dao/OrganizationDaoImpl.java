@@ -6,16 +6,19 @@ import javax.persistence.EntityManager;
 
 import com.cefalo.cci.model.Organization;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
 public class OrganizationDaoImpl implements OrganizationDao {
+
     @Inject
-    private EntityManager entityManager;
+     private Provider<EntityManager> entityManagerProvider;
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Organization> getAllOrganizations() {
+        EntityManager entityManager = entityManagerProvider.get();
         return entityManager.createQuery("select o from Organization o order by o.updated desc")
                 .setHint("org.hibernate.cacheable", true)
                 .setHint("org.hibernate.cacheRegion", "query.organizationList")
@@ -24,6 +27,7 @@ public class OrganizationDaoImpl implements OrganizationDao {
 
     @Override
     public Organization getOrganization(String id) {
+        EntityManager entityManager = entityManagerProvider.get();
         return entityManager.find(Organization.class, id);
     }
 }
