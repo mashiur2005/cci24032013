@@ -34,9 +34,9 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         bind(IssueDao.class).to(IssueDaoImpl.class);
         bind(IssueService.class).to(IssueServiceImpl.class);
 
-        bindConstant().annotatedWith(Names.named("epubFileDirPath")).to(Utils.FILE_BASE_PATH);
         bindConstant().annotatedWith(Names.named("cacheDirFullPath")).to(Utils.CACHE_DIR_FULLPATH);
-        bindConstant().annotatedWith(Names.named("fileSystemSeperator")).to(Utils.FILE_SEPARATOR);
+        bindConstant().annotatedWith(Names.named("cacheEpubDirFullPath")).to(Utils.CACHED_EPUBS_FULLPATH);
+        bindConstant().annotatedWith(Names.named("tmpDirFullPath")).to(Utils.TMP_DIR_FULLPATH);
 
         bind(new TypeLiteral<ConcurrentMap<String, String>>() {
         }).annotatedWith(Names.named("cacheKeyStore")).toInstance(new ConcurrentHashMap<String, String>());

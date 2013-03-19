@@ -45,7 +45,7 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public URI create(InputStream data) throws IOException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return issueDao.saveEpub(data);
     }
 
     @Override

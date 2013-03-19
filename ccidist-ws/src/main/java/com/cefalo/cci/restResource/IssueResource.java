@@ -65,6 +65,14 @@ public class IssueResource {
     @Named("cacheDirFullPath")
     private String cacheDirFullPath;
 
+    @Inject
+    @Named("tmpDirFullPath")
+    private String tmpDirFullPath;
+
+    @Inject
+    @Named("cacheEpubDirFullPath")
+    private String cacheEpubDirFullPath;
+
     @GET
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getIssueList(
@@ -252,7 +260,7 @@ public class IssueResource {
             if (uploadedInputStream == null) {
                 throw new NotFoundException();
             }
-            issueService.uploadEpubFile(publicationId, fileDetail.getFileName(), deviceSet, uploadedInputStream);
+            issueService.writeAndUploadEpubFile(publicationId, fileDetail.getFileName(), deviceSet, uploadedInputStream);
         } catch (NotFoundException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -292,17 +300,17 @@ public class IssueResource {
             epubId = epubIssue.getEpubFile().getId();
             oldInputStream = storage.get(URI.create(Long.toString(epubId)));
 
-            issueService.writeZipFileToTmpDir(fileInputStream, cacheDirFullPath + epubDetail.getFileName());
-            issueService.writeZipFileToTmpDir(oldInputStream, cacheDirFullPath + "old/" + epubIssue.getName());
+            Utils.writeZipFileToDir(fileInputStream, tmpDirFullPath + epubDetail.getFileName());
+            Utils.writeZipFileToDir(oldInputStream, tmpDirFullPath + "old/" + epubIssue.getName());
 
-            String uploadedFileLoc = "jar:file:/" + cacheDirFullPath + epubDetail.getFileName();
-            String existingFileLoc = "jar:file:/" + cacheDirFullPath + "old/" + epubIssue.getName();
+            String uploadedFileLoc = "jar:file:/" + tmpDirFullPath + epubDetail.getFileName();
+            String existingFileLoc = "jar:file:/" + tmpDirFullPath + "old/" + epubIssue.getName();
             URI uploadedFileUri = URI.create(uploadedFileLoc.replace("\\", "/"));
             URI existingFileUri = URI.create(existingFileLoc.replace("\\", "/"));
 
             issueService.findDifferenceAndSaveToDb(uploadedFileUri, existingFileUri);
 
-            fileInputStream = issueService.readFromTempFile(cacheDirFullPath + epubDetail.getFileName());
+            fileInputStream = Utils.readFileFromDir(tmpDirFullPath + epubDetail.getFileName());
             issueService.updateEpub(epubId, fileInputStream);
         } catch (NotFoundException ne) {
             throw ne;
@@ -314,19 +322,10 @@ public class IssueResource {
         } finally {
             Closeables.close(fileInputStream, true);
             Closeables.close(oldInputStream, true);
-            File tmpNewFile = new File(cacheDirFullPath + epubDetail.getFileName());
-            if (tmpNewFile.delete()) {
-                log.info("Temp File : " + tmpNewFile.getAbsolutePath() + " deleted properly");
-            } else {
-                log.info("Temp File : " + tmpNewFile.getAbsolutePath() + " delete problem");
-            }
-
-            File tmpOldFile = new File(cacheDirFullPath + "old/" + epubIssue.getName());
-            if (tmpOldFile.delete()) {
-                log.info("Temp File : " + tmpOldFile.getAbsolutePath() + " deleted properly");
-            } else {
-                log.info("Temp File : " + tmpOldFile.getAbsolutePath() + " delete problem");
-            }
+            File tmpNewFile = new File(tmpDirFullPath + epubDetail.getFileName());
+            deleteTempFiles(tmpNewFile);
+            File tmpOldFile = new File(tmpDirFullPath + "old/" + epubIssue.getName());
+            deleteTempFiles(tmpOldFile);
         }
 
         return Response.ok("Epub Successfully Updated and id is :" + epubId).build();
@@ -420,6 +419,14 @@ public class IssueResource {
                 !Objects.equals(publicationId, publication.getId()) ||
                 !Objects.equals(organizationId, publication.getOrganization().getId())) {
             throw new NotFoundException();
+        }
+    }
+
+    private void deleteTempFiles(File file) {
+        if (file.delete()) {
+            log.info("Temp File : " + file.getAbsolutePath() + " deleted properly");
+        } else {
+            log.info("Temp File : " + file.getAbsolutePath() + " delete problem");
         }
     }
 

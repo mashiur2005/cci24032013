@@ -6,6 +6,7 @@ import com.cefalo.cci.model.Publication;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -34,4 +35,8 @@ public interface IssueDao {
     List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String sortOrder);
 
     void updateEpub(long id, InputStream updateInputStream);
+
+    URI saveEpub(InputStream epubInputStream) throws IOException;
+
+    void saveIssue(String publicationId, String fileName, Set<String> deviceSet, long epubId);
 }

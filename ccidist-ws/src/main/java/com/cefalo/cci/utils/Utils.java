@@ -1,22 +1,29 @@
 package com.cefalo.cci.utils;
 
 import com.google.common.base.Strings;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
+import com.google.common.io.Files;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Utils {
-
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
     public static String HOME_DIR = System.getProperty("user.home");
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
-    public static String FILE_BASE_DIR = "epubs";
-    public static String FILE_BASE_PATH = HOME_DIR + FILE_SEPARATOR + FILE_BASE_DIR;
     public static int CLEANING_INTERVAL = 30;
-    public static String CACHE_DIR_NAME = "CachedStorate";
+    public static String CACHE_DIR_NAME = "CachedStorage";
+    public static String CACHED_EPUBS_DIR_NAME = "EPUBS";
+    public static String TMP_DIR_NAME = "tmp";
     public static String CACHE_DIR_FULLPATH = HOME_DIR + FILE_SEPARATOR + CACHE_DIR_NAME + FILE_SEPARATOR;
+    public static String CACHED_EPUBS_FULLPATH = CACHE_DIR_FULLPATH + FILE_SEPARATOR + CACHED_EPUBS_DIR_NAME + FILE_SEPARATOR;
+    public static String TMP_DIR_FULLPATH = CACHE_DIR_FULLPATH  + FILE_SEPARATOR + TMP_DIR_NAME + FILE_SEPARATOR;
 
     static {
          ORGANIZATION_DETAILS.put("Polaris", Arrays.asList("Addressa", "Harstadtidende"));
@@ -41,4 +48,33 @@ public class Utils {
     public static String createETagHeaderValue(final long value) {
         return String.format("\"%s\"", value);
     }
+
+    public static void writeZipFileToDir(InputStream inputStream, String fileAbsolutePath) throws IOException {
+
+        FileOutputStream tmpFileOutputStream = null;
+        try {
+            File tmpFile = new File(fileAbsolutePath);
+            Files.createParentDirs(tmpFile);
+            tmpFileOutputStream = new FileOutputStream(tmpFile);
+            ByteStreams.copy(inputStream, tmpFileOutputStream);
+        } catch (IOException io) {
+            throw io;
+        } finally {
+            Closeables.close(tmpFileOutputStream, true);
+        }
+    }
+
+    public static InputStream readFileFromDir(String fileAbsolutePath) throws IOException {
+        FileInputStream tmpFileInputStream = null;
+
+        try {
+            File tmpFile = new File(fileAbsolutePath);
+            tmpFileInputStream = new FileInputStream(tmpFile);
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+            throw fnfe;
+        }
+        return tmpFileInputStream;
+    }
+
 }

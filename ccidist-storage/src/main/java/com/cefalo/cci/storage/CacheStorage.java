@@ -32,11 +32,37 @@ public class CacheStorage implements Storage {
     @Named("cacheKeyStore")
     private final ConcurrentMap<String, String> fileKeyStor = new ConcurrentHashMap<String, String> ();
 
+    @Inject
+    @Named("cacheEpubDirFullPath")
+    private String cacheEpubDirFullPath;
+
     @Override
     public InputStream get(URI resourceID) throws IOException {
         checkNotNull(resourceID, "Resource Id can not be null");
 
-        return databaseStorage.get(resourceID);
+        File epubFile = new File(cacheEpubDirFullPath + resourceID.getPath());
+        if (epubFile.exists()) {
+            logger.info(String.format("File Download served from file system %s ", epubFile.getAbsolutePath()));
+            return readFileFromDir(epubFile.getAbsolutePath());
+        } else {
+            logger.info(String.format("File Download served from database and resource id is %s ", resourceID.getPath()));
+            boolean exceptionHappened = false;
+            InputStream data = null;
+            try{
+                data = databaseStorage.get(resourceID);
+                writeZipFileToDir(data, cacheEpubDirFullPath + resourceID.getPath());
+                data.close();
+                data = readFileFromDir(cacheEpubDirFullPath + resourceID.getPath());
+                return data;
+            } catch (IOException io) {
+                exceptionHappened = true;
+                throw io;
+            } finally {
+                if (exceptionHappened) {
+                    Closeables.close(data, false);
+                }
+            }
+        }
     }
 
     @Override
@@ -69,7 +95,26 @@ public class CacheStorage implements Storage {
 
     @Override
     public URI create(InputStream data) throws IOException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        long currentTime = System.currentTimeMillis();
+        File oldFile = null;
+        try{
+            writeZipFileToDir(data, cacheEpubDirFullPath + currentTime);
+            data.close();
+            data = readFileFromDir(cacheEpubDirFullPath + currentTime);
+            URI epubResource = databaseStorage.create(data);
+            data.close();
+            oldFile = new File(cacheEpubDirFullPath + currentTime);
+            File newFile = new File(cacheEpubDirFullPath + epubResource.getPath());
+            Files.copy(oldFile, newFile);
+            return epubResource;
+        } catch (IOException io) {
+            throw io;
+        } finally {
+            Closeables.close(data, false);
+            if (oldFile != null) {
+                logger.info("files deleted ", oldFile.delete());
+            }
+        }
     }
 
     @Override
@@ -91,6 +136,35 @@ public class CacheStorage implements Storage {
     public void invalidateExtractedFileCache(String key) {
         logger.info(String.format("Invalidating at : %s and the file id is : %s", System.currentTimeMillis(), key));
         fileKeyStor.remove(key);
+    }
+
+    public void writeZipFileToDir(InputStream inputStream, String fileAbsolutePath) throws IOException {
+
+        FileOutputStream tmpFileOutputStream = null;
+        try {
+            File tmpFile = new File(fileAbsolutePath);
+            Files.createParentDirs(tmpFile);
+            tmpFileOutputStream = new FileOutputStream(tmpFile);
+            ByteStreams.copy(inputStream, tmpFileOutputStream);
+        } catch (IOException io) {
+            io.printStackTrace();
+            throw io;
+        } finally {
+            Closeables.close(tmpFileOutputStream, true);
+        }
+    }
+
+    public InputStream readFileFromDir(String fileAbsolutePath) throws IOException {
+        FileInputStream tmpFileInputStream = null;
+
+        try {
+            File tmpFile = new File(fileAbsolutePath);
+            tmpFileInputStream = new FileInputStream(tmpFile);
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+            throw fnfe;
+        }
+        return tmpFileInputStream;
     }
 
     public void extractAndStoreEpub(URI resourceId) throws IOException {

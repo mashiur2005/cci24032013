@@ -25,7 +25,7 @@ public interface IssueService {
     SyndFeed getIssuesAsAtomFeed(Organization organization, Publication publication, long start, long limit,
             String deviceType, Date fromDate, String sortOrder, ResourceLocator resourceLocator);
 
-    void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException;
+    void writeAndUploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException;
 
     Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName);
 
@@ -33,8 +33,4 @@ public interface IssueService {
 
     //void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception;
     void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri) throws Exception;
-
-    void writeZipFileToTmpDir(InputStream inputStream, String fileAbsolutePath) throws Exception;
-
-    InputStream readFromTempFile(String fileAbsolutePath) throws Exception;
 }

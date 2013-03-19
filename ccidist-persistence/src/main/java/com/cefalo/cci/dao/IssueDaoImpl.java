@@ -6,9 +6,12 @@ import com.cefalo.cci.model.Platform;
 import com.cefalo.cci.model.Publication;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
+import com.google.inject.persist.Transactional;
+
 import javax.persistence.EntityManager;
 import java.io.*;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -73,6 +76,7 @@ public class IssueDaoImpl implements IssueDao {
 
 
     @Override
+    @Transactional
     public EpubFile getEpubFile(long id) {
         return entityManager.find(EpubFile.class, id);
     }
@@ -151,6 +155,41 @@ public class IssueDaoImpl implements IssueDao {
             }
             entityManager.clear();
         }
+    }
+
+    @Override
+    @Transactional
+    public URI saveEpub(InputStream epubInputStream) throws IOException {
+        byte[] fileContent;
+        try {
+            fileContent = ByteStreams.toByteArray(epubInputStream);
+        } catch (IOException ex) {
+            throw ex;
+        }
+
+        try {
+            EpubFile epubFile = new EpubFile();
+            epubFile.setFile(fileContent);
+            entityManager.persist(epubFile);
+            entityManager.flush();
+            return URI.create(String.valueOf(epubFile.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException();
+        } finally {
+            entityManager.clear();
+        }
+    }
+
+    @Override
+    public void saveIssue(String publicationId, String fileName, Set<String> deviceSet, long epubId) {
+        for (String deviceId : deviceSet) {
+            //generating issue primary key....based on fileName and count on existing fileName
+            String issuePK = generateIssuePrimaryKey(fileName.substring(0, fileName.length() - 1 - 4)); //length of .epub = 4
+            Issue issue = createIssue(publicationId, issuePK, fileName, deviceId, epubId);
+            entityManager.persist(issue);
+            entityManager.flush();
+        }
+        entityManager.clear();
     }
 
     public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId) {

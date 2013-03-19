@@ -27,6 +27,10 @@ public class PurgeFileService implements org.quartz.Job{
     private String cacheDirFullPath;
 
     @Inject
+    @Named("cacheEpubDirFullPath")
+    private String cacheEpubDirFullPath;
+
+    @Inject
     private Storage cachedStorage;
 
     @Inject
@@ -48,6 +52,10 @@ public class PurgeFileService implements org.quartz.Job{
             logger.info("Files to be deleted: " + file.getAbsolutePath());
             if (file.exists()) {
                 deleteRecursive(file);
+            }
+            File epubFile = new File(cacheEpubDirFullPath + anIssueList.getEpubFile().getId());
+            if (epubFile.delete()) {
+                logger.info(String.format("epub files deleting from cron service %s", epubFile.getAbsolutePath()));
             }
             cachedStorage.invalidateExtractedFileCache(String.valueOf(anIssueList.getEpubFile().getId()));
         }

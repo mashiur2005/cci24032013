@@ -1,31 +1,5 @@
 package com.cefalo.cci.service;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.joda.time.DateMidnight;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
@@ -35,17 +9,21 @@ import com.cefalo.cci.storage.CacheStorage;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
-import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndLink;
-import com.sun.syndication.feed.synd.SyndLinkImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
+import com.sun.syndication.feed.synd.*;
+import org.joda.time.DateMidnight;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class IssueServiceImpl implements IssueService {
 
@@ -176,6 +154,18 @@ public class IssueServiceImpl implements IssueService {
         issueDao.uploadEpubFile(publicationId, fileName, deviceSet, inputStream);
     }
 
+    @Transactional
+    public void writeAndUploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
+        URI epubResource;
+        try {
+            epubResource = cacheStorage.create(inputStream);
+        } catch (IOException io) {
+            io.printStackTrace();
+            throw io;
+        }
+        issueDao.saveIssue(publicationId, fileName, deviceSet, Long.valueOf(epubResource.getPath()));
+    }
+
     @Override
     public Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName) {
         List<Issue> issueList = issueDao.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceId, issueName, "desc");
@@ -295,47 +285,5 @@ public class IssueServiceImpl implements IssueService {
             }
         }
     }
-
-    public void writeZipFileToTmpDir(InputStream inputStream, String fileAbsolutePath) throws Exception {
-
-        FileOutputStream tmpFileOutputStream = null;
-        try {
-            File tmpFile = new File(fileAbsolutePath);
-            Files.createParentDirs(tmpFile);
-            tmpFileOutputStream = new FileOutputStream(tmpFile);
-            ByteStreams.copy(inputStream, tmpFileOutputStream);
-        } catch (IOException io) {
-            throw io;
-        } finally {
-            Closeables.close(tmpFileOutputStream, true);
-        }
-    }
-
-    public InputStream readFromTempFile(String fileAbsolutePath) throws Exception {
-        FileInputStream tmpFileInputStream = null;
-
-        try {
-            File tmpFile = new File(fileAbsolutePath);
-            tmpFileInputStream = new FileInputStream(tmpFile);
-        } catch (FileNotFoundException fnfe) {
-            fnfe.printStackTrace();
-            throw fnfe;
-        }
-        return tmpFileInputStream;
-    }
-
-    /*public void listOfFilesInDir(ZipInputStream zipInputStream, String type) throws Exception{
-        System.out.println(type);
-        ZipEntry zipEntry;
-        try {
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                System.out.println(zipEntry.getName());
-                *//*fileList.add(zipEntry.getName());*//*
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }*/
 
 }
