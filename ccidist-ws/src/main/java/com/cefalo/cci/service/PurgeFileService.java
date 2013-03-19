@@ -19,6 +19,7 @@ import java.util.List;
 @org.nnsoft.guice.guartz.Scheduled(jobName = "test", cronExpression = "0 0 0 * * ?")
 public class PurgeFileService implements org.quartz.Job{
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private Utils utils = new Utils();
 
     @Inject
     private IssueService issueService;
@@ -52,10 +53,10 @@ public class PurgeFileService implements org.quartz.Job{
             file = new File(cacheDirFullPath + "/" +  anIssueList.getEpubFile().getId());
             logger.info("Files to be deleted: " + file.getAbsolutePath());
             if (file.exists()) {
-                Utils.deleteRecursive(file);
+                utils.deleteRecursive(file);
             }
             File epubFile = new File(cacheEpubDirFullPath + anIssueList.getEpubFile().getId());
-            Utils.deleteRecursive(epubFile);
+            utils.deleteRecursive(epubFile);
             cachedStorage.invalidateExtractedFileCache(String.valueOf(anIssueList.getEpubFile().getId()));
         }
     }

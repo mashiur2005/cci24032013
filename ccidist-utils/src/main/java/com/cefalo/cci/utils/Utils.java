@@ -51,7 +51,7 @@ public class Utils {
         return String.format("\"%s\"", value);
     }
 
-    public static void writeZipFileToDir(InputStream inputStream, String fileAbsolutePath) throws IOException {
+    public void writeZipFileToDir(InputStream inputStream, String fileAbsolutePath) throws IOException {
 
         FileOutputStream tmpFileOutputStream = null;
         try {
@@ -66,7 +66,7 @@ public class Utils {
         }
     }
 
-    public static InputStream readFileFromDir(String fileAbsolutePath) throws IOException {
+    public InputStream readFileFromDir(String fileAbsolutePath) throws IOException {
         FileInputStream tmpFileInputStream = null;
 
         try {
@@ -79,7 +79,7 @@ public class Utils {
         return tmpFileInputStream;
     }
 
-    public static void deleteRecursive(File path){
+    public void deleteRecursive(File path){
         File[] c = path.listFiles();
         logger.info("Cleaning out folder:" + path.toString());
 
