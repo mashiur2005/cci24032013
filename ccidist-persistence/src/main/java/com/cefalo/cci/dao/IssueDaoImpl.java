@@ -134,25 +134,19 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    //@Transactional   ---need to fix.here transaction open only for firsttime entityManager calling....!!!!
+    @Transactional
     public void updateEpub(long Id, InputStream updateInputStream) {
-        boolean exceptionHappened = false;
         byte[] fileContent;
         try {
             fileContent = ByteStreams.toByteArray(updateInputStream);
 
-            entityManager.getTransaction().begin();
             EpubFile epubFile = getEpubFile(Id);
             epubFile.setFile(fileContent);
             entityManager.persist(epubFile);
+            entityManager.flush();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            if (exceptionHappened) {
-                entityManager.getTransaction().rollback();
-            } else {
-                entityManager.getTransaction().commit();
-            }
             entityManager.clear();
         }
     }

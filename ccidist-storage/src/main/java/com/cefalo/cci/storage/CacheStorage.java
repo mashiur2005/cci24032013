@@ -124,12 +124,31 @@ public class CacheStorage implements Storage {
 
     @Override
     public void update(URI resourceID, InputStream modifiedData) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        checkNotNull(resourceID, "Resource Id can not be null");
+
+        try{
+            logger.info(String.format("%s rewritting for update", cacheEpubDirFullPath + resourceID.getPath()));
+            writeZipFileToDir(modifiedData, cacheEpubDirFullPath + resourceID.getPath());
+            modifiedData.close();
+            modifiedData = readFileFromDir(cacheEpubDirFullPath + resourceID.getPath());
+            databaseStorage.update(resourceID, modifiedData);
+            modifiedData.close();
+        } catch (IOException io) {
+            throw io;
+        } finally {
+            Closeables.close(modifiedData, false);
+        }
     }
 
     @Override
     public URI delete(URI resourceID) throws IOException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        checkNotNull(resourceID, "Resource Id can not be null");
+
+        File extractedFile = new File(cacheDirFullPath + resourceID.getPath());
+        File epubFile = new File(cacheEpubDirFullPath + resourceID.getPath());
+        deleteRecursive(extractedFile);
+        deleteRecursive(epubFile);
+        return resourceID;
     }
 
     @Override
@@ -165,6 +184,25 @@ public class CacheStorage implements Storage {
             throw fnfe;
         }
         return tmpFileInputStream;
+    }
+
+    public void deleteRecursive(File path){
+        File[] c = path.listFiles();
+        logger.info("Cleaning out folder:" + path.toString());
+
+        if (c != null) {
+            for (File file : c){
+                if (file.isDirectory()){
+                    logger.info("Deleting file:" + file.toString());
+                    deleteRecursive(file);
+                    file.delete();
+                } else {
+                    file.delete();
+                }
+            }
+        }
+
+        path.delete();
     }
 
     public void extractAndStoreEpub(URI resourceId) throws IOException {

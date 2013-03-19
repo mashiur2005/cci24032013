@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Utils {
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class.getName());
+
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
     public static String HOME_DIR = System.getProperty("user.home");
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
@@ -22,7 +24,7 @@ public class Utils {
     public static String CACHED_EPUBS_DIR_NAME = "EPUBS";
     public static String TMP_DIR_NAME = "tmp";
     public static String CACHE_DIR_FULLPATH = HOME_DIR + FILE_SEPARATOR + CACHE_DIR_NAME + FILE_SEPARATOR;
-    public static String CACHED_EPUBS_FULLPATH = CACHE_DIR_FULLPATH + FILE_SEPARATOR + CACHED_EPUBS_DIR_NAME + FILE_SEPARATOR;
+    public static String CACHED_EPUBS_FULLPATH = CACHE_DIR_FULLPATH + CACHED_EPUBS_DIR_NAME + FILE_SEPARATOR;
     public static String TMP_DIR_FULLPATH = CACHE_DIR_FULLPATH  + FILE_SEPARATOR + TMP_DIR_NAME + FILE_SEPARATOR;
 
     static {
@@ -75,6 +77,25 @@ public class Utils {
             throw fnfe;
         }
         return tmpFileInputStream;
+    }
+
+    public static void deleteRecursive(File path){
+        File[] c = path.listFiles();
+        logger.info("Cleaning out folder:" + path.toString());
+
+        if (c != null) {
+            for (File file : c){
+                if (file.isDirectory()){
+                    logger.info("Deleting file:" + file.toString());
+                    deleteRecursive(file);
+                    file.delete();
+                } else {
+                    file.delete();
+                }
+            }
+        }
+
+        path.delete();
     }
 
 }

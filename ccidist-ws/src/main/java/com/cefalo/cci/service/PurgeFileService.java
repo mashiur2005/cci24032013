@@ -2,6 +2,7 @@ package com.cefalo.cci.service;
 
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.storage.Storage;
+import com.cefalo.cci.utils.Utils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.joda.time.DateTime;
@@ -51,29 +52,12 @@ public class PurgeFileService implements org.quartz.Job{
             file = new File(cacheDirFullPath + "/" +  anIssueList.getEpubFile().getId());
             logger.info("Files to be deleted: " + file.getAbsolutePath());
             if (file.exists()) {
-                deleteRecursive(file);
+                Utils.deleteRecursive(file);
             }
             File epubFile = new File(cacheEpubDirFullPath + anIssueList.getEpubFile().getId());
-            if (epubFile.delete()) {
-                logger.info(String.format("epub files deleting from cron service %s", epubFile.getAbsolutePath()));
-            }
+            Utils.deleteRecursive(epubFile);
             cachedStorage.invalidateExtractedFileCache(String.valueOf(anIssueList.getEpubFile().getId()));
         }
     }
 
-    public void deleteRecursive(File path){
-        File[] c = path.listFiles();
-        logger.info("Cleaning out folder:" + path.toString());
-        for (File file : c){
-            if (file.isDirectory()){
-                logger.info("Deleting file:" + file.toString());
-                deleteRecursive(file);
-                file.delete();
-            } else {
-                file.delete();
-            }
-        }
-
-        path.delete();
-    }
 }

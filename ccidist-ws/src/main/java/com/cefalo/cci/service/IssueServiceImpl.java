@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.google.inject.persist.Transactional;
 import com.sun.syndication.feed.synd.*;
 import org.joda.time.DateMidnight;
@@ -32,6 +33,10 @@ public class IssueServiceImpl implements IssueService {
 
     @Inject
     private CacheStorage cacheStorage;
+
+    @Inject
+    @Named("cacheEpubDirFullPath")
+    private String cacheEpubDirFullPath;
 
     public Issue getIssue(String issueId) {
         // TODO: Maybe throw an exception from here if issue not found????
@@ -176,8 +181,15 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public void updateEpub(long id, InputStream updateInputStream){
-        issueDao.updateEpub(id, updateInputStream);
+    @Transactional
+    public void updateEpub(long id, InputStream updateInputStream) throws IOException{
+        URI resourceId = URI.create(Long.toString(id));
+        try {
+            resourceId = cacheStorage.delete(resourceId);
+            cacheStorage.update(resourceId, updateInputStream);
+        } catch (IOException e) {
+            throw e;
+        }
     }
 
 

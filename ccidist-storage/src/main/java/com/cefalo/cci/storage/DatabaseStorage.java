@@ -55,7 +55,7 @@ public class DatabaseStorage implements Storage {
 
     @Override
     public void update(URI resourceID, InputStream modifiedData) throws IOException {
-        throw new UnsupportedOperationException();
+        issueDao.updateEpub(Long.valueOf(resourceID.getPath()), modifiedData);
     }
 
     @Override
