@@ -4,7 +4,6 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import java.util.zip.ZipInputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Singleton
 public class CacheStorage implements Storage {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -30,7 +28,9 @@ public class CacheStorage implements Storage {
     @Named("cacheDirFullPath")
     private String cacheDirFullPath;
 
-    private ConcurrentMap<String, String> fileKeyStor = new ConcurrentHashMap<String, String> ();
+    @Inject
+    @Named("cacheKeyStore")
+    private final ConcurrentMap<String, String> fileKeyStor = new ConcurrentHashMap<String, String> ();
 
     @Override
     public InputStream get(URI resourceID) throws IOException {

@@ -1,5 +1,31 @@
 package com.cefalo.cci.service;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.joda.time.DateMidnight;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
@@ -11,27 +37,17 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.sun.syndication.feed.synd.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.joda.time.DateMidnight;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import com.google.inject.persist.Transactional;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndLink;
+import com.sun.syndication.feed.synd.SyndLinkImpl;
+import com.sun.syndication.feed.synd.SyndPerson;
+import com.sun.syndication.feed.synd.SyndPersonImpl;
 
-import java.io.*;
-import java.net.URI;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import static com.google.common.base.Preconditions.checkArgument;
-
-@Singleton
 public class IssueServiceImpl implements IssueService {
-    private  final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
     private IssueDao issueDao;
@@ -155,6 +171,7 @@ public class IssueServiceImpl implements IssueService {
         return self;
     }
 
+    @Transactional
     public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
         issueDao.uploadEpubFile(publicationId, fileName, deviceSet, inputStream);
     }

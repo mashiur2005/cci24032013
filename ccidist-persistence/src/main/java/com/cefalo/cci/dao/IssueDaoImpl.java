@@ -6,9 +6,6 @@ import com.cefalo.cci.model.Platform;
 import com.cefalo.cci.model.Publication;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.persist.Transactional;
-
 import javax.persistence.EntityManager;
 import java.io.*;
 import java.io.Serializable;
@@ -16,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-@Singleton
 public class IssueDaoImpl implements IssueDao {
 
     @Inject
@@ -92,9 +88,7 @@ public class IssueDaoImpl implements IssueDao {
 
 
     @Override
-    //@Transactional   ---need to fix.here transaction open only for firsttime entityManager calling....!!!!
     public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
-        boolean exceptionHappened = false;
         byte[] fileContent;
         try {
             fileContent = ByteStreams.toByteArray(inputStream);
@@ -103,11 +97,9 @@ public class IssueDaoImpl implements IssueDao {
         }
 
         try {
-            entityManager.getTransaction().begin();
             EpubFile epubFile = new EpubFile();
             epubFile.setFile(fileContent);
             entityManager.persist(epubFile);
-            entityManager.flush();
 
             long epubId = epubFile.getId();
             for (String deviceId : deviceSet) {
@@ -118,15 +110,7 @@ public class IssueDaoImpl implements IssueDao {
                 entityManager.flush();
             }
         } catch (Exception e) {
-            exceptionHappened = true;
-            throw new RuntimeException();
-        } finally {
-            if (exceptionHappened) {
-                entityManager.getTransaction().rollback();
-            } else {
-                entityManager.getTransaction().commit();
-            }
-            entityManager.clear();
+            throw new RuntimeException(e);
         }
     }
 
