@@ -6,7 +6,6 @@ import com.cefalo.cci.model.Platform;
 import com.cefalo.cci.model.Publication;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
@@ -21,18 +20,17 @@ import java.util.Set;
 public class IssueDaoImpl implements IssueDao {
 
     @Inject
-    private Provider<EntityManager> entityManagerProvider;
+    private EntityManager entityManager;
+
 
     @Override
     public long getIssueCountByPublicationId(String publicationId) {
-        EntityManager entityManager = entityManagerProvider.get();
         return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName")
                 .setParameter("pName", publicationId).getSingleResult();
     }
 
     @Override
     public long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType, Date fromDate) {
-        EntityManager entityManager = entityManagerProvider.get();
         //form date need to be set
         return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.created >= :fromDate")
                 .setHint("org.hibernate.cacheable", true)
@@ -46,7 +44,6 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId) {
-        EntityManager entityManager = entityManagerProvider.get();
         return entityManager
                 .createQuery("select i from Issue i where i.publication.id like :pName order by i.updated desc")
                 .setParameter("pName", publicationId).getResultList();
@@ -55,7 +52,6 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationId(String publicationId, long start, long maxResult) {
-        EntityManager entityManager = entityManagerProvider.get();
         return entityManager
                 .createQuery("select i from Issue i where i.publication.id like :pName order by i.updated  desc")
                 .setParameter("pName", publicationId).setFirstResult((int) start).setMaxResults((int) maxResult)
@@ -65,7 +61,7 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueListByPublicationAndDeviceId(String publicationId, long start, long maxResult, String deviceType, Date fromDate, String sortOrder) {
-        EntityManager entityManager = entityManagerProvider.get();
+
         //Here creaded date used to compare with fromDate
         return entityManager
                 .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType  and i.created >= :fromDate  order by i.updated "  + sortOrder)
@@ -82,18 +78,15 @@ public class IssueDaoImpl implements IssueDao {
 
     @Override
     public EpubFile getEpubFile(long id) {
-        EntityManager entityManager = entityManagerProvider.get();
         return entityManager.find(EpubFile.class, id);
     }
 
     @Override
     public Issue getIssue(String id) {
-        EntityManager entityManager = entityManagerProvider.get();
         return entityManager.find(Issue.class, id);
     }
 
     public Publication getPublication(String id) {
-        EntityManager entityManager = entityManagerProvider.get();
         return entityManager.find(Publication.class, id);
     }
 
@@ -101,7 +94,6 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     //@Transactional   ---need to fix.here transaction open only for firsttime entityManager calling....!!!!
     public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
-        EntityManager entityManager = entityManagerProvider.get();
         boolean exceptionHappened = false;
         byte[] fileContent;
         try {
@@ -141,14 +133,12 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Issue> getOldIssueList(Date date) {
-        EntityManager entityManager = entityManagerProvider.get();
         return entityManager.createQuery("select i from Issue i where i.updated < :date").setParameter("date", date).getResultList();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Issue> getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName, String sortOrder) {
-        EntityManager entityManager = entityManagerProvider.get();
         return entityManager
                 .createQuery("select i from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.name like :issueName order by i.updated " + sortOrder)
                 .setParameter("pName", publicationId).setParameter("deviceType", deviceId).setParameter("issueName", issueName)
@@ -158,7 +148,6 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     //@Transactional   ---need to fix.here transaction open only for firsttime entityManager calling....!!!!
     public void updateEpub(long Id, InputStream updateInputStream) {
-        EntityManager entityManager = entityManagerProvider.get();
         boolean exceptionHappened = false;
         byte[] fileContent;
         try {
@@ -191,7 +180,6 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     public String generateIssuePrimaryKey(String fileName) {
-        EntityManager entityManager = entityManagerProvider.get();
         long countDuplicateIssue = (Long) entityManager.createQuery("SELECT COUNT(i) FROM Issue i Where i.id LIKE :fileName").setParameter("fileName", fileName + "_%")
                 .getSingleResult();
         return fileName + "_" + (countDuplicateIssue + 1);
