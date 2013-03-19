@@ -34,7 +34,7 @@ public class IssueDaoImpl implements IssueDao {
     public long getIssueCountByPublicationAndDeviceId(String publicationId, String deviceType, Date fromDate) {
         EntityManager entityManager = entityManagerProvider.get();
         //form date need to be set
-        return (Long) entityManager.createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.created >= :fromDate")
+        return (Long) entityManagerProvider.get().createQuery("select count(i) from Issue i where i.publication.id like :pName and i.platform.id like :deviceType and i.created >= :fromDate")
                 .setHint("org.hibernate.cacheable", true)
                 .setHint("org.hibernate.cacheRegion", "query.issueList")
                 .setParameter("pName", publicationId)
