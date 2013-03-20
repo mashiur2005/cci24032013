@@ -24,7 +24,6 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
     protected void configureServlets() {
         install(new JpaPersistModule("cciJpaUnit"));
 
-        bind(CciService.class).to(CciServiceImpl.class);
         bind(Storage.class).annotatedWith(Names.named("databaseStorage")).to(DatabaseStorage.class);
         bind(Storage.class).to(CacheStorage.class);
         bind(OrganizationDao.class).to(OrganizationDaoImpl.class);

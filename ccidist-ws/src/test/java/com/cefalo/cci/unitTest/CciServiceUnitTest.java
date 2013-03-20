@@ -1,13 +1,16 @@
 package com.cefalo.cci.unitTest;
 
-import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.utils.XpathUtils;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.*;
@@ -16,8 +19,6 @@ import static junit.framework.Assert.*;
 @GuiceJUnitRunner.GuiceModules({ServicesTestModule.class })
 public class CciServiceUnitTest {
     @Inject
-    private CciService cciService;
-    @Inject
     private XpathUtils xpathUtils;
 
     @Test
@@ -25,7 +26,7 @@ public class CciServiceUnitTest {
     	checkInvalidDirectoryPath(null, "", "   ");
 
         Path directoryPath = Paths.get("src", "test", "resources", "epubs");
-        List<String> listFileNames = cciService.getAllFileNamesInDirectory(directoryPath.toAbsolutePath().toString());
+        List<String> listFileNames = getAllFileNamesInDirectory(directoryPath.toAbsolutePath().toString());
         assertEquals(3, listFileNames.size());
         assertTrue(listFileNames.contains("widget-quiz-20121022.epub"));
     }
@@ -33,7 +34,7 @@ public class CciServiceUnitTest {
     private void checkInvalidDirectoryPath(final String... paths) {
     	for (String path : paths) {
     		try {
-    			cciService.getAllFileNamesInDirectory(path);
+    			getAllFileNamesInDirectory(path);
     			fail("Empty directory should be an invalid parameter");
     		}
     		catch (IllegalArgumentException ex) {
@@ -105,5 +106,37 @@ public class CciServiceUnitTest {
             expectedList = mockCciService.getAllFileNamesInDirectory("").subList(start -1 , toIndex);
         }
         assertEquals("element by element check: ", expectedList, actualList);*/
+    }
+
+
+
+    public List<String> getAllFileNamesInDirectory(final String directory) {
+        String dir = Strings.nullToEmpty(directory);
+        Preconditions.checkArgument(dir.trim().length() > 0, "Directory path may not be empty or null.");
+
+        final List<String> epubFileNames = new ArrayList<String>();
+        try {
+            final Path directoryPath = Paths.get(directory);
+            Files.walkFileTree(directoryPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    epubFileNames.add(file.getFileName().toString());
+                    return super.visitFile(file, attrs);
+                }
+
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    if (dir.equals(directoryPath)) {
+                        return super.preVisitDirectory(dir, attrs);
+                    }
+
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return epubFileNames;
     }
 }

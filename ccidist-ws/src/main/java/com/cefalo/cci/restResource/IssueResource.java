@@ -4,7 +4,6 @@ import com.cefalo.cci.mapping.JerseyResourceLocator;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Publication;
-import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.service.IssueService;
 import com.cefalo.cci.service.PublicationService;
 import com.cefalo.cci.storage.Storage;
@@ -32,6 +31,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static com.cefalo.cci.utils.Utils.isBlank;
@@ -46,9 +46,6 @@ public class IssueResource {
 
     @Inject
     private PublicationService publicationService;
-
-    @Inject
-    private CciService cciService;
 
     @Inject
     private Storage storage;
@@ -219,7 +216,7 @@ public class IssueResource {
                 }
             };
 
-            String mediaType = cciService.getMediaType(contentLocInEpub);
+            String mediaType = getMediaType(contentLocInEpub);
             if (mediaType == null) {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
             }
@@ -442,4 +439,11 @@ public class IssueResource {
         }
     }
 
+    private String getMediaType(String fileName) {
+        try {
+            return java.nio.file.Files.probeContentType(Paths.get(fileName));
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }
