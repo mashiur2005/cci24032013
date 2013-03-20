@@ -1,21 +1,25 @@
 package com.cefalo.cci.service;
 
+import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.model.Events;
 import com.cefalo.cci.utils.Category;
+import com.google.inject.Inject;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class EventServiceImpl implements EventService {
     private Set<Events> events;
+
+    @Inject
+    private IssueDao issueDao;
+
     @Override
     public void addEvents(long fileId,Set<String> updatedSet, Set<String> insertedSet, Set<String> deletedSet) {
 
-        //seperate method
         if (updatedSet.isEmpty() && insertedSet.isEmpty() && deletedSet.isEmpty()) {
             return;
         }
-
         if (events == null || events.size() == 0) {
             events = new HashSet<>();
         }
@@ -23,10 +27,10 @@ public class EventServiceImpl implements EventService {
         processFileSetAndAddEvents(fileId, Category.INSERTED.getValue(), insertedSet);
         processFileSetAndAddEvents(fileId, Category.DELETED.getValue(), deletedSet);
 
-
+        issueDao.saveEvents(events);
     }
 
-    public void processFileSetAndAddEvents(long fileId, int fileStatus,  Set<String> fileSet) {
+    private void processFileSetAndAddEvents(long fileId, int fileStatus,  Set<String> fileSet) {
         if (!fileSet.isEmpty()) {
             for (String filePath : fileSet) {
                 Events event = new Events();
@@ -37,5 +41,4 @@ public class EventServiceImpl implements EventService {
             }
         }
     }
-
 }

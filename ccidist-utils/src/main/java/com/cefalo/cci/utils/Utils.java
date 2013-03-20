@@ -65,7 +65,7 @@ public class Utils {
         return String.format("\"%s\"", value);
     }
 
-    public void writeZipFileToDir(InputStream inputStream, String fileAbsolutePath) throws IOException {
+    public static void writeZipFileToDir(final InputStream inputStream, final String fileAbsolutePath) throws IOException {
 
         FileOutputStream tmpFileOutputStream = null;
         try {
@@ -80,7 +80,7 @@ public class Utils {
         }
     }
 
-    public InputStream readFileFromDir(String fileAbsolutePath) throws IOException {
+    public static InputStream readFileFromDir(String fileAbsolutePath) throws IOException {
         FileInputStream tmpFileInputStream = null;
 
         try {

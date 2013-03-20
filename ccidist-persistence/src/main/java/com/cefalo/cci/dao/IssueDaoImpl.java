@@ -1,9 +1,6 @@
 package com.cefalo.cci.dao;
 
-import com.cefalo.cci.model.EpubFile;
-import com.cefalo.cci.model.Issue;
-import com.cefalo.cci.model.Platform;
-import com.cefalo.cci.model.Publication;
+import com.cefalo.cci.model.*;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
@@ -184,6 +181,12 @@ public class IssueDaoImpl implements IssueDao {
             entityManager.flush();
         }
         entityManager.clear();
+    }
+
+    public void saveEvents(Set<Events> eventSet) {
+        for (Events event : eventSet) {
+            entityManager.persist(event);
+        }
     }
 
     public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId) {

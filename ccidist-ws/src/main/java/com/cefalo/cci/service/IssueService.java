@@ -31,6 +31,5 @@ public interface IssueService {
 
     void updateEpub(long id, InputStream updateInputStream) throws IOException;
 
-    //void findDifferenceAndSaveToDb(String newFilePath, String oldFilePath) throws Exception;
-    void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri) throws Exception;
+    void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri, long fileId, String fileName) throws Exception;
 }

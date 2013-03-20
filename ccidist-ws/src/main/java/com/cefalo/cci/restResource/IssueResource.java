@@ -40,7 +40,6 @@ import static com.cefalo.cci.utils.Utils.isBlank;
 @Path("/{organization}/{publication}/issue/")
 public class IssueResource {
     private  final Logger log = LoggerFactory.getLogger(IssueResource.class);
-    private Utils utils = new Utils();
 
     @Inject
     private IssueService issueService;
@@ -316,18 +315,15 @@ public class IssueResource {
         try {
             oldInputStream = storage.get(URI.create(Long.toString(epubId)));
 
-            utils.writeZipFileToDir(fileInputStream, tmpDirFullPath + fileName);
-            utils.writeZipFileToDir(oldInputStream, tmpDirFullPath + "old/" + epubIssue.getName());
+            Utils.writeZipFileToDir(fileInputStream, tmpDirFullPath + fileName);
+            Utils.writeZipFileToDir(oldInputStream, tmpDirFullPath + "old/" + epubIssue.getName());
 
             String uploadedFileLoc = "jar:file:/" + tmpDirFullPath + fileName;
             String existingFileLoc = "jar:file:/" + tmpDirFullPath + "old/" + epubIssue.getName();
             URI uploadedFileUri = URI.create(uploadedFileLoc.replace("\\", "/"));
             URI existingFileUri = URI.create(existingFileLoc.replace("\\", "/"));
 
-            issueService.findDifferenceAndSaveToDb(uploadedFileUri, existingFileUri);
-
-            fileInputStream = utils.readFileFromDir(tmpDirFullPath + fileName);
-            issueService.updateEpub(epubId, fileInputStream);
+            issueService.findDifferenceAndSaveToDb(uploadedFileUri, existingFileUri, epubId, fileName);
         } catch (NotFoundException ne) {
             throw ne;
         } catch (FileNotFoundException fnfe) {

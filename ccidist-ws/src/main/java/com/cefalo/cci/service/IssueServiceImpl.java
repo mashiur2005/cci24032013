@@ -6,6 +6,7 @@ import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.cefalo.cci.storage.CacheStorage;
+import com.cefalo.cci.utils.Utils;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -35,8 +36,16 @@ public class IssueServiceImpl implements IssueService {
     private CacheStorage cacheStorage;
 
     @Inject
+    private EventService eventService;
+
+    @Inject
     @Named("cacheEpubDirFullPath")
     private String cacheEpubDirFullPath;
+
+    @Inject
+    @Named("tmpDirFullPath")
+    private String tmpDirFullPath;
+
 
     public Issue getIssue(String issueId) {
         // TODO: Maybe throw an exception from here if issue not found????
@@ -181,7 +190,6 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    @Transactional
     public void updateEpub(long id, InputStream updateInputStream) throws IOException{
         URI resourceId = URI.create(Long.toString(id));
         try {
@@ -194,8 +202,9 @@ public class IssueServiceImpl implements IssueService {
 
 
     @Override
-    public void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri) throws IOException {
-
+    @Transactional
+    public void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri, long fileId, String fileName) throws IOException {
+        InputStream fileInputStream = null;
         final Map<String, Boolean> visitedFiles = new HashMap<>();
         final Set<String> updatedSet = new HashSet<>();
         final Set<String> insertedSet = new HashSet<>();
@@ -211,12 +220,14 @@ public class IssueServiceImpl implements IssueService {
             existingFS = FileSystems.newFileSystem(existingFileUri, env);
             findDifference(existingFS, uploadedFS, visitedFiles, updatedSet, insertedSet);
             findDifference(uploadedFS, existingFS, visitedFiles, updatedSet, deletedSet);
-            showModifiedFiles(updatedSet, insertedSet, deletedSet);
+            eventService.addEvents(fileId, updatedSet, insertedSet, deletedSet);
+            fileInputStream = Utils.readFileFromDir(tmpDirFullPath + fileName);
+            updateEpub(fileId, fileInputStream);
         } finally {
             Closeables.close(uploadedFS, true);
             Closeables.close(existingFS, true);
+            Closeables.close(fileInputStream, true);
         }
-
     }
 
 
@@ -251,37 +262,4 @@ public class IssueServiceImpl implements IssueService {
            throw e;
         }
     }
-
-    public void showModifiedFiles(Set<String> updatedSet, Set<String> insertedSet, Set<String> deletedSet) {
-        if (updatedSet.isEmpty() && insertedSet.isEmpty() && deletedSet.isEmpty()) {
-            System.out.println("No file modified");
-        } else {
-            if (!updatedSet.isEmpty()) {
-                System.out.println("File Modified:");
-
-                for (String link : updatedSet) {
-                    System.out.println("---> " + link);
-                }
-            }
-
-            if (!insertedSet.isEmpty()) {
-                System.out.println("File Added:");
-
-                for (String link : insertedSet) {
-                    System.out.println("---> " + link);
-                }
-
-            }
-
-            if (!deletedSet.isEmpty()) {
-                System.out.println("File Deleted:");
-
-                for (String link : deletedSet) {
-                    System.out.println("---> " + link);
-                }
-
-            }
-        }
-    }
-
 }
