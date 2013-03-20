@@ -65,5 +65,15 @@
         <!--<cacheEventListenerFactory class="com.cefalo.cci.listener.EhcacheListenerFactory"/>-->
     </cache>
 
+    <cache
+            name="query.eventQueueList"
+            maxElementsInMemory="5"
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="1800"
+            timeToLiveSeconds="1800"
+            >
+    </cache>
+
 
 </ehcache>

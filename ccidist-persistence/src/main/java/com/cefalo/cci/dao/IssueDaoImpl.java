@@ -193,6 +193,8 @@ public class IssueDaoImpl implements IssueDao {
     @SuppressWarnings("unchecked")
     public List<Events> getEventsByEpubId(long epub_file_id, long start, long maxResult, String sortOrder, Date fromDate) {
         return entityManager.createQuery("select e from Events e where e.epubFileId =:Id and e.created >=:fromDate order by e.category " + sortOrder)
+                .setHint("org.hibernate.cacheable", true)
+                .setHint("org.hibernate.cacheRegion", "query.eventQueueList")
                 .setParameter("Id", epub_file_id)
                 .setParameter("fromDate", fromDate)
                 .setFirstResult((int) start)
@@ -203,6 +205,8 @@ public class IssueDaoImpl implements IssueDao {
     @Override
     public long getEventsCountByEpubId(long epub_file_id, Date fromDate) {
         return (Long) entityManager.createQuery("select count(e) from Events e where e.epubFileId =:Id and e.created >=:fromDate")
+                .setHint("org.hibernate.cacheable", true)
+                .setHint("org.hibernate.cacheRegion", "query.eventQueueList")
                 .setParameter("Id", epub_file_id)
                 .setParameter("fromDate", fromDate)
                 .getSingleResult();
