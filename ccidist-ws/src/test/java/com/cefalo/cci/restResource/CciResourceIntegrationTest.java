@@ -435,4 +435,11 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("File not found: ", 404, clientResponse.getStatus());
     }
 
+    @Test
+    public void getEventQueueTest() {
+        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("sash-for-you-20120827").path("events");
+        ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        assertEquals("event queue response status ", 200, clientResponse.getStatus());
+    }
+
 }

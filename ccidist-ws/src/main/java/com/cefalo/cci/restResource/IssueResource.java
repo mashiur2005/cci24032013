@@ -8,6 +8,7 @@ import com.cefalo.cci.service.CciService;
 import com.cefalo.cci.service.IssueService;
 import com.cefalo.cci.service.PublicationService;
 import com.cefalo.cci.storage.Storage;
+import com.cefalo.cci.utils.Category;
 import com.cefalo.cci.utils.Utils;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
@@ -22,9 +23,6 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import com.sun.syndication.feed.synd.SyndFeed;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,6 +158,21 @@ public class IssueResource {
                 locator.getEpubContentURI(organizationId, publicationId, issueId, "META-INF/container.xml"));
 
         return Response.ok(new Viewable("/issueDetail", model)).tag(String.valueOf(issue.getVersion())).lastModified(issue.getUpdated()).build();
+    }
+
+    @GET
+    @Path("/{issueId}/events")
+    @Produces(MediaType.APPLICATION_ATOM_XML)
+    public Response getEventQueue(@PathParam("organization") @DefaultValue("") final String organizationId,
+                                  @PathParam("publication") @DefaultValue("") final String publicationId,
+                                  @PathParam("issueId") @DefaultValue("") final String issueId) {
+        Issue issue = retrieveIssue(organizationId, publicationId, issueId);
+
+        ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(issue.getUpdated());
+        if (notModifiedResponseBuilder != null) {
+            return notModifiedResponseBuilder.lastModified(issue.getUpdated()).build();
+        }
+        return Response.ok(String.format("%s - %s - %s from response", organizationId, publicationId, issueId)).lastModified(issue.getUpdated()).build();
     }
 
     @Path("/{issue}/{contentLocInEpub: .+}")

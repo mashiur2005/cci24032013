@@ -33,9 +33,6 @@ public class Utils {
     public static String TMP_DIR_FULLPATH = CACHE_DIR_FULLPATH  + FILE_SEPARATOR + TMP_DIR_NAME + FILE_SEPARATOR;
     public static String DEFAULT_TZ = "GMT";
     public static String DATE_FORMAT = "yyyy-MM-dd";
-    public static int FILE_UPDATED = 1;
-    public static int FILE_INSERTED = 2;
-    public static int FILE_DELETED = 3;
     public static  Map<Integer, String> FILE_STATUS_MAP = new HashMap<>(3);
 
     static {

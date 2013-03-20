@@ -1,7 +1,7 @@
 package com.cefalo.cci.service;
 
 import com.cefalo.cci.model.Events;
-import com.cefalo.cci.utils.Utils;
+import com.cefalo.cci.utils.Category;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,9 +19,9 @@ public class EventServiceImpl implements EventService {
         if (events == null || events.size() == 0) {
             events = new HashSet<>();
         }
-        processFileSetAndAddEvents(fileId, Utils.FILE_UPDATED, updatedSet);
-        processFileSetAndAddEvents(fileId, Utils.FILE_INSERTED, insertedSet);
-        processFileSetAndAddEvents(fileId, Utils.FILE_DELETED, deletedSet);
+        processFileSetAndAddEvents(fileId, Category.UPDATED.getValue(), updatedSet);
+        processFileSetAndAddEvents(fileId, Category.INSERTED.getValue(), insertedSet);
+        processFileSetAndAddEvents(fileId, Category.DELETED.getValue(), deletedSet);
 
 
     }
