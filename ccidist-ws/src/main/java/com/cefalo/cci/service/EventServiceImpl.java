@@ -77,6 +77,7 @@ public class EventServiceImpl implements EventService {
         feed.setLinks(links);
 
         List<SyndEntry> entries = new ArrayList<SyndEntry>();
+        SyndCategory syndCategory;
 
         for (Events events : eventsList) {
             SyndEntryImpl entry = new SyndEntryImpl();
@@ -85,11 +86,26 @@ public class EventServiceImpl implements EventService {
             entry.setAuthor(publicationName);
             entry.setLink(events.getPath());
             entry.setUpdatedDate(events.getCreated());
+
+            syndCategory = new SyndCategoryImpl();
+            syndCategory.setName(getCategory(events.getCategory()));
+            entry.getCategories().add(syndCategory);
             entries.add(entry);
         }
 
         feed.setEntries(entries);
         return feed;
+    }
+
+    private String getCategory(int value) {
+        if (Category.INSERTED.getValue() == value) {
+            return Category.INSERTED.toString();
+        } else if (Category.UPDATED.getValue() == value) {
+            return Category.UPDATED.toString();
+        } else if (Category.DELETED.getValue() == value) {
+            return Category.DELETED.toString();
+        }
+        return null;
     }
 
     private void processFileSetAndAddEvents(long fileId, int fileStatus,  Set<String> fileSet) {
