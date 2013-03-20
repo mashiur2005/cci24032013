@@ -2,7 +2,6 @@ package com.cefalo.cci.service;
 
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
-import com.cefalo.cci.model.Events;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
@@ -231,15 +230,7 @@ public class IssueServiceImpl implements IssueService {
         }
     }
 
-    @Override
-    public List<Events> getEventsByEpubId(long epub_file_id, long start, long maxResult, String sortOrder, Date fromDate) {
-        return issueDao.getEventsByEpubId(epub_file_id, start, maxResult, sortOrder, fromDate);
-    }
 
-    @Override
-    public long getEventsCountByEpubId(long epub_file_id, Date fromDate) {
-        return issueDao.getEventsCountByEpubId(epub_file_id,fromDate);
-    }
 
 
     public void findDifference(final FileSystem comparedFromFS, FileSystem comparedToFS, final Map<String, Boolean> visitedFiles,

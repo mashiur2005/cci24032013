@@ -37,7 +37,5 @@ public interface IssueService {
 
     void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri, long fileId, String fileName) throws Exception;
 
-    List<Events> getEventsByEpubId(long epub_file_id, long start, long maxResult, String sortOrder, Date fromDate);
 
-    long getEventsCountByEpubId(long epub_file_id, Date fromDate);
 }

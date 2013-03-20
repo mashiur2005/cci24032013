@@ -1,7 +1,6 @@
 package com.cefalo.cci.dao;
 
 import com.cefalo.cci.model.EpubFile;
-import com.cefalo.cci.model.Events;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Publication;
 
@@ -40,11 +39,4 @@ public interface IssueDao {
     URI saveEpub(InputStream epubInputStream) throws IOException;
 
     void saveIssue(String publicationId, String fileName, Set<String> deviceSet, long epubId);
-
-    void saveEvents(Set<Events> eventSet);
-
-    List<Events> getEventsByEpubId(long epub_file_id, long start, long maxResult, String sortOrder, Date fromDate);
-
-    long getEventsCountByEpubId(long epub_file_id, Date fromDate);
-
 }

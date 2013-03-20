@@ -1,6 +1,6 @@
 package com.cefalo.cci.service;
 
-import com.cefalo.cci.dao.IssueDao;
+import com.cefalo.cci.dao.EventsDao;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Events;
 import com.cefalo.cci.model.Issue;
@@ -16,10 +16,10 @@ public class EventServiceImpl implements EventService {
     private Set<Events> events;
 
     @Inject
-    private IssueDao issueDao;
+    private IssueService issueService;
 
     @Inject
-    private IssueService issueService;
+    private EventsDao eventsDao;
 
     @Override
     public void addEvents(long fileId,Set<String> updatedSet, Set<String> insertedSet, Set<String> deletedSet) {
@@ -34,15 +34,14 @@ public class EventServiceImpl implements EventService {
         processFileSetAndAddEvents(fileId, Category.INSERTED.getValue(), insertedSet);
         processFileSetAndAddEvents(fileId, Category.DELETED.getValue(), deletedSet);
 
-        issueDao.saveEvents(events);
+        eventsDao.saveEvents(events);
     }
-
 
     @Override
     public SyndFeed getEventQueueAtomFeed(Issue issue, Organization organization, Publication publication, long start,
                                           long limit, String deviceType, Date fromDate, String sortOrder, ResourceLocator resourceLocator) {
         return generateEventQueueAtomFeed(
-                issueService.getEventsByEpubId(issue.getEpubFile().getId(), start, limit, sortOrder, fromDate),
+                eventsDao.getEventsByEpubId(issue.getEpubFile().getId(), start, limit, sortOrder, fromDate),
                 issue,
                 organization,
                 publication,
@@ -51,7 +50,7 @@ public class EventServiceImpl implements EventService {
                 deviceType,
                 fromDate,
                 sortOrder,
-                issueService.getEventsCountByEpubId(issue.getEpubFile().getId(),fromDate), resourceLocator);
+                eventsDao.getEventsCountByEpubId(issue.getEpubFile().getId(),fromDate), resourceLocator);
     }
 
 
@@ -84,7 +83,7 @@ public class EventServiceImpl implements EventService {
             entry.setUri("urn:".concat(String.valueOf(events.getId())));
             entry.setTitle(events.getPath());
             entry.setAuthor(publicationName);
-            entry.setLink(events.getPath());
+            entry.setLink(resourceLocator.getEpubContentURI(organization.getId(), publication.getId(), issue.getId(), events.getPath()).toString());
             entry.setUpdatedDate(events.getCreated());
 
             syndCategory = new SyndCategoryImpl();
