@@ -289,16 +289,18 @@ public class IssueResource {
         long epubId;
         InputStream oldInputStream = null;
         Issue epubIssue = null;
+
+        checkForValidPublication(organizationId, publicationId);
+
+        epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), fileName);
+
+        if (epubIssue == null || epubIssue.getEpubFile() == null) {
+            throw new NotFoundException(String.format("%s file not found in the database", fileName));
+        }
+
+        epubId = epubIssue.getEpubFile().getId();
+
         try {
-            checkForValidPublication(organizationId, publicationId);
-
-            epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), fileName);
-
-            if (epubIssue == null || epubIssue.getEpubFile() == null) {
-                throw new FileNotFoundException();
-            }
-
-            epubId = epubIssue.getEpubFile().getId();
             oldInputStream = storage.get(URI.create(Long.toString(epubId)));
 
             utils.writeZipFileToDir(fileInputStream, tmpDirFullPath + fileName);

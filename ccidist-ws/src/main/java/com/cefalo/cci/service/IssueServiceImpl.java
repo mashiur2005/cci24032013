@@ -174,8 +174,8 @@ public class IssueServiceImpl implements IssueService {
     @Override
     public Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName) {
         List<Issue> issueList = issueDao.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceId, issueName, "desc");
-        if (issueList == null) {
-            return new Issue();
+        if (issueList == null || issueList.size() == 0) {
+            return null;
         }
         return issueList.get(0);
     }

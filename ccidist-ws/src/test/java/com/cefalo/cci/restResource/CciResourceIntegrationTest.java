@@ -423,6 +423,16 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("ipad").path("widget-quiz-20121022.epub");
         ClientResponse clientResponse = ws.type(MediaType.APPLICATION_OCTET_STREAM).put(ClientResponse.class, fileInputStream);
         assertEquals(200, clientResponse.getStatus());
+
+        try {
+            fileInputStream = new FileInputStream(fileToUpdate);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("ipad").path("wrongFileName.epub");
+        clientResponse = ws.type(MediaType.APPLICATION_OCTET_STREAM).put(ClientResponse.class, fileInputStream);
+        assertEquals("File not found: ", 404, clientResponse.getStatus());
     }
 
 }
