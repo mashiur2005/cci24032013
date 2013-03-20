@@ -4,11 +4,12 @@ import com.cefalo.cci.mapping.JerseyResourceLocator;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Publication;
+import com.cefalo.cci.service.EventService;
 import com.cefalo.cci.service.IssueService;
 import com.cefalo.cci.service.PublicationService;
 import com.cefalo.cci.storage.Storage;
-import com.cefalo.cci.utils.Category;
 import com.cefalo.cci.utils.Utils;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -19,6 +20,7 @@ import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.multipart.FormDataParam;
 import com.sun.syndication.feed.synd.SyndFeed;
 import org.joda.time.DateMidnight;
@@ -32,6 +34,7 @@ import javax.ws.rs.core.Response.Status;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.*;
 
 import static com.cefalo.cci.utils.Utils.isBlank;
@@ -49,6 +52,9 @@ public class IssueResource {
 
     @Inject
     private Storage storage;
+
+    @Inject
+    private EventService eventService;
 
     @Context
     private Request request;
@@ -161,14 +167,35 @@ public class IssueResource {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getEventQueue(@PathParam("organization") @DefaultValue("") final String organizationId,
                                   @PathParam("publication") @DefaultValue("") final String publicationId,
-                                  @PathParam("issueId") @DefaultValue("") final String issueId) {
+                                  @PathParam("issueId") @DefaultValue("") final String issueId,
+                                  @HeaderParam("If-Modified-Since") @DefaultValue("") String ifModifiedSince) {
+
         Issue issue = retrieveIssue(organizationId, publicationId, issueId);
 
         ResponseBuilder notModifiedResponseBuilder = request.evaluatePreconditions(issue.getUpdated());
         if (notModifiedResponseBuilder != null) {
             return notModifiedResponseBuilder.lastModified(issue.getUpdated()).build();
         }
-        return Response.ok(String.format("%s - %s - %s from response", organizationId, publicationId, issueId)).lastModified(issue.getUpdated()).build();
+
+        int start = 1;
+        int limit = 10;
+        String sortOrder = "asc";
+        Date fromDate = null;
+        try {
+            if (! Strings.isNullOrEmpty(ifModifiedSince)) {
+                fromDate = HttpHeaderReader.readDate(ifModifiedSince);
+                fromDate = new DateMidnight(Utils.convertDateWithTZ(fromDate)).toDate();
+            } else {
+                fromDate = new DateMidnight(Utils.convertDateWithTZ(new Date())).toDate();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
+        SyndFeed feed = eventService.getEventQueueAtomFeed(issue, issue.getPublication().getOrganization(), issue.getPublication(),
+                start, limit, issue.getPlatform().getId(), fromDate , sortOrder, JerseyResourceLocator.from(uriInfo));
+        return Response.ok(feed).lastModified(issue.getUpdated()).build();
     }
 
     @Path("/{issue}/{contentLocInEpub: .+}")

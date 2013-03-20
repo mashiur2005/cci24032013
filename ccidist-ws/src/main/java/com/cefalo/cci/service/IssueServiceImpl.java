@@ -2,12 +2,12 @@ package com.cefalo.cci.service;
 
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
+import com.cefalo.cci.model.Events;
 import com.cefalo.cci.model.Issue;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.cefalo.cci.storage.CacheStorage;
 import com.cefalo.cci.utils.Utils;
-import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.inject.Inject;
@@ -137,7 +137,8 @@ public class IssueServiceImpl implements IssueService {
         return feed;
     }
 
-    List<SyndLink> getLinks(long start, long limit, String deviceType, Date fromDate, String sortOrder, long total, String issueListUri) {
+    @Override
+    public List<SyndLink> getLinks(long start, long limit, String deviceType, Date fromDate, String sortOrder, long total, String issueListUri) {
         List<SyndLink> links = new ArrayList<SyndLink>();
         links.add(createAtomLink("self", start, limit, deviceType, fromDate, sortOrder, issueListUri));
 
@@ -228,6 +229,16 @@ public class IssueServiceImpl implements IssueService {
             Closeables.close(existingFS, true);
             Closeables.close(fileInputStream, true);
         }
+    }
+
+    @Override
+    public List<Events> getEventsByEpubId(long epub_file_id, long start, long maxResult, String sortOrder, Date fromDate) {
+        return issueDao.getEventsByEpubId(epub_file_id, start, maxResult, sortOrder, fromDate);
+    }
+
+    @Override
+    public long getEventsCountByEpubId(long epub_file_id, Date fromDate) {
+        return issueDao.getEventsCountByEpubId(epub_file_id,fromDate);
     }
 
 

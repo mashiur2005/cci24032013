@@ -9,6 +9,7 @@ import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
@@ -18,10 +19,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -437,9 +435,14 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
     @Test
     public void getEventQueueTest() {
-        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("sash-for-you-20120827").path("events");
-        ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("widget-quiz-20121022").path("events");
+        DateTime dateTime = new DateTime();
+        dateTime = dateTime.minusDays(30);
+        ClientResponse clientResponse = ws.header("If-Modified-Since", dateTime.toDate()).accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
         assertEquals("event queue response status ", 200, clientResponse.getStatus());
+
+        String responseString = ws.header("If-Modified-Since", dateTime.toDate()).accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
+        System.out.println(responseString);
     }
 
 }

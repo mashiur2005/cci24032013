@@ -42,4 +42,9 @@ public interface IssueDao {
     void saveIssue(String publicationId, String fileName, Set<String> deviceSet, long epubId);
 
     void saveEvents(Set<Events> eventSet);
+
+    List<Events> getEventsByEpubId(long epub_file_id, long start, long maxResult, String sortOrder, Date fromDate);
+
+    long getEventsCountByEpubId(long epub_file_id, Date fromDate);
+
 }

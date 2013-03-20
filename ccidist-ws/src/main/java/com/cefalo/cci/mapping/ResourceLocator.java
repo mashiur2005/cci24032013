@@ -19,6 +19,8 @@ public interface ResourceLocator {
 
     URI getIssueURI(final String organizationID, final String publicationID, final String issueID);
 
+    URI getEventQueueURI(final String organizationId, final String publicationId, final String issueId);
+
     URI getEpubBinaryURI(final String organizationID, final String publicationID, final String issueID);
 
     URI getEpubContentURI(final String organizationID, final String publicationID, final String issueID,

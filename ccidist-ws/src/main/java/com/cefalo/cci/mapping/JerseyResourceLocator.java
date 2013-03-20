@@ -1,14 +1,13 @@
 package com.cefalo.cci.mapping;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.net.URI;
-
-import javax.ws.rs.core.UriInfo;
-
 import com.cefalo.cci.restResource.IssueResource;
 import com.cefalo.cci.restResource.OrganizationResource;
 import com.cefalo.cci.restResource.PublicationDetailResource;
+
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class JerseyResourceLocator implements ResourceLocator {
     private final UriInfo uriInfo;
@@ -52,6 +51,16 @@ public class JerseyResourceLocator implements ResourceLocator {
 
         return uriInfo.getBaseUriBuilder().path(IssueResource.class).path(IssueResource.class, "getIssueDetail")
                 .build(organizationID, publicationID, issueID);
+    }
+
+    @Override
+    public URI getEventQueueURI(String organizationId, String publicationId, String issueId) {
+        checkNotNull(organizationId);
+        checkNotNull(publicationId);
+        checkNotNull(issueId);
+
+        return uriInfo.getBaseUriBuilder().path(IssueResource.class).path(IssueResource.class, "getEventQueue")
+                .build(organizationId, publicationId, issueId);
     }
 
     @Override
