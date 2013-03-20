@@ -55,7 +55,7 @@ public class Events extends Persistent implements Serializable {
 
     @Temporal(value = TemporalType.TIMESTAMP)
     public Date getCreated() {
-        return created;
+        return Utils.convertDateWithTZ(created);
     }
 
     public void setCreated(Date created) {
