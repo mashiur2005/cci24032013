@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <name>CCI Utils :: JPA Utils Module</name>
-    <description>Provides functionality to retrieve data from database</description>
+    <description>Provides Utility Functionality</description>
     <url>http://www.cefalo.no/</url>
 
     <dependencies>

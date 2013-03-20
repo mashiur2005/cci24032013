@@ -14,7 +14,7 @@ public class Events extends Persistent implements Serializable {
     private long id;
     private long epubFileId;
     private String path;
-    private String category;
+    private int category;
     private Date created;
 
     @Id
@@ -45,11 +45,11 @@ public class Events extends Persistent implements Serializable {
         this.path = path;
     }
 
-    public String getCategory() {
+    public int getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(int category) {
         this.category = category;
     }
 

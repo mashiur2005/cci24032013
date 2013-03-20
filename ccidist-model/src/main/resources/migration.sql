@@ -60,7 +60,7 @@ create table events (
 id int not null auto_increment,
 epub_file_id int,
 path varchar(255),
-category varchar(255),
+category int,
 created datetime,
 primary key(id)
 );

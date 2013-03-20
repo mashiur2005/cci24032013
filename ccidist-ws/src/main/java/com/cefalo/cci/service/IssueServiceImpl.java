@@ -196,9 +196,10 @@ public class IssueServiceImpl implements IssueService {
     @Override
     public void findDifferenceAndSaveToDb(URI uploadedFileUri, URI existingFileUri) throws IOException {
 
-        final Map<String, String> visitedFiles = new HashMap<>();
-        final Set<String> uploadedChangedSet = new HashSet<>();
-        final Set<String> existingChangedSet = new HashSet<>();
+        final Map<String, Boolean> visitedFiles = new HashMap<>();
+        final Set<String> updatedSet = new HashSet<>();
+        final Set<String> insertedSet = new HashSet<>();
+        final Set<String> deletedSet = new HashSet<>();
 
         final Map<String, String> env = new HashMap<String, String>();
         env.put("create", "false");
@@ -208,9 +209,9 @@ public class IssueServiceImpl implements IssueService {
         try {
             uploadedFS = FileSystems.newFileSystem(uploadedFileUri, env);
             existingFS = FileSystems.newFileSystem(existingFileUri, env);
-            findDifference(existingFS, uploadedFS, visitedFiles, uploadedChangedSet);
-            findDifference(uploadedFS, existingFS, visitedFiles, existingChangedSet);
-            showModifiedFiles(uploadedChangedSet, existingChangedSet);
+            findDifference(existingFS, uploadedFS, visitedFiles, updatedSet, insertedSet);
+            findDifference(uploadedFS, existingFS, visitedFiles, updatedSet, deletedSet);
+            showModifiedFiles(updatedSet, insertedSet, deletedSet);
         } finally {
             Closeables.close(uploadedFS, true);
             Closeables.close(existingFS, true);
@@ -219,7 +220,8 @@ public class IssueServiceImpl implements IssueService {
     }
 
 
-    public void findDifference(final FileSystem comparedFromFS, FileSystem comparedToFS, final Map<String, String> visitedFiles, final Set<String> changedSet) throws IOException {
+    public void findDifference(final FileSystem comparedFromFS, FileSystem comparedToFS, final Map<String, Boolean> visitedFiles,
+                               final Set<String> updatedSet, final Set<String> newSet) throws IOException {
 
         try {
             java.nio.file.Files.walkFileTree(comparedToFS.getPath("/"), new SimpleFileVisitor<Path>() {
@@ -228,26 +230,19 @@ public class IssueServiceImpl implements IssueService {
                         throws IOException {
                     Path comparedFromPath = comparedFromFS.getPath(comparedToPath.toString());
 
-/*
-                    if (visitedFiles.get(comparedToPath.toAbsolutePath().toString()) != null) {
+                    if (visitedFiles.get(comparedToPath.toAbsolutePath().toString()) != null && visitedFiles.get(comparedToPath.toAbsolutePath().toString())) {
                         return FileVisitResult.CONTINUE;
-                    } else
-*/
-                    if (java.nio.file.Files.exists(comparedFromPath.toAbsolutePath())) {
-
-                        visitedFiles.put(comparedToPath.toAbsolutePath().toString(), "visited");
+                    } else if (java.nio.file.Files.exists(comparedFromPath.toAbsolutePath())) {
+                        visitedFiles.put(comparedToPath.toAbsolutePath().toString(), true);
 
                         byte[] comparedToByte = java.nio.file.Files.readAllBytes(comparedToPath.toAbsolutePath());
                         byte[] comparedFromByte = java.nio.file.Files.readAllBytes(comparedFromPath.toAbsolutePath());
-                        boolean isEqual = ByteStreams.equal(ByteStreams.newInputStreamSupplier(comparedToByte),
-                                ByteStreams.newInputStreamSupplier(comparedFromByte));
-
+                        boolean isEqual = ByteStreams.equal(ByteStreams.newInputStreamSupplier(comparedToByte), ByteStreams.newInputStreamSupplier(comparedFromByte));
                         if (!isEqual) {
-                            changedSet.add(comparedToPath.toAbsolutePath().toString());
-                            //visitedFiles.put(comparedToPath.toAbsolutePath().toString(), "visited");
+                            updatedSet.add(comparedToPath.toAbsolutePath().toString());
                         }
                     } else {
-                        changedSet.add(comparedToPath.toAbsolutePath().toString());
+                        newSet.add(comparedToPath.toAbsolutePath().toString());
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -255,42 +250,33 @@ public class IssueServiceImpl implements IssueService {
         } catch (IOException e) {
            throw e;
         }
-
-
     }
 
-    public void showModifiedFiles(Set<String> uploadedChangedSet, Set<String> existingChangedSet) {
-        if (uploadedChangedSet.isEmpty() && existingChangedSet.isEmpty()) {
+    public void showModifiedFiles(Set<String> updatedSet, Set<String> insertedSet, Set<String> deletedSet) {
+        if (updatedSet.isEmpty() && insertedSet.isEmpty() && deletedSet.isEmpty()) {
             System.out.println("No file modified");
         } else {
-            Set<String> intersectionSet;
-            intersectionSet = Sets.intersection(uploadedChangedSet, existingChangedSet);
-
-            if (!intersectionSet.isEmpty()) {
+            if (!updatedSet.isEmpty()) {
                 System.out.println("File Modified:");
 
-                for (String link : intersectionSet) {
+                for (String link : updatedSet) {
                     System.out.println("---> " + link);
                 }
             }
 
-            Set<String> diffSet = Sets.difference(uploadedChangedSet, intersectionSet);
-
-            if (!diffSet.isEmpty()) {
+            if (!insertedSet.isEmpty()) {
                 System.out.println("File Added:");
 
-                for (String link : diffSet) {
+                for (String link : insertedSet) {
                     System.out.println("---> " + link);
                 }
 
             }
 
-            diffSet = Sets.difference(existingChangedSet, intersectionSet);
-
-            if (!diffSet.isEmpty()) {
+            if (!deletedSet.isEmpty()) {
                 System.out.println("File Deleted:");
 
-                for (String link : diffSet) {
+                for (String link : deletedSet) {
                     System.out.println("---> " + link);
                 }
 

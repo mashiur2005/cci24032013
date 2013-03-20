@@ -33,6 +33,7 @@ public class JerseyServletModule extends com.sun.jersey.guice.JerseyServletModul
         bind(PublicationService.class).to(PublicationServiceImpl.class);
         bind(IssueDao.class).to(IssueDaoImpl.class);
         bind(IssueService.class).to(IssueServiceImpl.class);
+        bind(EventService.class).to(EventServiceImpl.class);
 
         bindConstant().annotatedWith(Names.named("cacheDirFullPath")).to(Utils.CACHE_DIR_FULLPATH);
         bindConstant().annotatedWith(Names.named("cacheEpubDirFullPath")).to(Utils.CACHED_EPUBS_FULLPATH);
