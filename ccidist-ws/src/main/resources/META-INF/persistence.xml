@@ -14,6 +14,7 @@
         <class>com.cefalo.cci.model.Platform</class>
         <class>com.cefalo.cci.model.Issue</class>
         <class>com.cefalo.cci.model.EpubFile</class>
+        <class>com.cefalo.cci.model.Events</class>
 
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
