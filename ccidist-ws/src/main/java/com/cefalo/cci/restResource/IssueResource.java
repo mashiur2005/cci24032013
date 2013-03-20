@@ -275,13 +275,13 @@ public class IssueResource {
     }
 
     @PUT
-    @Path("/{deviceIds}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Path("/{deviceIds}/{file: [^/]+.epub?}")
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response updateEpub(@PathParam("organization") @DefaultValue("") final String organizationId,
                                @PathParam("publication") @DefaultValue("") final String publicationId,
                                @PathParam("deviceIds") @DefaultValue("") final String deviceIds,
-                               @FormDataParam("epubFile") InputStream fileInputStream,
-                               @FormDataParam("epubFile") FormDataContentDisposition epubDetail) throws Exception{
+                               InputStream fileInputStream,
+                               @PathParam("file") @DefaultValue("") String  fileName) throws Exception{
         Set<String> deviceSet = Sets.newHashSet(deviceIds.split(","));
         if (deviceSet == null || deviceIds.isEmpty() || fileInputStream == null) {
             return Responses.clientError().entity("Device Type and epub attachment must be required").build();
@@ -292,9 +292,8 @@ public class IssueResource {
         Issue epubIssue = null;
         try {
             checkForValidPublication(organizationId, publicationId);
-            checkValidFileContent(epubDetail);
 
-            epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), epubDetail.getFileName());
+            epubIssue = issueService.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceSet.iterator().next(), fileName);
 
             if (epubIssue == null || epubIssue.getEpubFile() == null) {
                 throw new FileNotFoundException();
@@ -303,17 +302,17 @@ public class IssueResource {
             epubId = epubIssue.getEpubFile().getId();
             oldInputStream = storage.get(URI.create(Long.toString(epubId)));
 
-            utils.writeZipFileToDir(fileInputStream, tmpDirFullPath + epubDetail.getFileName());
+            utils.writeZipFileToDir(fileInputStream, tmpDirFullPath + fileName);
             utils.writeZipFileToDir(oldInputStream, tmpDirFullPath + "old/" + epubIssue.getName());
 
-            String uploadedFileLoc = "jar:file:/" + tmpDirFullPath + epubDetail.getFileName();
+            String uploadedFileLoc = "jar:file:/" + tmpDirFullPath + fileName;
             String existingFileLoc = "jar:file:/" + tmpDirFullPath + "old/" + epubIssue.getName();
             URI uploadedFileUri = URI.create(uploadedFileLoc.replace("\\", "/"));
             URI existingFileUri = URI.create(existingFileLoc.replace("\\", "/"));
 
             issueService.findDifferenceAndSaveToDb(uploadedFileUri, existingFileUri);
 
-            fileInputStream = utils.readFileFromDir(tmpDirFullPath + epubDetail.getFileName());
+            fileInputStream = utils.readFileFromDir(tmpDirFullPath + fileName);
             issueService.updateEpub(epubId, fileInputStream);
         } catch (NotFoundException ne) {
             throw ne;
@@ -325,7 +324,7 @@ public class IssueResource {
         } finally {
             Closeables.close(fileInputStream, true);
             Closeables.close(oldInputStream, true);
-            File tmpNewFile = new File(tmpDirFullPath + epubDetail.getFileName());
+            File tmpNewFile = new File(tmpDirFullPath + fileName);
             deleteTempFiles(tmpNewFile);
             File tmpOldFile = new File(tmpDirFullPath + "old/" + epubIssue.getName());
             deleteTempFiles(tmpOldFile);

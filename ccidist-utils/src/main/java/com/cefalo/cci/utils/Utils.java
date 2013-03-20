@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Utils {
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(Utils.class.getName());
 
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
     public static String HOME_DIR = System.getProperty("user.home");
@@ -81,12 +81,12 @@ public class Utils {
 
     public void deleteRecursive(File path){
         File[] c = path.listFiles();
-        logger.info("Cleaning out folder:" + path.toString());
+        logger.info(String.format("Cleaning out folder: %s", path.toString()));
 
         if (c != null) {
             for (File file : c){
                 if (file.isDirectory()){
-                    logger.info("Deleting file:" + file.toString());
+                    logger.info(String.format("Deleting file: %s", file.toString()));
                     deleteRecursive(file);
                     file.delete();
                 } else {

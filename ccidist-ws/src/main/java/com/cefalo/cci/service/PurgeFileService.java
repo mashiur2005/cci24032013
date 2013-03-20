@@ -41,7 +41,7 @@ public class PurgeFileService implements org.quartz.Job{
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        logger.info("cron job working for removing old files ......." + System.currentTimeMillis());
+        logger.info(String.format("cron job working for removing old files at : %s", System.currentTimeMillis()));
         DateTime prevDate = new DateTime();
         long purgeTime = prevDate.minusDays(interval).getMillis();
         Date purgeDate = new Date(purgeTime);
@@ -51,7 +51,7 @@ public class PurgeFileService implements org.quartz.Job{
 
         for (Issue anIssueList : issueList) {
             file = new File(cacheDirFullPath + "/" +  anIssueList.getEpubFile().getId());
-            logger.info("Files to be deleted: " + file.getAbsolutePath());
+            logger.info(String.format("Files to be deleted: %s", file.getAbsolutePath()));
             if (file.exists()) {
                 utils.deleteRecursive(file);
             }

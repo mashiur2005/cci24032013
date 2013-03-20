@@ -15,8 +15,7 @@ import org.junit.Test;
 import org.w3c.dom.NodeList;
 
 import javax.ws.rs.core.MediaType;
-import java.io.ByteArrayInputStream;
-import java.io.File;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -414,11 +413,15 @@ public class CciResourceIntegrationTest extends JerseyTest{
     public void updateEpubTest() {
         Path directoryPath = Paths.get("src", "test", "resources", "epubs");
         File fileToUpdate = new File(directoryPath.toAbsolutePath().toString() + "/widget-quiz-20121022.epub");
-        final FormDataMultiPart multiPart = new FormDataMultiPart();
-        multiPart.bodyPart(new FileDataBodyPart("epubFile", fileToUpdate, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+        InputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(fileToUpdate);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("ipad");
-        ClientResponse clientResponse = ws.type(MediaType.MULTIPART_FORM_DATA).put(ClientResponse.class, multiPart);
+        ws = resource().path(BASE_URL).path("polaris").path("addressa").path("issue").path("ipad").path("widget-quiz-20121022.epub");
+        ClientResponse clientResponse = ws.type(MediaType.APPLICATION_OCTET_STREAM).put(ClientResponse.class, fileInputStream);
         assertEquals(200, clientResponse.getStatus());
     }
 
