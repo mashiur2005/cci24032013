@@ -1,5 +1,6 @@
 package com.cefalo.cci.model;
 
+import com.cefalo.cci.utils.Utils;
 import org.hibernate.annotations.*;
 
 import java.io.Serializable;
@@ -73,7 +74,7 @@ public class Issue extends Persistent implements Serializable {
 
     @Temporal(value = TemporalType.TIMESTAMP)
     public Date getCreated() {
-        return created;
+        return Utils.convertDateWithTZ(created);
     }
 
     public void setCreated(Date created) {
@@ -82,7 +83,7 @@ public class Issue extends Persistent implements Serializable {
 
     @Temporal(value = TemporalType.TIMESTAMP)
     public Date getUpdated() {
-        return updated;
+        return Utils.convertDateWithTZ(updated);
     }
 
     public void setUpdated(Date updated) {
@@ -91,12 +92,12 @@ public class Issue extends Persistent implements Serializable {
 
     @PrePersist
     protected void onCreate() {
-        setCreated(new Date());
-        setUpdated(new Date());
+        setCreated(Utils.convertDateWithTZ(new Date()));
+        setUpdated(Utils.convertDateWithTZ(new Date()));
     }
 
     @PreUpdate
     protected void onUpdate() {
-        setUpdated(new Date());
+        setUpdated(Utils.convertDateWithTZ(new Date()));
     }
 }

@@ -17,6 +17,11 @@
     <url>http://www.cefalo.no/</url>
 
     <dependencies>
+        <dependency>
+            <groupId>com.cefalo</groupId>
+            <artifactId>ccidist-utils</artifactId>
+        </dependency>
+
         <!--hibernate dependencies-->
         <dependency>
             <groupId>org.hibernate</groupId>

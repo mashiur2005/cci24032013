@@ -97,12 +97,11 @@ public class IssueResource {
 
         Date fromDate = null;
         if (Utils.isBlank(from)) {
-            fromDate = new DateMidnight().toDate();
+            Date date = new Date();
+            fromDate = new DateMidnight(Utils.convertDateWithTZ(date)).toDate();
         } else {
             try {
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-                DateTime dateTime = formatter.parseDateTime(from);
-                fromDate = dateTime.toDateMidnight().toDate();
+                fromDate = new DateMidnight(Utils.convertDateFormatTZ(from, Utils.DATE_FORMAT)).toDate();
             } catch (IllegalArgumentException e) {
                 return  Responses.clientError().entity("Invalid Date format.").build();
 

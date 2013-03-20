@@ -45,7 +45,7 @@ public class PurgeFileService implements org.quartz.Job{
         DateTime prevDate = new DateTime();
         long purgeTime = prevDate.minusDays(interval).getMillis();
         Date purgeDate = new Date(purgeTime);
-        List<Issue> issueList = issueService.getOldIssueList(purgeDate);
+        List<Issue> issueList = issueService.getOldIssueList(Utils.convertDateWithTZ(purgeDate));
 
         File file = null;
 

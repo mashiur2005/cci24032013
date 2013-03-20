@@ -4,14 +4,19 @@ import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Utils {
     private final Logger logger = LoggerFactory.getLogger(Utils.class.getName());
@@ -26,6 +31,8 @@ public class Utils {
     public static String CACHE_DIR_FULLPATH = HOME_DIR + FILE_SEPARATOR + CACHE_DIR_NAME + FILE_SEPARATOR;
     public static String CACHED_EPUBS_FULLPATH = CACHE_DIR_FULLPATH + CACHED_EPUBS_DIR_NAME + FILE_SEPARATOR;
     public static String TMP_DIR_FULLPATH = CACHE_DIR_FULLPATH  + FILE_SEPARATOR + TMP_DIR_NAME + FILE_SEPARATOR;
+    public static String DEFAULT_TZ = "GMT";
+    public static String DATE_FORMAT = "yyyy-MM-dd";
 
     static {
          ORGANIZATION_DETAILS.put("Polaris", Arrays.asList("Addressa", "Harstadtidende"));
@@ -98,4 +105,18 @@ public class Utils {
         path.delete();
     }
 
+    public static Date convertDateWithTZ(Date date, String tz) {
+        DateTime dt = new DateTime(date, DateTimeZone.forID(tz));
+        return dt.toDate();
+    }
+
+    public static Date convertDateWithTZ(Date date) {
+        return convertDateWithTZ(date, DEFAULT_TZ);
+    }
+
+    public static Date convertDateFormatTZ(String dateStr, String format) throws IllegalArgumentException {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(format);
+        DateTime dateTime = formatter.parseDateTime(dateStr);
+        return convertDateWithTZ(dateTime.toDate());
+    }
 }
