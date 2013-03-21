@@ -1,6 +1,7 @@
 package com.cefalo.cci.dao;
 
 import com.cefalo.cci.model.*;
+import com.cefalo.cci.utils.Utils;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
@@ -88,6 +89,7 @@ public class IssueDaoImpl implements IssueDao {
     }
 
 
+/*
     @Override
     public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
         byte[] fileContent;
@@ -114,6 +116,7 @@ public class IssueDaoImpl implements IssueDao {
             throw new RuntimeException(e);
         }
     }
+*/
 
     @Override
     @SuppressWarnings("unchecked")
@@ -172,11 +175,11 @@ public class IssueDaoImpl implements IssueDao {
     }
 
     @Override
-    public void saveIssue(String publicationId, String fileName, Set<String> deviceSet, long epubId) {
+    public void saveIssue(String publicationId, String fileName, Date date, Set<String> deviceSet, long epubId) {
         for (String deviceId : deviceSet) {
             //generating issue primary key....based on fileName and count on existing fileName
-            String issuePK = generateIssuePrimaryKey(fileName.substring(0, fileName.length() - 1 - 4)); //length of .epub = 4
-            Issue issue = createIssue(publicationId, issuePK, fileName, deviceId, epubId);
+            String issuePK = generateIssuePrimaryKey(fileName);
+            Issue issue = createIssue(publicationId, issuePK, fileName, deviceId, epubId, date);
             entityManager.persist(issue);
             entityManager.flush();
         }
@@ -185,13 +188,15 @@ public class IssueDaoImpl implements IssueDao {
 
 
 
-    public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId) {
+    public Issue createIssue(String publicationId, String issuePK, String fileName, String deviceId,  Serializable epubId, Date date) {
         Issue issue = new Issue();
         issue.setId(issuePK);
         issue.setName(fileName);
         issue.setPlatform(new Platform(deviceId));
         issue.setPublication(new Publication(publicationId));
         issue.setEpubFile(new EpubFile((Long) epubId));
+        issue.setCreated(date);
+        issue.setUpdated(date);
         return issue;
     }
 

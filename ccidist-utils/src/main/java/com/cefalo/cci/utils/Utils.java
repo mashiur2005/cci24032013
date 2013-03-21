@@ -1,10 +1,10 @@
 package com.cefalo.cci.utils;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -13,10 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Utils {
     private final Logger logger = LoggerFactory.getLogger(Utils.class.getName());
@@ -121,9 +120,42 @@ public class Utils {
         return convertDateWithTZ(date, DEFAULT_TZ);
     }
 
+    public static Date convertDateFormatTZ(String dateStr) throws IllegalArgumentException {
+        return convertDateFormatTZ(dateStr, DATE_FORMAT);
+    }
+
     public static Date convertDateFormatTZ(String dateStr, String format) throws IllegalArgumentException {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(format);
         DateTime dateTime = formatter.parseDateTime(dateStr);
         return convertDateWithTZ(dateTime.toDate());
+    }
+
+
+    public static boolean areSetsEquals(Set<String> from, Set<String> to) {
+          return Sets.difference(from, to).size() == 0;
+    }
+
+    public static String getExtractedContent(String fileLoc, String fileName) throws IOException {
+        ZipInputStream zipInputStream = null;
+        try {
+            zipInputStream =  new ZipInputStream(new FileInputStream(fileLoc));
+            if (zipInputStream == null) {
+                throw new IOException();
+            }
+             ZipEntry ze;
+            byte[] bytes = null;
+            while ((ze = zipInputStream.getNextEntry()) != null) {
+                  if (fileName.equals(ze.getName())) {
+                      bytes = ByteStreams.toByteArray(zipInputStream);
+                      break;
+                  }
+            }
+            if (bytes != null) {
+                return new String(bytes);
+            }
+            return "";
+        } finally {
+            Closeables.close(zipInputStream, true);
+        }
     }
 }

@@ -29,7 +29,7 @@ public interface IssueService {
 
     List<SyndLink> getLinks(long start, long limit, String deviceType, Date fromDate, String sortOrder, long total, String issueListUri);
 
-    void writeAndUploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException;
+    void writeAndUploadEpubFile(String organizationId, String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException;
 
     Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName);
 

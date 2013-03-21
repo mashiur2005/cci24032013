@@ -90,11 +90,13 @@ public class Issue extends Persistent implements Serializable {
         this.updated = updated;
     }
 
+/*
     @PrePersist
     protected void onCreate() {
         setCreated(Utils.convertDateWithTZ(new Date()));
         setUpdated(Utils.convertDateWithTZ(new Date()));
     }
+*/
 
     @PreUpdate
     protected void onUpdate() {

@@ -295,11 +295,13 @@ public class IssueResource {
             if (uploadedInputStream == null) {
                 throw new NotFoundException();
             }
-            issueService.writeAndUploadEpubFile(publicationId, fileDetail.getFileName(), deviceSet, uploadedInputStream);
+            issueService.writeAndUploadEpubFile(organizationId, publicationId, fileDetail.getFileName(), deviceSet, uploadedInputStream);
         } catch (NotFoundException ex) {
             throw ex;
+        } catch (IllegalArgumentException ex) {
+              throw new WebApplicationException(ex.getCause(), Status.BAD_REQUEST);
         } catch (IOException ex) {
-            throw new NotFoundException();
+            throw new WebApplicationException(ex.getCause(), Status.BAD_REQUEST);
         } finally {
             Closeables.close(uploadedInputStream, true);
         }

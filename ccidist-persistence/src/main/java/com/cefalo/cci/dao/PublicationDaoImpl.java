@@ -15,4 +15,13 @@ public class PublicationDaoImpl implements PublicationDao {
     public Publication getPublication(String id) {
         return (Publication) entityManager.find(Publication.class, id);
     }
+
+    @Override
+    public boolean isDuplicatePublicationExists(String publicationId,String organizationId) {
+        return (Long) entityManager.createQuery("select count(p) from Publication p, Organization o where p.organization.id = o.id and p.organization.id like :oName and p.id like :pName")
+                .setParameter("oName", organizationId)
+                .setParameter("pName", publicationId)
+                .getSingleResult() > 0;
+
+    }
 }

@@ -3,10 +3,15 @@ package com.cefalo.cci.service;
 import com.cefalo.cci.dao.IssueDao;
 import com.cefalo.cci.mapping.ResourceLocator;
 import com.cefalo.cci.model.Issue;
+import com.cefalo.cci.model.MetaData;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.cefalo.cci.storage.CacheStorage;
+import com.cefalo.cci.enums.MetaDataInfo;
 import com.cefalo.cci.utils.Utils;
+import com.cefalo.cci.utils.XpathUtils;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.inject.Inject;
@@ -16,6 +21,8 @@ import com.sun.syndication.feed.synd.*;
 import org.joda.time.DateMidnight;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -163,21 +170,26 @@ public class IssueServiceImpl implements IssueService {
         return self;
     }
 
+/*
     @Transactional
     public void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
         issueDao.uploadEpubFile(publicationId, fileName, deviceSet, inputStream);
     }
+*/
 
     @Transactional
-    public void writeAndUploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
+    public void writeAndUploadEpubFile(String organizationId, String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException {
         URI epubResource;
         try {
             epubResource = cacheStorage.create(inputStream);
-        } catch (IOException io) {
+            processMetaDataAndCreateIssue(cacheEpubDirFullPath + epubResource.getPath(), "META-INF/container.xml",
+                    organizationId, publicationId, deviceSet, Long.valueOf(epubResource.getPath()));
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }catch (IOException io) {
             io.printStackTrace();
             throw io;
         }
-        issueDao.saveIssue(publicationId, fileName, deviceSet, Long.valueOf(epubResource.getPath()));
     }
 
     @Override
@@ -263,5 +275,89 @@ public class IssueServiceImpl implements IssueService {
         } catch (IOException e) {
            throw e;
         }
+    }
+
+    public void processMetaDataAndCreateIssue(String fileLoc, String fileName, String organizationId, String publicationId, Set<String> deviceSet, long epubId) throws IOException {
+        MetaData metaData = parseMetaData(fileLoc, fileName);
+
+        if (!organizationId.equals(metaData.getCreator())) {
+            throw new IllegalArgumentException("Creator is empty");
+        }
+        if (!publicationId.equals(metaData.getTitle())) {
+            throw new IllegalArgumentException("Title is empty");
+        }
+        if (Utils.isBlank(metaData.getDevice()) || !Utils.areSetsEquals(deviceSet, Sets.newHashSet(Splitter.on(" , ").split(metaData.getDevice())))) {
+            throw new IllegalArgumentException("Device is Null or device not found");
+        }
+
+        if (Utils.isBlank(metaData.getIssue())) {
+            throw new IllegalArgumentException("Issue name is empty");
+        }
+
+        try {
+            if (!Utils.isBlank(metaData.getDateStr())) {
+                metaData.setDate(Utils.convertDateFormatTZ(metaData.getDateStr()));
+            } else {
+                metaData.setDate(Utils.convertDateWithTZ(new Date()));
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid date format");
+        }
+        issueDao.saveIssue(publicationId, metaData.getIssue(), metaData.getDate(), deviceSet, epubId);
+    }
+
+    public MetaData parseMetaData(String fileLoc, String fileName) throws IOException {
+        Node node =  null;
+        MetaData metaData = null;
+        try {
+            String content = Utils.getExtractedContent(fileLoc, "META-INF/container.xml");
+            node = extractedContentNode("container/rootfiles/rootfile/@full-path", content);
+            content = Utils.getExtractedContent(fileLoc, node.getTextContent());
+            node = extractedContentNode("package/metadata", content);
+            metaData = createMetaDateObject(node);
+
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        }
+
+        return metaData;
+    }
+
+    public Node extractedContentNode(String pattern, String content) throws IllegalArgumentException {
+        XpathUtils xpathUtils = new XpathUtils();
+        NodeList nodeList = xpathUtils.getNodeListFromHtml(pattern, content);
+        if (nodeList == null) {
+            throw new IllegalArgumentException("Can not extract epub file");
+        }
+        return nodeList.item(0);
+    }
+
+    public MetaData createMetaDateObject(Node node) throws IllegalArgumentException {
+        if (!node.hasChildNodes()) {
+            throw new IllegalArgumentException("MetaData is empty");
+        }
+        NodeList nodeList = node.getChildNodes();
+        MetaData metaData = new MetaData();
+        for (int i= 0; i < nodeList.getLength(); i++) {
+             Node n = nodeList.item(i);
+            if (MetaDataInfo.DC_CREATOR.getValue().equals(n.getNodeName())) {
+                metaData.setCreator(n.getTextContent());
+            } else if (MetaDataInfo.DC_DATE.getValue().equals(n.getNodeName())) {
+                metaData.setDateStr(n.getTextContent());
+            } else if (MetaDataInfo.DC_DEVICE.getValue().equals(n.getNodeName())) {
+                metaData.setDevice(n.getTextContent());
+            } else if (MetaDataInfo.DC_IDENTIFIER.getValue().equals(n.getNodeName())) {
+                metaData.setIdentifier(n.getTextContent());
+            } else if (MetaDataInfo.DC_ISSUE.getValue().equals(n.getNodeName())) {
+                metaData.setIssue(n.getTextContent());
+            } else if (MetaDataInfo.DC_LANGUAGE.getValue().equals(n.getNodeName())) {
+                metaData.setLanguage(n.getTextContent());
+            } else if (MetaDataInfo.DC_TITLE.getValue().equals(n.getNodeName())) {
+                metaData.setTitle(n.getTextContent());
+            }
+        }
+        return metaData;
     }
 }

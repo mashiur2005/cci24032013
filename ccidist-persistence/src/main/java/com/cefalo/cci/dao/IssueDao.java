@@ -28,7 +28,7 @@ public interface IssueDao {
 
     Publication getPublication(String id);
 
-    void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException;
+   // void uploadEpubFile(String publicationId, String fileName, Set<String> deviceSet, InputStream inputStream) throws IOException;
 
     List<Issue> getOldIssueList(Date date);
 
@@ -38,5 +38,5 @@ public interface IssueDao {
 
     URI saveEpub(InputStream epubInputStream) throws IOException;
 
-    void saveIssue(String publicationId, String fileName, Set<String> deviceSet, long epubId);
+    void saveIssue(String publicationId, String fileName, Date date, Set<String> deviceSet, long epubId);
 }
