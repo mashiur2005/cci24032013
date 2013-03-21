@@ -87,10 +87,10 @@ insert into platform (id, name) value ('mini-ipad', 'Mini-iPad');
 insert into platform (id, name) value ('iphone', 'iPhone');
 
 /*epub Files*/
-insert into epub_file (file) values (LOAD_FILE('C:/Users/Nadim/epubs/regime-anticancer-arabic-20121022.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:/Users/Nadim/epubs/sash-for-you-20120827.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:/Users/Nadim/epubs/widget-figure-gallery-20121022.epub'));
-insert into epub_file (file) values (LOAD_FILE('C:/Users/Nadim/epubs/widget-quiz-20121022.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/regime-anticancer-arabic-20121022.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/sash-for-you-20120827.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/widget-figure-gallery-20121022.epub'));
+insert into epub_file (file) values (LOAD_FILE('<absolute-root>/ccidist/ccidist-model/src/main/resources/widget-quiz-20121022.epub'));
 
 
 
