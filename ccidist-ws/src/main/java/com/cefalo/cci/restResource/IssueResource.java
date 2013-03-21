@@ -193,8 +193,9 @@ public class IssueResource {
         }
 
 
-        SyndFeed feed = eventService.getEventQueueAtomFeed(issue, issue.getPublication().getOrganization(), issue.getPublication(),
-                start, limit, issue.getPlatform().getId(), fromDate , sortOrder, JerseyResourceLocator.from(uriInfo));
+        SyndFeed feed = eventService.getEventQueueAtomFeed(issue, start, limit, issue.getPlatform().getId(), fromDate ,
+                sortOrder, JerseyResourceLocator.from(uriInfo));
+
         return Response.ok(feed).lastModified(issue.getUpdated()).build();
     }
 

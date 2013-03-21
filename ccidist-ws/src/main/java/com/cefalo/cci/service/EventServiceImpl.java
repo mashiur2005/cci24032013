@@ -38,13 +38,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public SyndFeed getEventQueueAtomFeed(Issue issue, Organization organization, Publication publication, long start,
-                                          long limit, String deviceType, Date fromDate, String sortOrder, ResourceLocator resourceLocator) {
+    public SyndFeed getEventQueueAtomFeed(Issue issue, long start, long limit, String deviceType, Date fromDate,
+                                          String sortOrder, ResourceLocator resourceLocator) {
         return generateEventQueueAtomFeed(
                 eventsDao.getEventsByEpubId(issue.getEpubFile().getId(), start, limit, sortOrder, fromDate),
                 issue,
-                organization,
-                publication,
                 start,
                 limit,
                 deviceType,
@@ -56,9 +54,12 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public SyndFeed generateEventQueueAtomFeed(List<Events> eventsList, Issue issue, Organization organization, Publication publication,
-                                                long start, long limit, String deviceType, Date fromDate, String sortOrder,
-                                                long total, ResourceLocator resourceLocator) {
+    public SyndFeed generateEventQueueAtomFeed(List<Events> eventsList, Issue issue, long start, long limit,
+                                               String deviceType, Date fromDate, String sortOrder, long total,
+                                               ResourceLocator resourceLocator) {
+
+        Organization organization = issue.getPublication().getOrganization();
+        Publication publication = issue.getPublication();
         String publicationName = publication.getName();
 
         SyndFeed feed = new SyndFeedImpl();
