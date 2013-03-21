@@ -443,6 +443,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("event queue response status ", 200, clientResponse.getStatus());
 
         String responseString = ws.header("If-Modified-Since", dateTime.toDate()).accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
+        assertNotNull(responseString);
 
         /*TODO: This is ok but fail on other machine depending on local database
         * TODO: change it when use embedded Database*/
