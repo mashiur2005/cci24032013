@@ -9,7 +9,6 @@ import com.cefalo.cci.service.IssueService;
 import com.cefalo.cci.service.PublicationService;
 import com.cefalo.cci.storage.Storage;
 import com.cefalo.cci.utils.Utils;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -168,7 +167,7 @@ public class IssueResource {
     public Response getEventQueue(@PathParam("organization") @DefaultValue("") final String organizationId,
                                   @PathParam("publication") @DefaultValue("") final String publicationId,
                                   @PathParam("issueId") @DefaultValue("") final String issueId,
-                                  @HeaderParam("If-Modified-Since") @DefaultValue("") String ifModifiedSince) {
+                                  @HeaderParam("If-Modified-Since") @DefaultValue("Thu Jan 1 00:00:00 1970") String ifModifiedSince) {
 
         Issue issue = retrieveIssue(organizationId, publicationId, issueId);
 
@@ -182,12 +181,8 @@ public class IssueResource {
         String sortOrder = "asc";
         Date fromDate = null;
         try {
-            if (! Strings.isNullOrEmpty(ifModifiedSince)) {
-                fromDate = HttpHeaderReader.readDate(ifModifiedSince);
-                fromDate = new DateMidnight(Utils.convertDateWithTZ(fromDate)).toDate();
-            } else {
-                fromDate = new DateMidnight(Utils.convertDateWithTZ(new Date())).toDate();
-            }
+            fromDate = HttpHeaderReader.readDate(ifModifiedSince);
+            fromDate = new DateMidnight(Utils.convertDateWithTZ(fromDate)).toDate();
         } catch (ParseException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
