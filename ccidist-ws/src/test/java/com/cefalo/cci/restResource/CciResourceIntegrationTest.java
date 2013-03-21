@@ -190,15 +190,16 @@ public class CciResourceIntegrationTest extends JerseyTest{
         String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         NodeList nodeList;
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/dl/dd/a", responseString);
 
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
-        assertEquals(2, nodeList.getLength());
+        assertEquals(3, nodeList.getLength());
 
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li/a/@href", responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/dl/dd/a/@href", responseString);
         assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022.epub", nodeList.item(0).getTextContent());
         assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022/META-INF/container.xml", nodeList.item(1).getTextContent());
+        assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022/events", nodeList.item(2).getTextContent());
 
         ws = resource().path(BASE_URL).path("/polaris/addressa/issue/widget-quiz-20121022");
         clientResponse = ws.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -442,7 +443,14 @@ public class CciResourceIntegrationTest extends JerseyTest{
         assertEquals("event queue response status ", 200, clientResponse.getStatus());
 
         String responseString = ws.header("If-Modified-Since", dateTime.toDate()).accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
-        System.out.println(responseString);
+
+        /*TODO: This is ok but fail on other machine depending on local machine
+        * TODO: change it when use embedded Database*/
+        /*NodeList nodeList = xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        assertEquals("number of events entry: ", 10, nodeList.getLength());*/
+
+        clientResponse = ws.header("If-Modified-Since", new Date()).accept(MediaType.APPLICATION_ATOM_XML).get(ClientResponse.class);
+        assertEquals("Not modified status send: ", 304, clientResponse.getStatus());
     }
 
 }

@@ -157,6 +157,7 @@ public class IssueResource {
         model.put("binaryUri", locator.getEpubBinaryURI(organizationId, publicationId, issueId));
         model.put("containerUri",
                 locator.getEpubContentURI(organizationId, publicationId, issueId, "META-INF/container.xml"));
+        model.put("eventsUri", locator.getEventQueueURI(organizationId, publicationId, issueId));
 
         return Response.ok(new Viewable("/issueDetail", model)).tag(String.valueOf(issue.getVersion())).lastModified(issue.getUpdated()).build();
     }
