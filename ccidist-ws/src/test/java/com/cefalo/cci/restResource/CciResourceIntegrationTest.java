@@ -444,7 +444,7 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
         String responseString = ws.header("If-Modified-Since", dateTime.toDate()).accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
 
-        /*TODO: This is ok but fail on other machine depending on local machine
+        /*TODO: This is ok but fail on other machine depending on local database
         * TODO: change it when use embedded Database*/
         /*NodeList nodeList = xpathUtils.getNodeListFromHtml("feed/entry", responseString);
         assertEquals("number of events entry: ", 10, nodeList.getLength());*/
