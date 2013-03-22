@@ -65,20 +65,12 @@ public class IssueServiceImpl implements IssueService {
 
     @Override
     public List<Issue> getIssueListByPublicationId(String publicationId) {
-        List<Issue> issueList = issueDao.getIssueListByPublicationId(publicationId);
-        if (issueList == null) {
-            new ArrayList<Issue>();
-        }
-        return issueList;
+        return issueDao.getIssueListByPublicationId(publicationId);
     }
 
     @Override
     public List<Issue> getOldIssueList(Date date) {
-        List<Issue> issueList = issueDao.getOldIssueList(date);
-        if (issueList == null) {
-            return new ArrayList<Issue>();
-        }
-        return issueList;
+        return issueDao.getOldIssueList(date);
     }
 
     @Override
@@ -195,7 +187,7 @@ public class IssueServiceImpl implements IssueService {
     @Override
     public Issue getIssueByPublicationAndDeviceIdAndIssue(String publicationId, String deviceId, String issueName) {
         List<Issue> issueList = issueDao.getIssueByPublicationAndDeviceIdAndIssue(publicationId, deviceId, issueName, "desc");
-        if (issueList == null || issueList.size() == 0) {
+        if (issueList.isEmpty()) {
             return null;
         }
         return issueList.get(0);
