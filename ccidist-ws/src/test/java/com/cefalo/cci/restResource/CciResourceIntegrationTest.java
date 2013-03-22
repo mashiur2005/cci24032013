@@ -33,7 +33,6 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
     public CciResourceIntegrationTest() {
         super(new WebAppDescriptor.Builder(PACKAGE_NAME).build());
-        xpathUtils = new XpathUtils();
     }
 
     @Test
@@ -41,7 +40,8 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("/");
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         String responseHtml = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseHtml);
+        xpathUtils = new XpathUtils(responseHtml);
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li");
 
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseHtml);
@@ -95,7 +95,8 @@ public class CciResourceIntegrationTest extends JerseyTest{
         ws = resource().path(BASE_URL).path("/polaris");
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li", responseString);
+        xpathUtils = new XpathUtils(responseString);
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/ul/li");
 
         assertEquals("status found: ", 200, clientResponse.getStatus());
         assertNotNull(responseString);
@@ -190,13 +191,14 @@ public class CciResourceIntegrationTest extends JerseyTest{
         String responseString = ws.accept(MediaType.APPLICATION_XHTML_XML).get(String.class);
         ClientResponse clientResponse = ws.accept(MediaType.APPLICATION_XHTML_XML).get(ClientResponse.class);
         NodeList nodeList;
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/dl/dd/a", responseString);
+        xpathUtils = new XpathUtils(responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/dl/dd/a");
 
         assertEquals(200, clientResponse.getStatus());
         assertNotNull(responseString);
         assertEquals(3, nodeList.getLength());
 
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/dl/dd/a/@href", responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("html/body/dl/dd/a/@href");
         assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022.epub", nodeList.item(0).getTextContent());
         assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022/META-INF/container.xml", nodeList.item(1).getTextContent());
         assertEquals("http://localhost:9998/cciService/polaris/addressa/issue/widget-quiz-20121022/events", nodeList.item(2).getTextContent());
@@ -349,8 +351,8 @@ public class CciResourceIntegrationTest extends JerseyTest{
 
         String responseString = ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
-
-        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        xpathUtils = new XpathUtils(responseString);
+        NodeList nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry");
         assertEquals("Default number of entry: ", 1, nodeList.getLength());
 
         //TODO: 404 error should be checked
@@ -367,14 +369,16 @@ public class CciResourceIntegrationTest extends JerseyTest{
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        xpathUtils = new XpathUtils(responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry");
         assertEquals("number of entry start 2: ", 2, nodeList.getLength());
 
         ws = resource().queryParam("start", "2").queryParam("device-type", deviceType).queryParam("from", fromDateStr).path(BASE_URL).path("polaris").path("addressa").path("issue");
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        xpathUtils = new XpathUtils(responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry");
         assertEquals("number of entry limit default: ", 1, nodeList.getLength());
 
         ws = resource().queryParam("start", "2").queryParam("limit", "-8").queryParam("device-type", deviceType).queryParam("from", fromDateStr).path(BASE_URL).path("polaris").path("addressa").path("issue");
@@ -385,9 +389,10 @@ public class CciResourceIntegrationTest extends JerseyTest{
         responseString= ws.accept(MediaType.APPLICATION_ATOM_XML).get(String.class);
         assertNotNull(responseString);
 
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry", responseString);
+        xpathUtils = new XpathUtils(responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/entry");
         assertEquals("number of entry for problematic start and limit: ", 0, nodeList.getLength());
-        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link", responseString);
+        nodeList = (NodeList) xpathUtils.getNodeListFromHtml("feed/link");
         assertEquals("number f links for start = 40 exceeding total number of files: ", 2, nodeList.getLength());
 
         /*TODO: here integration test is done properly but commented as "If-Modified-Since" header is checked against

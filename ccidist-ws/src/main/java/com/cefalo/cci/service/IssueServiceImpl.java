@@ -7,7 +7,6 @@ import com.cefalo.cci.model.MetaData;
 import com.cefalo.cci.model.Organization;
 import com.cefalo.cci.model.Publication;
 import com.cefalo.cci.storage.CacheStorage;
-import com.cefalo.cci.enums.MetaDataInfo;
 import com.cefalo.cci.utils.Utils;
 import com.cefalo.cci.utils.XpathUtils;
 import com.google.common.base.Splitter;
@@ -273,17 +272,17 @@ public class IssueServiceImpl implements IssueService {
         MetaData metaData = parseMetaData(fileLoc, fileName);
 
         if (!organizationId.equals(metaData.getCreator())) {
-            throw new IllegalArgumentException("Creator is empty");
+            throw new IllegalArgumentException("Organization id does not match with Creator metadata");
         }
         if (!publicationId.equals(metaData.getTitle())) {
-            throw new IllegalArgumentException("Title is empty");
+            throw new IllegalArgumentException("Title id does not match with Tile metadata");
         }
         if (Utils.isBlank(metaData.getDevice()) || !Utils.areSetsEquals(deviceSet, Sets.newHashSet(Splitter.on(" , ").split(metaData.getDevice())))) {
-            throw new IllegalArgumentException("Device is Null or device not found");
+            throw new IllegalArgumentException("Device(s) id does not match with Device metadata");
         }
 
         if (Utils.isBlank(metaData.getIssue())) {
-            throw new IllegalArgumentException("Issue name is empty");
+            throw new IllegalArgumentException("Issue metadata is empty");
         }
 
         try {
@@ -293,7 +292,7 @@ public class IssueServiceImpl implements IssueService {
                 metaData.setDate(Utils.convertDateWithTZ(new Date()));
             }
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid date format");
+            throw new IllegalArgumentException("Date metadata is in invalid format. Valid format is yyyy-MM-dd");
         }
         issueDao.saveIssue(publicationId, metaData.getIssue(), metaData.getDate(), deviceSet, epubId);
     }
@@ -305,8 +304,7 @@ public class IssueServiceImpl implements IssueService {
             String content = Utils.getExtractedContent(fileLoc, "META-INF/container.xml");
             node = extractedContentNode("container/rootfiles/rootfile/@full-path", content);
             content = Utils.getExtractedContent(fileLoc, node.getTextContent());
-            node = extractedContentNode("package/metadata", content);
-            metaData = createMetaDateObject(node);
+            metaData = createMetaDateObject(content);
 
         } catch (IllegalArgumentException e) {
             throw e;
@@ -318,38 +316,25 @@ public class IssueServiceImpl implements IssueService {
     }
 
     public Node extractedContentNode(String pattern, String content) throws IllegalArgumentException {
-        XpathUtils xpathUtils = new XpathUtils();
-        NodeList nodeList = xpathUtils.getNodeListFromHtml(pattern, content);
+        XpathUtils xpathUtils = new XpathUtils(content);
+        NodeList nodeList = xpathUtils.getNodeListFromHtml(pattern);
         if (nodeList == null) {
             throw new IllegalArgumentException("Can not extract epub file");
         }
         return nodeList.item(0);
     }
 
-    public MetaData createMetaDateObject(Node node) throws IllegalArgumentException {
-        if (!node.hasChildNodes()) {
-            throw new IllegalArgumentException("MetaData is empty");
-        }
-        NodeList nodeList = node.getChildNodes();
+    public MetaData createMetaDateObject(String content) throws IllegalArgumentException {
+        XpathUtils xpathUtils = new XpathUtils(content);
         MetaData metaData = new MetaData();
-        for (int i= 0; i < nodeList.getLength(); i++) {
-             Node n = nodeList.item(i);
-            if (MetaDataInfo.DC_CREATOR.getValue().equals(n.getNodeName())) {
-                metaData.setCreator(n.getTextContent());
-            } else if (MetaDataInfo.DC_DATE.getValue().equals(n.getNodeName())) {
-                metaData.setDateStr(n.getTextContent());
-            } else if (MetaDataInfo.DC_DEVICE.getValue().equals(n.getNodeName())) {
-                metaData.setDevice(n.getTextContent());
-            } else if (MetaDataInfo.DC_IDENTIFIER.getValue().equals(n.getNodeName())) {
-                metaData.setIdentifier(n.getTextContent());
-            } else if (MetaDataInfo.DC_ISSUE.getValue().equals(n.getNodeName())) {
-                metaData.setIssue(n.getTextContent());
-            } else if (MetaDataInfo.DC_LANGUAGE.getValue().equals(n.getNodeName())) {
-                metaData.setLanguage(n.getTextContent());
-            } else if (MetaDataInfo.DC_TITLE.getValue().equals(n.getNodeName())) {
-                metaData.setTitle(n.getTextContent());
-            }
-        }
+
+        metaData.setCreator(xpathUtils.parseNodeValue("package/metadata/creator"));
+        metaData.setTitle(xpathUtils.parseNodeValue("package/metadata/title"));
+        metaData.setDateStr(xpathUtils.parseNodeValue("package/metadata/date"));
+        metaData.setIdentifier(xpathUtils.parseNodeValue("package/metadata/identifier"));
+        metaData.setLanguage(xpathUtils.parseNodeValue("package/metadata/language"));
+        metaData.setDevice(xpathUtils.parseNodeValue("package/metadata/meta[@property='cci:device']"));
+        metaData.setIssue(xpathUtils.parseNodeValue("package/metadata/meta[@property='cci:issue']"));
         return metaData;
     }
 }

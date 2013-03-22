@@ -18,8 +18,6 @@ import static junit.framework.Assert.*;
 @RunWith(GuiceJUnitRunner.class)
 @GuiceJUnitRunner.GuiceModules({ServicesTestModule.class })
 public class CciServiceUnitTest {
-    @Inject
-    private XpathUtils xpathUtils;
 
     @Test
     public void getAllFileNamesInDirectoryTest() {

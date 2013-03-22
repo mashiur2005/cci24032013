@@ -303,9 +303,9 @@ public class IssueResource {
         } catch (NotFoundException ex) {
             throw ex;
         } catch (IllegalArgumentException ex) {
-              throw new WebApplicationException(ex.getCause(), Status.BAD_REQUEST);
+            return Responses.clientError().entity(ex.getMessage()).build();
         } catch (IOException ex) {
-            throw new WebApplicationException(ex.getCause(), Status.BAD_REQUEST);
+            throw new RuntimeException();
         } finally {
             Closeables.close(uploadedInputStream, true);
         }

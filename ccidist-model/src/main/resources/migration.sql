@@ -1,5 +1,6 @@
 /*DDL*/
 create database cciservice;
+use cciservice;
 
 create table organization(
 id varchar(255) not null,

@@ -114,7 +114,7 @@ public class CacheStorage implements Storage {
         } finally {
             Closeables.close(data, false);
             if (oldFile != null) {
-              //  logger.info(String.format("files deleted : %s", oldFile.delete()));
+                logger.info(String.format("files deleted : %s", oldFile.delete()));
             }
         }
     }
