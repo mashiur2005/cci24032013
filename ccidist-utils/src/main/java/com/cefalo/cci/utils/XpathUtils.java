@@ -61,12 +61,11 @@ public class XpathUtils {
         return nodeList;
     }
 
-    public String parseNodeValue(String pattern) {
+    public String parseSingleNodeValue(String pattern) {
         NodeList nodeList = getNodeListFromHtml(pattern);
 
-        if (nodeList != null) {
-            Node node = nodeList.item(0);
-            return node.getTextContent();
+        if (nodeList != null && nodeList.item(0) != null) {
+            return nodeList.item(0).getTextContent();
         }
         return "";
     }

@@ -328,13 +328,13 @@ public class IssueServiceImpl implements IssueService {
         XpathUtils xpathUtils = new XpathUtils(content);
         MetaData metaData = new MetaData();
 
-        metaData.setCreator(xpathUtils.parseNodeValue("package/metadata/creator"));
-        metaData.setTitle(xpathUtils.parseNodeValue("package/metadata/title"));
-        metaData.setDateStr(xpathUtils.parseNodeValue("package/metadata/date"));
-        metaData.setIdentifier(xpathUtils.parseNodeValue("package/metadata/identifier"));
-        metaData.setLanguage(xpathUtils.parseNodeValue("package/metadata/language"));
-        metaData.setDevice(xpathUtils.parseNodeValue("package/metadata/meta[@property='cci:device']"));
-        metaData.setIssue(xpathUtils.parseNodeValue("package/metadata/meta[@property='cci:issue']"));
+        metaData.setCreator(xpathUtils.parseSingleNodeValue("package/metadata/creator"));
+        metaData.setTitle(xpathUtils.parseSingleNodeValue("package/metadata/title"));
+        metaData.setDateStr(xpathUtils.parseSingleNodeValue("package/metadata/date"));
+        metaData.setIdentifier(xpathUtils.parseSingleNodeValue("package/metadata/identifier"));
+        metaData.setLanguage(xpathUtils.parseSingleNodeValue("package/metadata/language"));
+        metaData.setDevice(xpathUtils.parseSingleNodeValue("package/metadata/meta[@property='cci:device']"));
+        metaData.setIssue(xpathUtils.parseSingleNodeValue("package/metadata/meta[@property='cci:issue']"));
         return metaData;
     }
 }
