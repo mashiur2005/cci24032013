@@ -91,6 +91,11 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+        </dependency>
+
         <!--Jersey Test Framework Starts-->
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>

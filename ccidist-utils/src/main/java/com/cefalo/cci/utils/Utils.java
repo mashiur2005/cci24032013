@@ -21,7 +21,7 @@ public class Utils {
     private final Logger logger = LoggerFactory.getLogger(Utils.class.getName());
 
     public static Map<String, List<String>> ORGANIZATION_DETAILS = new HashMap<String, List<String>>();
-    public static String HOME_DIR = System.getProperty("user.home");
+    public static String HOME_DIR = "E:/test";
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
     public static int CLEANING_INTERVAL = 30;
     public static String CACHE_DIR_NAME = "CachedStorage";
@@ -29,7 +29,7 @@ public class Utils {
     public static String TMP_DIR_NAME = "tmp";
     public static String CACHE_DIR_FULLPATH = HOME_DIR + FILE_SEPARATOR + CACHE_DIR_NAME + FILE_SEPARATOR;
     public static String CACHED_EPUBS_FULLPATH = CACHE_DIR_FULLPATH + CACHED_EPUBS_DIR_NAME + FILE_SEPARATOR;
-    public static String TMP_DIR_FULLPATH = CACHE_DIR_FULLPATH  + FILE_SEPARATOR + TMP_DIR_NAME + FILE_SEPARATOR;
+    public static String TMP_DIR_FULLPATH = CACHE_DIR_FULLPATH + TMP_DIR_NAME + FILE_SEPARATOR;
     public static String DEFAULT_TZ = "GMT";
     public static String DATE_FORMAT = "yyyy-MM-dd";
     public static  Map<Integer, String> FILE_STATUS_MAP = new HashMap<>(3);
